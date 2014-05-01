@@ -14,9 +14,9 @@
     <context:annotation-config />
     <context:component-scan base-package="com.toomanydrummers.controller" />
     
-    <!--
-    Another way to handle JSON
-    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+    
+    <!-- Another way to handle JSON -->
+<!--     <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
       <property name = "mediaTypes">
         <map>
           <entry key="json" value="application/json"/>
@@ -41,9 +41,28 @@
         <property name="supportedMediaTypes" value="application/json"/>
     </bean>
     
+    <bean class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping"/>
+    
+    <bean id="urlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+    	<property name="mappings">
+    		<props>
+    			<prop key="index.htm">indexController</prop>
+    		</props>
+    	</property>
+    </bean>
+    
+    <!-- <bean name="roomController" class="com.toomanydrummers.controller.RoomController"/> -->
+    
+    <bean name="indexController" 
+    	class="org.springframework.web.servlet.mvc.ParameterizableViewController"
+    	p:viewName="index"/>
+    	
     <bean id="viewResolver"
           class="org.springframework.web.servlet.view.InternalResourceViewResolver"
           p:prefix="/WEB-INF/jsp/"
           p:suffix=".jsp" />
+          
+    <mvc:resources mapping="/resources/**" location="/resources/" />
+	<mvc:annotation-driven />
     
 </beans>

@@ -1,6 +1,6 @@
 package com.toomanydrummers.dao;
 
-import com.toomanydrummers.bean.User;
+import com.toomanydrummers.bean.Userr;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,12 +13,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class UserDAO {
 
-    List<User> users = new ArrayList<User>();
+    List<Userr> users = new ArrayList<Userr>();
 
     public UserDAO() {
         System.out.println("*** UserDAO instantiated");
         
-        User user1 = new User();
+        Userr user1 = new Userr();
         user1.setName("John");
         user1.setId(1);
         user1.setAge(21);
@@ -29,7 +29,7 @@ public class UserDAO {
         user1.setHobbies(hobbies);
         users.add(user1);
 
-        User user2 = new User();
+        Userr user2 = new Userr();
         user2.setName("Jack");
         user2.setId(2);
         user2.setAge(22);
@@ -39,7 +39,7 @@ public class UserDAO {
         user2.setHobbies(hobbies2);
         users.add(user2);
 
-        User user3 = new User();
+        Userr user3 = new Userr();
         user3.setName("Helen");
         user3.setId(3);
         user3.setAge(20);
@@ -52,7 +52,7 @@ public class UserDAO {
         users.add(user3);
     }
 
-    public User getUser(int id) {
+    public Userr getUser(int id) {
         if (id >= 0 && id < users.size()) {
             return users.get(id);
         } else {
@@ -60,7 +60,7 @@ public class UserDAO {
         }
     }
 
-    public List<User> getUsers() {
+    public List<Userr> getUsers() {
         return users;
     }
 }

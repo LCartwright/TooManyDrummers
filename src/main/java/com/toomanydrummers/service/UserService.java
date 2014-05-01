@@ -1,7 +1,7 @@
 
 package com.toomanydrummers.service;
 
-import com.toomanydrummers.bean.User;
+import com.toomanydrummers.bean.Userr;
 import com.toomanydrummers.dao.UserDAO;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,16 +25,16 @@ public class UserService {
         return "Hello " + name + "!";
     }
     
-    public User getUser(int id) {
+    public Userr getUser(int id) {
         if (id < 0) {
             return null;
         }
-        User user = userDAO.getUser(id);
+        Userr user = userDAO.getUser(id);
         return user;
     }
     
-    public List<User> getUsers() {
-        List<User> users = userDAO.getUsers();
+    public List<Userr> getUsers() {
+        List<Userr> users = userDAO.getUsers();
         return users;
     }
 }
