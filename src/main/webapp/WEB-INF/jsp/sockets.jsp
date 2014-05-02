@@ -3,6 +3,9 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<!-- TODO: Link up a stylesheet -->
+
 <script
 	src="${pageContext.request.contextPath}/resources/js/jquery-2.1.0.js"></script>
 <script
@@ -31,6 +34,9 @@
 	</noscript>
 
 	<h1>TooManyDrummers</h1>
+
+	<!-- Div for connect, disconnect and username fields. TODO: Make pretty -->
+	<!-- TODO: Automate connection, TODO: filter bad usernames, TODO: clear the hint in the enterUsername element. -->
 	<div>
 		<button id="connect" onclick="connect();">Connect</button>
 		<button id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
@@ -40,7 +46,10 @@
 		<p id="connectedUsers"></p>
 	</div>
 
+	<!-- This div presents the main functionality of the application -->
 	<div id="drumkit">
+	
+		<!-- The library of sound files to play for each drum. Hopefully all autoloaded. -->
 		<audio id="basssound"
 			src="${pageContext.request.contextPath}/resources/sounds/bass.wav"
 			preload="auto"></audio>
@@ -51,10 +60,12 @@
 			src="${pageContext.request.contextPath}/resources/sounds/snare.wav"
 			preload="auto"></audio>
 
+		<!-- The drumkit to play on! TODO: Sort out scaling -->
 		<img
 			src="${pageContext.request.contextPath}/resources/images/drums.png"
 			alt="drums" usemap="#drumsmap" />
 
+		<!-- Maps different parts of the image so different drums can make different sounds. -->
 		<map name="drumsmap">
 			<area shape="circle" coords="150,150,150" alt="Bass"
 				href="javascript:hitBass()" />
@@ -64,6 +75,7 @@
 				href="javascript:hitSnare()" />
 		</map>
 
+		<!-- Holder for the cursors of other users. -->
 		<div id="drumsticks"></div>
 
 	</div>

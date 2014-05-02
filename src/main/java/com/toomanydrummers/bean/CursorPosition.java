@@ -15,11 +15,11 @@ public class CursorPosition {
 	private String id;
 	private int x;
 	private int y;
-	
+
 	public CursorPosition() {
-		
+
 	}
-	
+
 	public CursorPosition(String id, int x, int y) {
 		this.id = id;
 		this.x = x;
@@ -30,17 +30,17 @@ public class CursorPosition {
 		return id;
 	}
 
-	 public void setId(String id) {
-	 this.id = id;
-	 }
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public int getX() {
 		return x;
 	}
 
-	 public void setX(int x) {
-	 this.x = x;
-	 }
+	public void setX(int x) {
+		this.x = x;
+	}
 
 	public int getY() {
 		return y;
