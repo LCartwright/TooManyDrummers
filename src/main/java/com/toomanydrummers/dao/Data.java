@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.toomanydrummers.bean.FacebookUser;
+import com.toomanydrummers.bean.User;
 
 public final class Data {
 
@@ -45,9 +46,14 @@ public final class Data {
 	 * 
 	 * @return - List<User> allusers
 	 */
-	public static Collection<FacebookUser> getUsers()
+	public static List<User> getUsers()
 	{ 
-		return users.values();
+		List<User> result = new ArrayList<User>();
+		for (User user : users.values())
+		{
+			result.add(user);
+		}
+		return result;
 	}
 	
 	/**

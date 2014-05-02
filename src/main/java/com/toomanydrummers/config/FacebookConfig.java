@@ -21,21 +21,28 @@ import org.springframework.social.connect.web.ProviderSignInController;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 
-import com.toomanydrummers.service.SocialContext;
-import com.toomanydrummers.service.UserCookieGenerator;
+import com.toomanydrummers.service.FacebookCookieManager;
 
+/**
+ * Based on example from
+ * 'http://java.dzone.com/articles/getting-started-spring-social-0'
+ * 
+ * @author Henry Tesei
+ *
+ */
 @Configuration
-public class FacebookConfig implements InitializingBean {
+public class FacebookConfig implements InitializingBean
+{
 
 	private static final Logger logger = LoggerFactory.getLogger(FacebookConfig.class);
-	
-//	private static final String appId = "1417475415186556"; //Henry
-//	private static final String appSecret = "b5acd3061b80a889a0536c5e32d65923"; //Henry
 
-	private static final String appId = "1483054771924097"; //Laurence
-	private static final String appSecret = "d22acf6e69ec2ab8000a4c7a1377726b"; //Laurence
+	// private static final String appId = "1417475415186556"; //Henry
+	// private static final String appSecret = "b5acd3061b80a889a0536c5e32d65923"; //Henry
 
-	private SocialContext socialContext;
+	private static final String appId = "1483054771924097"; // Laurence
+	private static final String appSecret = "d22acf6e69ec2ab8000a4c7a1377726b"; // Laurence
+
+	private FacebookCookieManager facebookCookieManager;
 
 	private UsersConnectionRepository usersConnectionRepositiory;
 
@@ -49,14 +56,14 @@ public class FacebookConfig implements InitializingBean {
 	 * @Bean(name="myBean")
 	 */
 	@Bean
-	public SocialContext socialContext() {
-
-		return socialContext;
+	public FacebookCookieManager facebookCookieManager()
+	{
+		return facebookCookieManager;
 	}
 
 	@Bean
-	public ConnectionFactoryLocator connectionFactoryLocator() {
-
+	public ConnectionFactoryLocator connectionFactoryLocator()
+	{
 		logger.info("getting connectionFactoryLocator");
 		ConnectionFactoryRegistry registry = new ConnectionFactoryRegistry();
 		registry.addConnectionFactory(new FacebookConnectionFactory(appId, appSecret));
@@ -68,8 +75,8 @@ public class FacebookConfig implements InitializingBean {
 	 * users.
 	 */
 	@Bean
-	public UsersConnectionRepository usersConnectionRepository() {
-
+	public UsersConnectionRepository usersConnectionRepository()
+	{
 		return usersConnectionRepositiory;
 	}
 
@@ -79,8 +86,9 @@ public class FacebookConfig implements InitializingBean {
 	 */
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.INTERFACES)
-	public ConnectionRepository connectionRepository() {
-		String userId = socialContext.getUserId();
+	public ConnectionRepository connectionRepository()
+	{
+		String userId = facebookCookieManager.getUserId();
 		logger.info("Createing ConnectionRepository for user: " + userId);
 		return usersConnectionRepository().createConnectionRepository(userId);
 	}
@@ -94,7 +102,8 @@ public class FacebookConfig implements InitializingBean {
 	 */
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.INTERFACES)
-	public Facebook facebook() {
+	public Facebook facebook()
+	{
 		return connectionRepository().getPrimaryConnection(Facebook.class).getApi();
 	}
 
@@ -103,21 +112,22 @@ public class FacebookConfig implements InitializingBean {
 	 * tell it to redirect back to /posts once sign in has completed
 	 */
 	@Bean
-	public ProviderSignInController providerSignInController() {
-		ProviderSignInController providerSigninController = new ProviderSignInController(connectionFactoryLocator(), usersConnectionRepository(), socialContext);
+	public ProviderSignInController providerSignInController()
+	{
+		ProviderSignInController providerSigninController = new ProviderSignInController(connectionFactoryLocator(), usersConnectionRepository(), facebookCookieManager);
 		logger.info(" providerSignInController ");
 		providerSigninController.setPostSignInUrl("/details");
 		return providerSigninController;
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
-
+	public void afterPropertiesSet() throws Exception
+	{
 		JdbcUsersConnectionRepository usersConnectionRepositiory = new JdbcUsersConnectionRepository(dataSource, connectionFactoryLocator(), Encryptors.noOpText());
 
-		socialContext = new SocialContext(usersConnectionRepositiory, new UserCookieGenerator(), facebook());
+		facebookCookieManager = new FacebookCookieManager(usersConnectionRepositiory);
 
-		usersConnectionRepositiory.setConnectionSignUp(socialContext);
+		usersConnectionRepositiory.setConnectionSignUp(facebookCookieManager);
 		this.usersConnectionRepositiory = usersConnectionRepositiory;
 	}
 }
