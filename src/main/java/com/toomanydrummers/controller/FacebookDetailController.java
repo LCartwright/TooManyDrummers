@@ -1,3 +1,6 @@
+/**
+ * Copyright 2012 Marin Solutions
+ */
 package com.toomanydrummers.controller;
 
 import java.util.List;
