@@ -46,10 +46,10 @@ public final class Data {
 	 * 
 	 * @return - List<User> allusers
 	 */
-	public static List<User> getUsers()
+	public static List<FacebookUser> getUsers()
 	{ 
-		List<User> result = new ArrayList<User>();
-		for (User user : users.values())
+		List<FacebookUser> result = new ArrayList<FacebookUser>();
+		for (FacebookUser user : users.values())
 		{
 			result.add(user);
 		}

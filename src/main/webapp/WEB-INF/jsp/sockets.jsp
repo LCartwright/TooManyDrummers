@@ -4,11 +4,11 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <script
-	src="${pageContext.request.contextPath}/resources/js/lib/jquery-2.1.0.js"></script>
+	src="${pageContext.request.contextPath}/resources/js/jquery-2.1.0.js"></script>
 <script
-	src="${pageContext.request.contextPath}/resources/js/lib/sockjs-0.3.4.js"></script>
+	src="${pageContext.request.contextPath}/resources/js/sockjs-0.3.4.js"></script>
 <script
-	src="${pageContext.request.contextPath}/resources/js/lib/stomp.js"></script>
+	src="${pageContext.request.contextPath}/resources/js/stomp.js"></script>
 
 <script type="text/javascript">
 	// Necessary for websocket communication with the server.

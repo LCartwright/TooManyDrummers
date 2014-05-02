@@ -41,6 +41,8 @@ public class User
 
 	public void setX(int x) {
 		this.x = x;
+	}
+	
 	public String getFirstName()
 	{
 		return firstName;
@@ -59,11 +61,6 @@ public class User
 	public int getX()
 	{
 		return x;
-	}
-
-	public void setX(int x)
-	{
-		this.x = x;
 	}
 
 	public int getY()
