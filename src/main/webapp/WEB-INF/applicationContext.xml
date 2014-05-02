@@ -8,8 +8,12 @@
        http://www.springframework.org/schema/context/spring-context-3.0.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
     
-    <context:annotation-config />
-    <context:component-scan base-package="com.toomanydrummers.service, com.toomanydrummers.dao" />
+<!--     <context:annotation-config /> -->
+<!--     <context:component-scan base-package="com.toomanydrummers" /> -->
+<!--     <context:component-scan base-package="com.toomanydrummers.service, com.toomanydrummers.dao" />
     <context:component-scan base-package="com.toomanydrummers.config" />
+    <context:component-scan base-package="com.toomanydrummers" /> -->
+    <import resource="data.xml" />
+    <context:component-scan base-package="com.toomanydrummers" />
     
 </beans>

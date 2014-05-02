@@ -11,9 +11,17 @@
        http://www.springframework.org/schema/mvc
        http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
 
+    
+
+<!--     <import resource="data.xml" />
+     -->
     <context:annotation-config />
-    <context:component-scan base-package="com.toomanydrummers.controller" />
+    <context:component-scan base-package="com.toomanydrummers" />
+    
+    
+<!--     <context:component-scan base-package="com.toomanydrummers.controller" />
     <context:component-scan base-package="com.toomanydrummers.config" />
+	<context:component-scan base-package="com.toomanydrummers" /> -->
     
     
     <!-- Another way to handle JSON -->
@@ -49,6 +57,8 @@
     		<props>
     			<prop key="index.htm">indexController</prop>
     			<prop key="sockets.htm">socketsController</prop>
+    			<prop key="home.htm">homeController</prop>
+    			<prop key="showDetails.htm">showDetailsController</prop>
     		</props>
     	</property>
     </bean>
@@ -63,6 +73,14 @@
     	class="org.springframework.web.servlet.mvc.ParameterizableViewController"
     	p:viewName="sockets"/>
     	
+   <bean name="homeController" 
+    	class="org.springframework.web.servlet.mvc.ParameterizableViewController"
+    	p:viewName="home"/>
+    	
+    <bean name="showDetailsController" 
+    	class="org.springframework.web.servlet.mvc.ParameterizableViewController"
+    	p:viewName="showDetails"/>
+    	
     <bean id="viewResolver"
           class="org.springframework.web.servlet.view.InternalResourceViewResolver"
           p:prefix="/WEB-INF/jsp/"
@@ -73,5 +91,7 @@
 	<mvc:annotation-driven>
 		<mvc:async-support default-timeout="3000" />
 	</mvc:annotation-driven>
+	
+	
     
 </beans>
