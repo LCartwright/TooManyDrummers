@@ -12,7 +12,7 @@
 	<h3>Facebook Details</h3>
 	<ul>
 		<c:forEach items="${details}" var="detail">
-			<li><img src="http://graph.facebook.com/<c:out value="${detail.id}"/>/picture" align="middle"/> <c:out value="${detail.first_name}"/><br/> <c:out value="${detail.last_name}"/><br/>
+			<li><img src="http://graph.facebook.com/<c:out value="${detail.getId()}"/>/picture" align="middle"/> <c:out value="${detail.getFirstName()}"/><br/> <c:out value="${detail.getLastName()}"/><br/>
 			<hr />
 			</li>
 		</c:forEach>
