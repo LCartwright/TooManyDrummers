@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.toomanydrummers.dao.Data;
-import com.toomanydrummers.bean.User;
+import com.toomanydrummers.bean.FacebookUser;
 import com.toomanydrummers.service.SocialContext;
 
 /**
@@ -52,7 +52,7 @@ public class FacebookDetailController {
 
 		if (socialContext.isSignedIn(request, response)) {
 
-			List<User> details = retrieveDetails();
+			List<FacebookUser> details = retrieveDetails();
 			model.addAttribute("details", details);
 			nextView = "show-details";
 		} else {
@@ -62,15 +62,15 @@ public class FacebookDetailController {
 		return nextView;
 	}
 
-	private List<User> retrieveDetails() {
+	private List<FacebookUser> retrieveDetails() {
 		Connection<Facebook> connection = connectionRepository.findPrimaryConnection(Facebook.class);
 		FacebookProfile fbp = connection.getApi().userOperations().getUserProfile();
 		
 		logger.info("adding: " + fbp.getFirstName() + " " + fbp.getLastName() + " - " + fbp.getId());
-		Data.addUser(new User(fbp.getFirstName(), fbp.getLastName(), fbp.getId()));	
+		Data.addUser(new FacebookUser(fbp.getFirstName(), fbp.getLastName(), fbp.getId()));	
 		
-		List<User> result = new ArrayList<User> ();
-		for(User user: Data.getUsers())
+		List<FacebookUser> result = new ArrayList<FacebookUser> ();
+		for(FacebookUser user: Data.getUsers())
 		{
 			result.add(user);
 		}

@@ -10,14 +10,17 @@ package com.toomanydrummers.bean;
  *
  * @author john
  */
-public class User {
+public class FacebookUser {
     
     private String id;
     private String firstName;
     private String lastName;
     
-    private int x;
-    private int y;
+    public FacebookUser(String id, String firstName, String lastName) {
+    	this.id = id;
+    	this.firstName = firstName;
+    	this.lastName = lastName;
+    }
     
     public String getId() {
         return id;
@@ -42,23 +45,5 @@ public class User {
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
-
-	public int getX() {
-		return x;
-	}
-
-	public void setX(int x) {
-		this.x = x;
-	}
-
-	public int getY() {
-		return y;
-	}
-
-	public void setY(int y) {
-		this.y = y;
-	}
-    
-    
     
 }

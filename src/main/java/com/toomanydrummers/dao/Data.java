@@ -6,12 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.toomanydrummers.bean.User;
+import com.toomanydrummers.bean.FacebookUser;
 
 public final class Data {
 
 	//List of all users details
-	private static Map<String,User> users = new HashMap<String,User>();
+	private static Map<String,FacebookUser> users = new HashMap<String,FacebookUser>();
 	private static final ThreadLocal<String> currentUser = new ThreadLocal<String>();
 	
 	/**
@@ -27,7 +27,7 @@ public final class Data {
 	 * 
 	 * @param user - user to add
 	 */
-	public static void addUser(User user)
+	public static void addUser(FacebookUser user)
 	{
 		if(!users.containsKey(user.getId()))
 		{
@@ -45,7 +45,7 @@ public final class Data {
 	 * 
 	 * @return - List<User> allusers
 	 */
-	public static Collection<User> getUsers()
+	public static Collection<FacebookUser> getUsers()
 	{ 
 		return users.values();
 	}
@@ -56,7 +56,7 @@ public final class Data {
 	 * @param id - id of user in list
 	 * @return - null or user object with specified id
 	 */
-	public static User getUser(String id)
+	public static FacebookUser getUser(String id)
 	{
 		return users.get(id);
 	}
