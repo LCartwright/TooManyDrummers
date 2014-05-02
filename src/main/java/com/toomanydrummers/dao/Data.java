@@ -45,9 +45,14 @@ public final class Data {
 	 * 
 	 * @return - List<User> allusers
 	 */
-	public static Collection<User> getUsers()
+	public static List<User> getUsers()
 	{ 
-		return users.values();
+		List<User> result = new ArrayList<User>();
+		for (User user : users.values())
+		{
+			result.add(user);
+		}
+		return result;
 	}
 	
 	/**
