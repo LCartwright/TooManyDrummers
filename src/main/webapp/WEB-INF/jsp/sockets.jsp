@@ -53,7 +53,7 @@
 			stompClient = Stomp.over(socket);
 			stompClient.connect({}, function(frame) {
 				setConnected(true);
-				console.log('Connected: ' + frame);
+				//console.log('Connected: ' + frame);
 				stompClient.subscribe('/topic/hitreports', function(drumhit) {
 					play(JSON.parse(drumhit.body).name);
 				});
@@ -80,7 +80,7 @@
 
 	function disconnect() {
 
-		// TODO Rather than sending a message, it would be better to react to disconnections from the serverside
+		// TODO Rather than sending a message, it would be better to react to disconnections on the serverside
 		stompClient.send('/app/finished', {}, JSON.stringify({
 			'id' : myId,
 			'firstName' : null,
@@ -89,16 +89,8 @@
 
 		stompClient.disconnect();
 		setConnected(false);
-		console.log("Disconnected");
+		//console.log("Disconnected");
 	}
-
-	//function showGreeting(message) {
-	//	var response = document.getElementById('response');
-	//	var p = document.createElement('p');
-	//	p.style.wordWrap = 'break-word';
-	//	p.appendChild(document.createTextNode(message));
-	//	response.appendChild(p);
-	//}
 
 	function hitBass() {
 		stompClient.send("/app/hit", {}, JSON.stringify({
@@ -165,7 +157,7 @@
 				}
 
 				if (noDrumstick) {
-					
+
 					var newChild = document.createElement("img");
 					newChild
 							.setAttribute("src",
@@ -176,7 +168,6 @@
 
 					// Hmmmmmmm
 					newChild.setAttribute("style", "position:absolute;");
-					
 
 					document.getElementById('drumsticks').appendChild(newChild);
 				}
@@ -204,10 +195,14 @@
 
 			// Find their drumstick
 			for (var j = 0; j < jMax; j++) {
-				
+
 				// If we've landed on the right drumstick
 				if (drumsticks[j].getAttribute("id") == currentId) {
-					
+
+					//$("#" + drumsticks[j].getAttribute("id")).animate({
+					//	left : "'" + positions[i].x + "px'",
+					//	top : "'" + positions[i].y + "px'"
+					//});
 					drumsticks[j].style.left = positions[i].x + 'px';
 					drumsticks[j].style.top = positions[i].y + 'px';
 
@@ -226,8 +221,8 @@
 
 		setConnected(false);
 
-		window.onmousemove = handleMouseMove/* () */;
-		setInterval(sendMousePosition/* () */, 300);
+		window.onmousemove = handleMouseMove;
+		setInterval(sendMousePosition, 100);
 		setInterval(cleanDeadDrumsticks, 10000);
 
 		function handleMouseMove(event) {

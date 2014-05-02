@@ -14,8 +14,7 @@ import com.toomanydrummers.service.UsersService;
 @Controller
 public class HitController {
 
-	// TODO: Make interval shorter
-	private static final int REFRESH_RATE_MILLIS = 300;
+	private static final int REFRESH_RATE_MILLIS = 100;
 	private volatile boolean keepLooping = true;
 
 	@Autowired
