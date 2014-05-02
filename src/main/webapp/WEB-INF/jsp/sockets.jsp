@@ -11,13 +11,24 @@
 	src="${pageContext.request.contextPath}/resources/js/lib/stomp.js"></script>
 
 <script type="text/javascript">
+	// Necessary for websocket communication with the server.
 	var stompClient = null;
+	// To relieve some load from the server, we retain a copy of this client's id and
+	// filter it out on this end. This must be unique or we may wrongly ignore another
+	// user's information.
 	var myId = null;
-
+	// An array of identifiers for all users connected to the service.
 	var ids = new Array();
 
-	// Reference!
-	var channel_max = 5;
+	// Modified version of the code available at this address:
+	// http://www.storiesinflight.com/html5/audio.html
+	// Updated: October 31, 2010
+	// Implementation of Rotating Audio Channels
+	// If a request is made for an audio element to play a file while
+	// already playing one, the request will be dropped.
+	// This array contains channel_max audio channels and the earliest
+	// 'free' channel is used to handle a sound request.
+	var channel_max = 10; // Decrease if there's a noticeable performance hit.
 	var audiochannels = new Array();
 	for (var a = 0; a < channel_max; a++) {
 		audiochannels[a] = new Array();
@@ -25,20 +36,31 @@
 		audiochannels[a]['finished'] = -1;
 	}
 
+	// A holder for the x,y coordinates of this user's cursor so it can be relayed
+	// to the server every so often
 	var mousePos;
 
+	// Change the UI to better represent the options available to a connected/disconnected user.
 	function setConnected(connected) {
 
+		// Hide the enterUsername field once a connection is established.
+		// Changes wouldn't make a difference from this point on.
 		document.getElementById('enterUsername').style.visibility = connected ? 'hidden'
 				: 'visible';
+
+		// Show the list of connected users so the user can see who's online.
 		document.getElementById('connectedUsers').style.visibility = connected ? 'visible'
 				: 'hidden';
 
+		// A connected user can't connect if they're already connected!
 		document.getElementById('connect').disabled = connected;
+
+		// A disconnected user can't connect if they're already disconnected!
 		document.getElementById('disconnect').disabled = !connected;
-		document.getElementById('conversationDiv').style.visibility = connected ? 'visible'
+
+		// TODO: Continue commenting from this point...
+		document.getElementById('drumkit').style.visibility = connected ? 'visible'
 				: 'hidden';
-		document.getElementById('response').innerHTML = '';
 	}
 
 	function connect() {
@@ -114,7 +136,7 @@
 
 		var audio = message + 'sound';
 
-		// Reference!
+		// TODO Reference, see above
 		for (var a = 0; a < channel_max; a++) {
 			var thistime = new Date();
 
@@ -165,15 +187,15 @@
 					newChild.setAttribute("id", allIds[i]);
 					newChild.setAttribute("width", "80");
 					newChild.setAttribute("width", "50");
-
-					// Hmmmmmmm
 					newChild.setAttribute("style", "position:absolute;");
 
 					document.getElementById('drumsticks').appendChild(newChild);
 				}
 
 			}
+
 		}
+
 	}
 
 	// SLOOOW, find a more efficient way of doing this...
@@ -213,9 +235,8 @@
 			}
 
 		}
-	}
 
-	var mousePos;
+	}
 
 	window.onload = function() {
 
@@ -275,7 +296,9 @@
 
 	}
 </script>
-<title>SOCKETS</title>
+
+<title>TooManyDrummers</title>
+
 </head>
 <body>
 
@@ -285,24 +308,18 @@
 			enable Javascript and reload this page!</h2>
 	</noscript>
 
-	<h2>SOCKETS</h2>
+	<h2>TooManyDrummers</h2>
 	<div>
 		<button id="connect" onclick="connect();">Connect</button>
 		<button id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
+		<br />
+		<input id="enterUsername" type="text"
+			value="Please enter your username..." />
+			<!-- TODO: Check this for commas, both here and on the server. -->
+		<p id="connectedUsers"></p>
 	</div>
-	<input id="enterUsername" type="text"
-		value="Please enter your username..." />
-	<p id="connectedUsers"></p>
-	<div id="conversationDiv">
-		<!--
-                <label>What is your name?</label><input type="text" id="name" />
-                <button id="sendName" onclick="sendName();">Send</button>
-                
-                
-                <button id="drum_bass" onclick="hitBass()">Bass</button>
-                <button id="drum_tomtom" onclick="hitTomTom()">TomTom</button>
-                <button id="drum_snare" onclick="hitSnare()">Snare</button>
-                -->
+
+	<div id="drumkit">
 		<audio id="basssound"
 			src="${pageContext.request.contextPath}/resources/sounds/bass.wav"
 			preload="auto"></audio>
@@ -325,11 +342,11 @@
 			<area shape="circle" coords="750,150,150" alt="Snare"
 				href="javascript:hitSnare()" />
 		</map>
+		
+		<div id="drumsticks"></div>
 
-		<p id="response"></p>
 	</div>
-	<div id="drumsticks"></div>
-	</div>
+	
 </body>
 </html>
 
