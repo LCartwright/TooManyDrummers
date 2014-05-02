@@ -58,29 +58,24 @@
     			<prop key="index.htm">indexController</prop>
     			<prop key="sockets.htm">socketsController</prop>
     			<prop key="home.htm">homeController</prop>
-    			<prop key="showDetails.htm">showDetailsController</prop>
+    			<prop key="show-details.htm">showDetailsController</prop>
+    			<prop key="chat.htm">chatController</prop>
     		</props>
     	</property>
     </bean>
    
     <!-- <bean name="roomController" class="com.toomanydrummers.controller.RoomController"/> -->
     
-    <bean name="indexController" 
-    	class="org.springframework.web.servlet.mvc.ParameterizableViewController"
-    	p:viewName="index"/>
+    <bean name="indexController" class="org.springframework.web.servlet.mvc.ParameterizableViewController" p:viewName="index"/>
     	
-    <bean name="socketsController" 
-    	class="org.springframework.web.servlet.mvc.ParameterizableViewController"
-    	p:viewName="sockets"/>
+    <bean name="socketsController" class="org.springframework.web.servlet.mvc.ParameterizableViewController" p:viewName="sockets"/>
     	
-   <bean name="homeController" 
-    	class="org.springframework.web.servlet.mvc.ParameterizableViewController"
-    	p:viewName="home"/>
+   <bean name="homeController" class="org.springframework.web.servlet.mvc.ParameterizableViewController" p:viewName="home"/>
     	
-    <bean name="showDetailsController" 
-    	class="org.springframework.web.servlet.mvc.ParameterizableViewController"
-    	p:viewName="showDetails"/>
-    	
+    <bean name="showDetailsController" class="org.springframework.web.servlet.mvc.ParameterizableViewController" p:viewName="show-details"/>
+    
+    <bean name="chatController" class="org.springframework.web.servlet.mvc.ParameterizableViewController" p:viewName="chat"/>
+    
     <bean id="viewResolver"
           class="org.springframework.web.servlet.view.InternalResourceViewResolver"
           p:prefix="/WEB-INF/jsp/"
