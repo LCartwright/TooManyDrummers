@@ -29,6 +29,9 @@ var mouseDelay = 200;
 // How many milliseconds between each cleanup of dead drumsticks.
 var cleanupDelay = 10000;
 
+var cursorPositionRunner;
+var deadCursorRunner;
+
 var contextPath;
 
 var snare; // snare
@@ -99,7 +102,7 @@ function connect() {
 			// and join in!
 			// TODO:
 			stompClient.subscribe('/topic/hitreports', function(drumhit) {
-			play(JSON.parse(drumhit.body).name);
+				play(JSON.parse(drumhit.body).name);
 			});
 
 			// Subscribe for changes in the room's users so new users can join
@@ -121,19 +124,18 @@ function connect() {
 
 			// Subscribe for updates on the cursor positions of other users.
 			// TODO:
-//			 stompClient.subscribe('/topic/motion', function(cursorPositions)
-//			 {
-//			 moveDrumsticks(JSON.parse(cursorPositions.body));
-//			 });
+			stompClient.subscribe('/topic/motion', function(cursorPositions) {
+				moveDrumsticks(JSON.parse(cursorPositions.body));
+			});
 
 			// Listen for mouse movements
-//			window.onmousemove = handleMouseMove;
+			window.onmousemove = handleMouseMove;
 			// Fire off your location 5 times per second
 			// Increase this time for better performance
-//			setInterval(sendMousePosition, mouseDelay);
+			cursorPositionRunner = setInterval(sendMousePosition, mouseDelay);
 
 			// Clear dead users every 10 seconds.
-//			setInterval(cleanDeadDrumsticks, cleanupDelay);
+			deadCursorRunner = setInterval(cleanDeadDrumsticks, cleanupDelay);
 
 		});
 	}
@@ -153,9 +155,8 @@ function disconnect() {
 		'lastName' : null
 	}));
 
-	// TODO: Stop reporting cursor location
-	// clearInterval();
-	// clearInterval();
+	clearInterval(cursorPositionRunner);
+	clearInterval(deadCursorRunner);
 
 	// Cleanly disconnect and inform the user.
 	stompClient.disconnect();
@@ -164,51 +165,51 @@ function disconnect() {
 
 // //TODO: Play a sound!
 function play(message) {
-	
+
 	switch (message) {
-		
-	case "hato" : {
+
+	case "hato": {
 		hato.play();
 		hatc.stop();
 		break;
 	}
-	
-	case "hatc" : {
+
+	case "hatc": {
 		hatc.play();
 		hato.stop();
 		break;
 	}
-	
-	case "snare" : {
+
+	case "snare": {
 		snare.play();
 		break;
 	}
-	
-	case "kick" : {
+
+	case "kick": {
 		kick.play();
 		break;
 	}
-	
-	case "rtom" : {
+
+	case "rtom": {
 		rtom.play();
 		break;
 	}
-	
-	case "ftom" : {
+
+	case "ftom": {
 		ftom.play();
 		break;
 	}
-	
-	case "crash" : {
+
+	case "crash": {
 		crash.play();
 		break;
 	}
-	
-	case "ride" : {
+
+	case "ride": {
 		ride.play();
 		break;
 	}
-	
+
 	}
 
 	// This will (must) be the id of the appropriate <audio /> element
@@ -279,7 +280,7 @@ function refreshUsers(users) {
 
 				// Create a new image
 				var newChild = document.createElement("img");
-				
+
 				// Make it display the correct image
 				newChild.setAttribute("src", contextPath
 						+ "/resources/images/drumstick.png");
@@ -412,7 +413,7 @@ function initialize(contextPath) {
 	if (!createjs.Sound.initializeDefaultPlugins()) {
 		return;
 	}
-	
+
 	this.contextPath = contextPath;
 
 	var manifest = [
@@ -460,7 +461,7 @@ function initialize(contextPath) {
 	hatc = createjs.Sound.createInstance("hatc");
 	hato = createjs.Sound.createInstance("hato");
 
-	$('#hato').click(function() {
+	$('#hato').mousedown(function() {
 		stompClient.send("/app/hit", {}, JSON.stringify({
 			'name' : 'hato'
 		}));
@@ -468,7 +469,7 @@ function initialize(contextPath) {
 		// hatc.stop();
 	});
 
-	$('#hatc').click(function() {
+	$('#hatc').mousedown(function() {
 		stompClient.send("/app/hit", {}, JSON.stringify({
 			'name' : 'hatc'
 		}));
@@ -476,42 +477,42 @@ function initialize(contextPath) {
 		// hato.stop();
 	});
 
-	$('#snare').click(function() {
+	$('#snare').mousedown(function() {
 		stompClient.send("/app/hit", {}, JSON.stringify({
 			'name' : 'snare'
 		}));
 		// snare.play();
 	});
 
-	$('#kick').click(function() {
+	$('#kick').mousedown(function() {
 		stompClient.send("/app/hit", {}, JSON.stringify({
 			'name' : 'kick'
 		}));
 		// kick.play();
 	});
 
-	$('#rtom').click(function() {
+	$('#rtom').mousedown(function() {
 		stompClient.send("/app/hit", {}, JSON.stringify({
 			'name' : 'rtom'
 		}));
 		// rtom.play();
 	});
 
-	$('#ftom').click(function() {
+	$('#ftom').mousedown(function() {
 		stompClient.send("/app/hit", {}, JSON.stringify({
 			'name' : 'ftom'
 		}));
 		// ftom.play();
 	});
 
-	$('#crash').click(function() {
+	$('#crash').mousedown(function() {
 		stompClient.send("/app/hit", {}, JSON.stringify({
 			'name' : 'crash'
 		}));
 		// crash.play();
 	});
 
-	$('#ride').click(function() {
+	$('#ride').mousedown(function() {
 		stompClient.send("/app/hit", {}, JSON.stringify({
 			'name' : 'ride'
 		}));
