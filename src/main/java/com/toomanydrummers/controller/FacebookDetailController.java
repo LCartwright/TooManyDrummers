@@ -55,11 +55,10 @@ public class FacebookDetailController
 		if (facebookCookieManager.checkSignedIn(request, response))
 		{
 			addUser();
-			List<User> details = usersService.getUsers();
-			//Add the list of users so that they can be displayed on the jsp page
-			model.addAttribute("details", details);
-			nextView = "show-details";
-		//	nextView = "sockets";
+			Connection<Facebook> connection = connectionRepository.findPrimaryConnection(Facebook.class);
+			FacebookProfile fbp = connection.getApi().userOperations().getUserProfile();
+			model.addAttribute("myId", fbp.getId());
+			nextView = "sockets";
 		}
 		else
 		{

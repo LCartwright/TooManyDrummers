@@ -84,7 +84,8 @@ function connect() {
 	} else {
 
 		// TODO: As above, get this from another source.
-		myId = document.getElementById('enterUsername').value;
+		
+//		myId = document.getElementById('enterUsername').value;
 
 		// Create a socket which looks for the 'hit' endpoint.
 		var socket = new SockJS('./hit');
@@ -116,11 +117,7 @@ function connect() {
 			// TODO: Maybe we just need to send the ID and the server can pick
 			// up everything else.
 			// Let the Server know I've joined!
-			stompClient.send('/app/newuser', {}, JSON.stringify({
-				'id' : myId,
-				'firstName' : myId,
-				'lastName' : myId
-			}));
+			stompClient.send('/app/newuser', {}, null);
 
 			// Subscribe for updates on the cursor positions of other users.
 			// TODO:
@@ -149,11 +146,7 @@ function disconnect() {
 
 	// TODO Rather than sending a message, it would be much better to react to
 	// disconnections on the serverside...
-	stompClient.send('/app/finished', {}, JSON.stringify({
-		'id' : myId,
-		'firstName' : null,
-		'lastName' : null
-	}));
+	stompClient.send('/app/finished', {}, myId);
 
 	clearInterval(cursorPositionRunner);
 	clearInterval(deadCursorRunner);
@@ -356,8 +349,8 @@ function handleMouseMove(event) {
 
 	// Update mousePos
 	mousePos = {
-		y : event.clientY,
-		x : event.clientX
+		x : event.clientX,
+		y : event.clientY
 	};
 
 	// }
@@ -407,7 +400,7 @@ function cleanDeadDrumsticks() {
 }
 
 // Stuff to do as soon as everything has loaded
-function initialize(contextPath) {
+function initialize(contextPath, myId) {
 
 	// if initializeDefaultPlugins returns false, we cannot play sound
 	if (!createjs.Sound.initializeDefaultPlugins()) {
@@ -415,7 +408,9 @@ function initialize(contextPath) {
 	}
 
 	this.contextPath = contextPath;
-
+	
+	this.myId = myId;
+	
 	var manifest = [
 			{
 				id : "snare",
@@ -521,6 +516,8 @@ function initialize(contextPath) {
 
 	// Make sure the user is not initially connected
 	setConnected(false);
+	
+	connect();
 
 	// Modified version of the code available at this address:
 	// http://www.storiesinflight.com/html5/audio.html

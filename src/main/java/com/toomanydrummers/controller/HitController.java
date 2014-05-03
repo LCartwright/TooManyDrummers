@@ -72,8 +72,7 @@ public class HitController {
 	 */
 	@MessageMapping("/newuser")
 	@SendTo("/topic/allusers")
-	public String newUser(User user) throws Exception {
-		usersService.addUser(user);
+	public String newUser() throws Exception {
 		return usersService.itemizeIDs();
 	}
 
@@ -89,8 +88,8 @@ public class HitController {
 	 */
 	@MessageMapping("/finished")
 	@SendTo("/topic/allusers")
-	public String removeUser(User user) throws Exception {
-		usersService.removeUser(user.getId());
+	public String removeUser(String id) throws Exception {
+		usersService.removeUser(id);
 		return usersService.itemizeIDs();
 	}
 

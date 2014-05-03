@@ -32,7 +32,7 @@
 
 	$(window).load(function() {
 
-		initialize("${pageContext.request.contextPath}");
+		initialize("${pageContext.request.contextPath}","${myId}");
 
 		document.getElementById("drumkit").ondragstart = function() {
 			return false;

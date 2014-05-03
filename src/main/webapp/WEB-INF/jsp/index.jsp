@@ -50,7 +50,7 @@
 					<li class="active">
 					<li><a href="${pageContext.request.contextPath}/chat.htm">CHAT</a></li>
 					<li><a href="${pageContext.request.contextPath}/home.htm">FACEBOOK</a></li>
-					<li><a href="${pageContext.request.contextPath}/sockets.htm">WEB SOCKETS</a></li>
+					<%-- <li><a href="${pageContext.request.contextPath}/sockets.htm">WEB SOCKETS</a></li> --%>
 				</ul>
 			</div>
 			<!--/.nav-collapse -->

@@ -25,7 +25,7 @@ import com.toomanydrummers.bean.User;
 public class UsersService
 {
 
-	private static Map<String, User> users = new HashMap<String, User>();
+	private final Map<String, User> users = new HashMap<String, User>();
 	// private final ArrayList<User> users = new ArrayList<User>();
 	private final ArrayList<CursorPosition> cursorPositions = new ArrayList<CursorPosition>();
 	private final ReentrantLock usersLock = new ReentrantLock();
