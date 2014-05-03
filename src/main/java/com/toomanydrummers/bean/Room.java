@@ -9,15 +9,16 @@ public class Room {
 	
 	private static AtomicInteger counter = new AtomicInteger(0);
     private final String name;
-    private final int roomId;
+    private final String roomId;
     private List<Message> messageList = new ArrayList<Message>();
     
     public Room(String name) {
     	this.name = name;
-    	this.roomId = Room.counter.incrementAndGet();
+    	this.roomId = String.valueOf(Room.counter.incrementAndGet()) ;
+    	System.out.println("ROOM MADE" + name);
     }
     
-    public int getRoomId(){
+    public String getRoomID(){
     	return this.roomId;
     }
     

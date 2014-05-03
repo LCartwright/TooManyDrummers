@@ -16,16 +16,73 @@ var currentUserLastName;
 var currentUserFullName;
 var currentUserPictureURL;
 
-function joinRoom(roomId, roomName) {
+var room_id_list = [];
+
+function joinRoom(room_id) {
 	currentRoomId = roomId;
-	currentRoomName = roomName;
 	currentRoomLastMessageId = -1;
+	var getRoomURI = roomsURI + "/" + room_id
+	var getting = $.get(getRoomURI);
 	
 	$('#current-room-name').text(currentRoomName);
+	
+	getting.done(function(data) {
+		var room = JSON.parse(data);
+	});
+	
 	//window.setInterval(fetchMessages(), 100);
 	setInterval(function() {
 		fetchMessages();
 	}, 100);
+}
+
+function changeToRoom(room){
+	//{"name":"default","roomID":1,"messages":[]}
+	name = room.name;
+	room_id = room.roomID;
+	messages = room.messages;
+	
+	//switch the tabs
+}
+
+function updateRooms(){
+	var getting = $.get(roomsURI);
+	
+	getting.done(function(data) {
+		var rooms = JSON.parse(JSON.stringify(data));
+		//[{"name":"default","roomID":1,"messages":[]}]
+		//alert(JSON.stringify(data));
+		//Check if room id is in room ID list
+		var new_room_id_list = []; //used to add new elements to switch too
+		for(var i = 0; i < rooms.length; i++){
+			
+			console.log(rooms[i].roomID);
+			
+			$.inArray(rooms[i].roomID, room_id_list);
+			if(!(true)){
+				console.log("test passed");
+				room_id_list.push(room[i].roomID); //add to global list
+				new_room_id_list.push(room[i].roomID); //add to local list
+				$("#chat-rooms-list").append(createRoomElement(room)); //add to screen
+			}
+		}
+		
+		
+	});
+}
+
+function createRoomElement(room){
+	//<li class="active"><a onclick="alert();">Default</a></li>
+	var room_li = 
+	$(document.createElement("li"))
+	.attr("class","")
+	.attr("room_id", room.roomID)
+	.append(
+			$(document.createElement("a"))
+			.attr("onclick","alert();")
+			.text(room.name)
+	);
+	return room_li;
 }
 
 /* function startInterval(){
@@ -161,9 +218,9 @@ $( document ).ready(function() {
 	
 	//Assign controls to all buttons
 	$( "#das-boot" ).click(function() {
-		  $( "#chat-message-area" ).animate({ "width": "+=50px" }, "slow" );
+		  //$( "#chat-message-area" ).animate({ "width": "+=50px" }, "slow" );
 		  console.log("booted");
-		  addChatMessageToArea();
+		  updateRooms();
 	});
 	
 	$( "#das-add-message" ).click(function() {
