@@ -17,8 +17,8 @@ var ids = new Array();
 // already playing one, the request will be dropped.
 // This array contains channel_max audio channels and the earliest
 // 'free' channel is used to handle a sound request.
-var audio_channel_max = 5;
-var audiochannels = new Array();
+// TODO: var audio_channel_max = 5;
+// TODO: var audiochannels = new Array();
 
 // A holder for the x,y coordinates of this user's cursor so it can be relayed
 // to the server every so often
@@ -28,6 +28,21 @@ var mousePos;
 var mouseDelay = 200;
 // How many milliseconds between each cleanup of dead drumsticks.
 var cleanupDelay = 10000;
+
+var cursorPositionRunner;
+var deadCursorRunner;
+
+var contextPath;
+
+var snare; // snare
+var kick; // kick
+var ftom; // ftom
+var rtom; // rtom
+var hatc; // hatc
+var hato; // hato
+var crash; // crash
+var ride; // ride
+// var cuica; // cuica
 
 // Change the UI to better represent the options available to a
 // connected/disconnected user.
@@ -49,7 +64,7 @@ function setConnected(connected) {
 	document.getElementById('disconnect').disabled = !connected;
 
 	// If we're connected, show the drumkit so the user can play!
-	document.getElementById('drumkit').style.visibility = connected ? 'visible'
+	document.getElementById('drumkit_div').style.visibility = connected ? 'visible'
 			: 'hidden';
 }
 
@@ -85,6 +100,7 @@ function connect() {
 
 			// Register for hitreports so the user can hear other users playing
 			// and join in!
+			// TODO:
 			stompClient.subscribe('/topic/hitreports', function(drumhit) {
 				play(JSON.parse(drumhit.body).name);
 			});
@@ -107,6 +123,7 @@ function connect() {
 			}));
 
 			// Subscribe for updates on the cursor positions of other users.
+			// TODO:
 			stompClient.subscribe('/topic/motion', function(cursorPositions) {
 				moveDrumsticks(JSON.parse(cursorPositions.body));
 			});
@@ -115,10 +132,10 @@ function connect() {
 			window.onmousemove = handleMouseMove;
 			// Fire off your location 5 times per second
 			// Increase this time for better performance
-			setInterval(sendMousePosition, mouseDelay);
+			cursorPositionRunner = setInterval(sendMousePosition, mouseDelay);
 
 			// Clear dead users every 10 seconds.
-			setInterval(cleanDeadDrumsticks, cleanupDelay);
+			deadCursorRunner = setInterval(cleanDeadDrumsticks, cleanupDelay);
 
 		});
 	}
@@ -138,37 +155,65 @@ function disconnect() {
 		'lastName' : null
 	}));
 
+	clearInterval(cursorPositionRunner);
+	clearInterval(deadCursorRunner);
+
 	// Cleanly disconnect and inform the user.
 	stompClient.disconnect();
 	setConnected(false);
 }
 
-// Lets the server know that the bass drum has been hit!
-function hitBass() {
-	stompClient.send("/app/hit", {}, JSON.stringify({
-		'name' : 'bass'
-	}));
-}
-
-//Lets the server know that the tomtom has been hit!
-function hitTomTom() {
-	stompClient.send("/app/hit", {}, JSON.stringify({
-		'name' : 'tomtom'
-	}));
-}
-
-//Lets the server know that the snare has been hit!
-function hitSnare() {
-	stompClient.send("/app/hit", {}, JSON.stringify({
-		'name' : 'snare'
-	}));
-}
-
-// Play a sound!
+// //TODO: Play a sound!
 function play(message) {
-	
-	// This will (must) be the id of the appropriate <audio /> element 
-	var audio = message + 'sound';
+
+	switch (message) {
+
+	case "hato": {
+		hato.play();
+		hatc.stop();
+		break;
+	}
+
+	case "hatc": {
+		hatc.play();
+		hato.stop();
+		break;
+	}
+
+	case "snare": {
+		snare.play();
+		break;
+	}
+
+	case "kick": {
+		kick.play();
+		break;
+	}
+
+	case "rtom": {
+		rtom.play();
+		break;
+	}
+
+	case "ftom": {
+		ftom.play();
+		break;
+	}
+
+	case "crash": {
+		crash.play();
+		break;
+	}
+
+	case "ride": {
+		ride.play();
+		break;
+	}
+
+	}
+
+	// This will (must) be the id of the appropriate <audio /> element
+	// var audio = message + 'sound';
 
 	// Modified version of the code available at this address:
 	// http://www.storiesinflight.com/html5/audio.html
@@ -176,48 +221,50 @@ function play(message) {
 	// Implementation of Rotating Audio Channels
 	// Searches audiochannels for a free channel to play the
 	// drum sound.
-	for (var a = 0; a < audio_channel_max; a++) {
-		var thistime = new Date();
-
-		if (audiochannels[a]['finished'] < thistime.getTime()) {
-			audiochannels[a]['finished'] = thistime.getTime()
-					+ document.getElementById(audio).duration * 1000;
-			audiochannels[a]['channel'].src = document.getElementById(audio).src;
-			audiochannels[a]['channel'].load();
-			audiochannels[a]['channel'].play();
-			break;
-		}
-
-	}
+	// for (var a = 0; a < audio_channel_max; a++) {
+	// var thistime = new Date();
+	//
+	// if (audiochannels[a]['finished'] < thistime.getTime()) {
+	// audiochannels[a]['finished'] = thistime.getTime()
+	// + document.getElementById(audio).duration * 1000;
+	// audiochannels[a]['channel'].src = document.getElementById(audio).src;
+	// audiochannels[a]['channel'].load();
+	// audiochannels[a]['channel'].play();
+	// break;
+	// }
+	//
+	// }
 
 }
 
 // Called whenever a user joins or leaves.
 function refreshUsers(users) {
-	
-	// TODO: Do something better with the list of connected users than just print them.
+
+	// TODO: Do something better with the list of connected users than just
+	// print them.
 	// TODO: Move this into the loop so this client's name is not displayed.
 	document.getElementById('connectedUsers').innerHTML = users;
-	
-	// Get the array of drumsticks. One is needed to track each user's mouse movements.
+
+	// Get the array of drumsticks. One is needed to track each user's mouse
+	// movements.
 	var drumsticks = document.getElementById('drumsticks').childNodes;
 
 	// Get all the ids provided
 	var allIds = users.split(",");
-	
+
 	// Clear the ids array - we have more recent information.
 	// TODO: Is there a cheaper clear() that can be used?
 	ids = new Array();
 
 	// For all users
 	for (var i = 0; i < allIds.length; i++) {
-		
+
 		// Filter out my own username and the empty value at the end
 		if (allIds[i] != myId && allIds[i] != "") {
-			
+
 			// Add it to the array of connected users!
 			ids.push(allIds[i]);
-			
+
 			// Ensure this id has a drumstick, else create one
 			var noDrumstick = true;
 
@@ -233,17 +280,18 @@ function refreshUsers(users) {
 
 				// Create a new image
 				var newChild = document.createElement("img");
+
 				// Make it display the correct image
-				newChild
-						.setAttribute("src",
-								"${pageContext.request.contextPath}/resources/images/drumstick.png");
-				// Give it the appropriate id so it can be found by other methods
+				newChild.setAttribute("src", contextPath
+						+ "/resources/images/drumstick.png");
+				// Give it the appropriate id so it can be found by other
+				// methods
 				newChild.setAttribute("id", allIds[i]);
-				
+
 				// TODO: Find a better way of scaling down
 				newChild.setAttribute("width", "80");
 				newChild.setAttribute("width", "50");
-				
+
 				// Needed for positions to work
 				newChild.setAttribute("style", "position:absolute;");
 
@@ -255,7 +303,6 @@ function refreshUsers(users) {
 	}
 
 }
-
 
 // This method is NOT responsible for creating/removing drumsticks.
 function moveDrumsticks(positions) {
@@ -300,19 +347,19 @@ function moveDrumsticks(positions) {
 
 function handleMouseMove(event) {
 	event = event || window.event; // IE
-	
+
 	// TODO: Consider nullifying mousePos if it hasn't changed
 	// so sendMousePosition() won't send an update
 	// if (mousePos.x == event.clientX && mousePos.y == event.clientY) {
-	// 	  mousePos = null;
+	// mousePos = null;
 	// } else {
-	
+
 	// Update mousePos
 	mousePos = {
 		y : event.clientY,
 		x : event.clientX
 	};
-	
+
 	// }
 }
 
@@ -347,12 +394,12 @@ function cleanDeadDrumsticks() {
 			}
 
 		}
-		
+
 		// If this is still true, delete the node!
 		if (drumstickMatchesDeadConnection) {
 			document.getElementById('drumsticks').removeChild(drumsticks[i]);
 			// TODO: I'm not sure we need to step back.
-			//i--;
+			// i--;
 		}
 
 	}
@@ -360,7 +407,117 @@ function cleanDeadDrumsticks() {
 }
 
 // Stuff to do as soon as everything has loaded
-function initialize() {
+function initialize(contextPath) {
+
+	// if initializeDefaultPlugins returns false, we cannot play sound
+	if (!createjs.Sound.initializeDefaultPlugins()) {
+		return;
+	}
+
+	this.contextPath = contextPath;
+
+	var manifest = [
+			{
+				id : "snare",
+				src : "resources/sounds/slingerland-kit/Ludwig-Snare-B.ogg"
+			},
+			{
+				id : "kick",
+				src : "resources/sounds/slingerland-kit/Slingerland-Kit-Kick-A.ogg"
+			},
+			{
+				id : "hatc",
+				src : "resources/sounds/slingerland-kit/Slingerland-Kit-SabianHHX-HiHat-Closed-A.ogg"
+			},
+			{
+				id : "hato",
+				src : "resources/sounds/slingerland-kit/Slingerland-Kit-SabianHHX-HiHat-Open-A.ogg"
+			},
+			{
+				id : "rtom",
+				src : "resources/sounds/slingerland-kit/Slingerland-Kit-RackTom-A.ogg"
+			},
+			{
+				id : "ftom",
+				src : "resources/sounds/slingerland-kit/Slingerland-Kit-FloorTom-A.ogg"
+			},
+			{
+				id : "crash",
+				src : "resources/sounds/slingerland-kit/Slingerland-Kit-Sabian-Crash-Left-B.ogg"
+			},
+			{
+				id : "ride",
+				src : "resources/sounds/slingerland-kit/Slingerland-Kit-Sabian-Ride-A.ogg"
+			} ];
+
+	createjs.Sound.registerManifest(manifest, contextPath + "/");
+
+	snare = createjs.Sound.createInstance("snare");
+	kick = createjs.Sound.createInstance("kick");
+	ftom = createjs.Sound.createInstance("ftom");
+	rtom = createjs.Sound.createInstance("rtom");
+	crash = createjs.Sound.createInstance("crash");
+	ride = createjs.Sound.createInstance("ride");
+	hatc = createjs.Sound.createInstance("hatc");
+	hato = createjs.Sound.createInstance("hato");
+
+	$('#hato').mousedown(function() {
+		stompClient.send("/app/hit", {}, JSON.stringify({
+			'name' : 'hato'
+		}));
+		// hato.play();
+		// hatc.stop();
+	});
+
+	$('#hatc').mousedown(function() {
+		stompClient.send("/app/hit", {}, JSON.stringify({
+			'name' : 'hatc'
+		}));
+		// hatc.play();
+		// hato.stop();
+	});
+
+	$('#snare').mousedown(function() {
+		stompClient.send("/app/hit", {}, JSON.stringify({
+			'name' : 'snare'
+		}));
+		// snare.play();
+	});
+
+	$('#kick').mousedown(function() {
+		stompClient.send("/app/hit", {}, JSON.stringify({
+			'name' : 'kick'
+		}));
+		// kick.play();
+	});
+
+	$('#rtom').mousedown(function() {
+		stompClient.send("/app/hit", {}, JSON.stringify({
+			'name' : 'rtom'
+		}));
+		// rtom.play();
+	});
+
+	$('#ftom').mousedown(function() {
+		stompClient.send("/app/hit", {}, JSON.stringify({
+			'name' : 'ftom'
+		}));
+		// ftom.play();
+	});
+
+	$('#crash').mousedown(function() {
+		stompClient.send("/app/hit", {}, JSON.stringify({
+			'name' : 'crash'
+		}));
+		// crash.play();
+	});
+
+	$('#ride').mousedown(function() {
+		stompClient.send("/app/hit", {}, JSON.stringify({
+			'name' : 'ride'
+		}));
+		// ride.play();
+	});
 
 	// Make sure the user is not initially connected
 	setConnected(false);
@@ -373,9 +530,10 @@ function initialize() {
 	// already playing one, the request will be dropped.
 	// This array contains channel_max audio channels and the earliest
 	// 'free' channel is used to handle a sound request.
-	for (var a = 0; a < audio_channel_max; a++) {
-		audiochannels[a] = new Array();
-		audiochannels[a]['channel'] = new Audio();
-		audiochannels[a]['finished'] = -1;
-	}
+	// TODO:
+	// for (var a = 0; a < audio_channel_max; a++) {
+	// audiochannels[a] = new Array();
+	// audiochannels[a]['channel'] = new Audio();
+	// audiochannels[a]['finished'] = -1;
+	// }
 }
