@@ -7,6 +7,8 @@
 package com.toomanydrummers.bean;
 
 /**
+ * A basic DTO for a cursor's x,y coordinates and the user identification to be
+ * associated with it.
  *
  * @author john
  */
@@ -15,11 +17,14 @@ public class CursorPosition {
 	private String id;
 	private int x;
 	private int y;
-	
-	public CursorPosition() {
-		
-	}
-	
+
+	/**
+	 * A full constructor, specifying all of a CursorPosition's attributes.
+	 * 
+	 * @param id
+	 * @param x
+	 * @param y
+	 */
 	public CursorPosition(String id, int x, int y) {
 		this.id = id;
 		this.x = x;
@@ -30,17 +35,18 @@ public class CursorPosition {
 		return id;
 	}
 
-	 public void setId(String id) {
-	 this.id = id;
-	 }
+	// TODO: Do we even need setters?
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public int getX() {
 		return x;
 	}
 
-	 public void setX(int x) {
-	 this.x = x;
-	 }
+	public void setX(int x) {
+		this.x = x;
+	}
 
 	public int getY() {
 		return y;
