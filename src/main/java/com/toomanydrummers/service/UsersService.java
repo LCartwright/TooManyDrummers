@@ -6,6 +6,7 @@
 package com.toomanydrummers.service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.stereotype.Service;
@@ -146,6 +147,22 @@ public class UsersService {
 		
 		return this.cursorPositions;
 
+	}
+	
+	public User getUser(String id){
+		//Need to user a map really
+		User userOUT = null;
+		for(User user : users){
+			if(!"".equals(id) && id.equals(user.getId())){
+				userOUT = user;
+				break;
+			}
+		}
+		return userOUT;
+	}
+	
+	public List<User> getUsers(){
+		return users;
 	}
 
 }
