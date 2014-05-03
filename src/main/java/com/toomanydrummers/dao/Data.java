@@ -1,19 +1,16 @@
 package com.toomanydrummers.dao;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.toomanydrummers.bean.FacebookUser;
 import com.toomanydrummers.bean.User;
 
 public final class Data {
 
 	//List of all users details
-	private static Map<String,FacebookUser> users = new HashMap<String,FacebookUser>();
-	private static final ThreadLocal<String> currentUser = new ThreadLocal<String>();
+	private static Map<String,User> users = new HashMap<String,User>();
 	
 	/**
 	 * private constructor
@@ -28,7 +25,7 @@ public final class Data {
 	 * 
 	 * @param user - user to add
 	 */
-	public static void addUser(FacebookUser user)
+	public static void addUser(User user)
 	{
 		if(!users.containsKey(user.getId()))
 		{
@@ -46,10 +43,10 @@ public final class Data {
 	 * 
 	 * @return - List<User> allusers
 	 */
-	public static List<FacebookUser> getUsers()
+	public static List<User> getUsers()
 	{ 
-		List<FacebookUser> result = new ArrayList<FacebookUser>();
-		for (FacebookUser user : users.values())
+		List<User> result = new ArrayList<User>();
+		for (User user : users.values())
 		{
 			result.add(user);
 		}
@@ -62,7 +59,7 @@ public final class Data {
 	 * @param id - id of user in list
 	 * @return - null or user object with specified id
 	 */
-	public static FacebookUser getUser(String id)
+	public static User getUser(String id)
 	{
 		return users.get(id);
 	}

@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.toomanydrummers.dao.Data;
-import com.toomanydrummers.bean.FacebookUser;
 import com.toomanydrummers.bean.User;
 import com.toomanydrummers.service.FacebookCookieManager;
 
@@ -53,7 +52,7 @@ public class FacebookDetailController
 		if (facebookCookieManager.checkSignedIn(request, response))
 		{
 			addUser();
-			List<FacebookUser> details = Data.getUsers();
+			List<User> details = Data.getUsers();
 			//Add the list of users so that they can be displayed on the jsp page
 			model.addAttribute("details", details);
 			nextView = "show-details";
@@ -73,6 +72,6 @@ public class FacebookDetailController
 	{
 		Connection<Facebook> connection = connectionRepository.findPrimaryConnection(Facebook.class);
 		FacebookProfile fbp = connection.getApi().userOperations().getUserProfile();
-		Data.addUser(new FacebookUser(fbp.getFirstName(), fbp.getLastName(), fbp.getId()));
+		Data.addUser(new User(fbp.getFirstName(), fbp.getLastName(), fbp.getId()));
 	}
 }
