@@ -6,16 +6,31 @@ import org.springframework.web.socket.config.annotation.AbstractWebSocketMessage
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
+/**
+ * Prepares the project for websocket communication
+ * 
+ * @author john
+ *
+ */
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
-	
+
+	/**
+	 * Prepares to write to the /topic/ folder (to which clients will be
+	 * subscribed) and to read the /app/ folder which will be the master
+	 * endpoint of this application.
+	 */
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry config) {
 		config.enableSimpleBroker("/topic/");
 		config.setApplicationDestinationPrefixes("/app");
 	}
 
+	/**
+	 * These are the app's Stomp endpoints and allow for a fallback to SockJS
+	 * technology.
+	 */
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry.addEndpoint("/hit").withSockJS();
@@ -23,7 +38,5 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 		registry.addEndpoint("/finished").withSockJS();
 		registry.addEndpoint("/motion").withSockJS();
 	}
-	
-	
 
 }
