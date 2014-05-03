@@ -17,10 +17,6 @@ public class CursorPosition {
 	private String id;
 	private int x;
 	private int y;
-	
-	public CursorPosition() {
-		
-	}
 
 	//Needed for JSON Mapper
 	public CursorPosition(){
