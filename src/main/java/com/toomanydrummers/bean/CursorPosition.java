@@ -17,6 +17,10 @@ public class CursorPosition {
 	private String id;
 	private int x;
 	private int y;
+	
+	public CursorPosition() {
+		
+	}
 
 	/**
 	 * A full constructor, specifying all of a CursorPosition's attributes.
@@ -35,7 +39,6 @@ public class CursorPosition {
 		return id;
 	}
 
-	// TODO: Do we even need setters?
 	public void setId(String id) {
 		this.id = id;
 	}
