@@ -31,9 +31,8 @@ public class RestController {
 	
 	public RestController() {
 		System.out.println("REST CONTROLLER STARTED");
-		roomList.add(new Room("bacon"));
-		roomList.add(new Room("avocado"));
-		roomList.add(new Room("chicken"));
+		//Add default room to join
+		roomList.add(new Room("default"));
 	}
 
 	@RequestMapping(value = "/bacon", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
@@ -171,8 +170,16 @@ public class RestController {
         return pictureOUT;
     }
     
-    
-    
-    
+    @RequestMapping( value = "/users/add", method = RequestMethod.POST)
+    protected @ResponseBody User addUser(
+    			@RequestParam("first_name") String first_name
+    		,	@RequestParam("last_name") String last_name
+    		, 	@RequestParam("id") String id
+    		) throws Exception {
+    	String pictureURL = "https://graph.facebook.com" + id +"/picture";
+    	User user = new User(first_name, last_name, id, pictureURL, 0, 0);
+    	usersService.addUser(user);
+    	return user;
+    }
     
 }
