@@ -3,6 +3,7 @@ package com.toomanydrummers.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,7 +12,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.toomanydrummers.bean.Message;
+import com.toomanydrummers.bean.Name;
+import com.toomanydrummers.bean.Picture;
 import com.toomanydrummers.bean.Room;
+import com.toomanydrummers.bean.User;
+import com.toomanydrummers.bean.XandY;
+import com.toomanydrummers.service.UsersService;
+
 
 @Controller
 @RequestMapping("REST")
@@ -19,12 +26,13 @@ public class RestController {
 
 	List<Room> roomList = new ArrayList<Room>();
 	
+    @Autowired
+    private UsersService usersService;
+	
 	public RestController() {
 		System.out.println("REST CONTROLLER STARTED");
-		
-		roomList.add(new Room("bacon"));
-		roomList.add(new Room("avocado"));
-		roomList.add(new Room("chicken"));
+		//Add default room to join
+		roomList.add(new Room("default"));
 	}
 
 	@RequestMapping(value = "/bacon", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
@@ -116,13 +124,62 @@ public class RestController {
 	public @ResponseBody List<Room> rooms() {
 		return this.roomList;
 	}
-
-//	@RequestMapping(value = "/rooms", method = RequestMethod.GET)
-//	public @ResponseBody String rooms() {
-//		StringBuilder sb = new StringBuilder();
-//		for (Room room : roomList) {
-//			sb.append(room.getName() + "");
-//		}
-//		return sb.toString();
-//	}
+	
+	
+	
+    @RequestMapping( value = "/users", method = RequestMethod.GET)
+    protected @ResponseBody List<User> getUsers() {
+    	//Return a list of users
+        return usersService.getUsers();
+    }
+    
+    @RequestMapping( value = "/users/{id}", method = RequestMethod.GET)
+    protected @ResponseBody User getUser(@PathVariable("id") String id) throws Exception {
+    	//Return user from ID
+        return usersService.getUser(id);
+    }
+    
+    @RequestMapping( value = "/users/{id}/name", method = RequestMethod.GET)
+    protected @ResponseBody Name getUserName(@PathVariable("id") int id) throws Exception {
+    	//Return user firstname + lastname
+    	User user = usersService.getUser(String.valueOf(id)); //no null checking
+    	Name nameOUT = null;
+    	if(user != null){
+    		nameOUT =  new Name(user.getFirstName(), user.getLastName());
+    	}
+        return nameOUT;
+    }
+    
+    @RequestMapping( value = "/users/{id}/xy", method = RequestMethod.GET)
+    protected @ResponseBody XandY getUserXY(@PathVariable("id") int id) throws Exception {
+    	User user = usersService.getUser(String.valueOf(id)); //no null checking
+    	XandY xyOUT = null;
+    	if(user != null){
+    		xyOUT = new XandY(user.getX(), user.getY());
+    	}
+        return xyOUT;
+    }
+    
+    @RequestMapping( value = "/users/{id}/picture", method = RequestMethod.GET)
+    protected @ResponseBody Picture getUserPicture(@PathVariable("id") int id) throws Exception {
+    	User user = usersService.getUser(String.valueOf(id)); //no null checking
+    	Picture pictureOUT = null;
+    	if(user != null){
+    		pictureOUT = new Picture(user.getPictureURL());
+    	}
+        return pictureOUT;
+    }
+    
+    @RequestMapping( value = "/users/add", method = RequestMethod.POST)
+    protected @ResponseBody User addUser(
+    			@RequestParam("first_name") String first_name
+    		,	@RequestParam("last_name") String last_name
+    		, 	@RequestParam("id") String id
+    		) throws Exception {
+    	String pictureURL = "https://graph.facebook.com" + id +"/picture";
+    	User user = new User(first_name, last_name, id, pictureURL, 0, 0);
+    	usersService.addUser(user);
+    	return user;
+    }
+    
 }

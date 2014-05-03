@@ -8,6 +8,13 @@ var currentRoomLastMessageId;
 var roomsURI = "REST/rooms";
 var roomsAddURI = roomsURI + "/add";
 
+var usersURI = "REST/users";
+	
+var currentUserID;
+var currentUserFirstName;
+var currentUserLastName;
+var currentUserFullName;
+var currentUserPictureURL;
 
 function joinRoom(roomId, roomName) {
 	currentRoomId = roomId;
@@ -17,7 +24,7 @@ function joinRoom(roomId, roomName) {
 	$('#current-room-name').text(currentRoomName);
 	//window.setInterval(fetchMessages(), 100);
 	setInterval(function() {
-		fetchMessages()
+		fetchMessages();
 	}, 100);
 }
 
@@ -101,6 +108,10 @@ function getUserInfoForMessage(user_id){
 	return user_info;
 }
 
+function createNewRoom(){
+	
+}
+
 var message_counter = 0;
 
 function createMessageElement(user_id, room_id, message_text){
@@ -139,9 +150,16 @@ function createMessageElement(user_id, room_id, message_text){
 }
 
 function addChatMessageToArea(user_id, room_id, message){
-	$("#chat-message-area").append(createMessageElement(0,0,"FUCKING BACON"));
+	$("#chat-message-area-div").append(createMessageElement(0,0,"FUCKING BACON"));
 }
+
 $( document ).ready(function() {
+	
+	
+	//First set the user as logged out
+	setLoggedOut();
+	
+	//Assign controls to all buttons
 	$( "#das-boot" ).click(function() {
 		  $( "#chat-message-area" ).animate({ "width": "+=50px" }, "slow" );
 		  console.log("booted");
@@ -152,4 +170,127 @@ $( document ).ready(function() {
 		console.log("message added");
 		addChatMessageToArea();
 	});
+	
+	$("#chat-signin-button").click(function() {
+		setUserDEMO();
+		console.log("UserID: " + userID);
+	});
+	
+	$.ajaxSetup({ cache: true });
+	$.getScript('//connect.facebook.net/en_UK/all.js', function(){
+	    FB.init({
+	      appId: '1483054771924097',
+	    });     
+	    $('#loginbutton,#feedbutton').removeAttr('disabled');
+	    FB.getLoginStatus(updateStatusCallback);
+	});
+	
+	
+	$("#chat-facebook-login").click(function() {
+		FB.getLoginStatus(function(response) {
+			  if (response.status === 'connected') {
+			    console.log('user already logged in');
+			    setLoggedIn(response);
+			  }
+			  else {
+				console.log("user not logged in, Facebook login called");
+			    
+				FB.login(function(response) {
+					   if (response.authResponse) {
+					     console.log('Welcome!  Fetching your information.... ');
+					     FB.api('/me', function(response) {
+					       console.log('Good to see you, ' + response.name + '.');
+					     });
+					     setLoggedIn(response);
+					   } else {
+					     console.log('User cancelled login or did not fully authorize.');
+					   }
+				});
+			  }
+		});
+	});
+	
+	$("#chat-facebook-logout").click(function() {
+		FB.getLoginStatus(function(response) {
+			  if (response.status === 'connected') {
+				console.log("user logged in, Facebook logout called");
+			    FB.logout();
+			    setLoggedOut();
+			  } else {
+				  console.log("user not logged in");
+			  }
+		});
+	});
 });
+
+
+//Call to setup the page that the user is logged out
+// facebook auth response
+function setLoggedIn(response){
+	
+	console.log("function LOGGED IN called");
+	
+	$("#chat-facebook-login").attr("disabled","disabled");
+	$("#chat-facebook-logout").removeAttr("disabled");
+	
+	
+	FB.api('/me', {fields: ['last_name', "first_name", "picture"]}, function(response) {
+		//alert(JSON.stringify(response));
+		currentUserID = response.id;
+		currentUserFirstName = response.first_name;
+		currentUserLastName = response.last_name;
+		currentUserFullName = response.first_name + " " + response.last_name;
+		currentUserPictureURL = response.picture.data.url;
+		
+		console.log("currentUserID: " + currentUserID);
+		console.log("currentUserFirstName: " + currentUserFirstName);
+		console.log("currentUserLastName: " + currentUserLastName);
+		console.log("currentUserFullName: " + currentUserFullName);
+		console.log("currentUserPictureURL: " + currentUserPictureURL);
+		
+		$("#current-user").text("Welcome " + currentUserFullName);
+		
+		var posting = $.post(usersURI + "/add", {
+			first_name : currentUserFirstName,
+			last_name : currentUserLastName,
+			id : currentUserID
+		});
+		
+		posting.done(function(data) {
+			alert(JSON.stringify(data));
+		});
+	});
+	
+	$("#chat-main-div").css("display","block");
+	
+	//welcome message!
+	//disble login button
+}
+
+//Call the setup the page that the user is logged out
+function setLoggedOut(){
+	
+	console.log("function LOGGED OUT called");
+	currentUserID = null;
+	currentUserFirstName = null;
+	currentUserLastName = null;
+	currentUserFullName = null;
+	currentUserPictureURL = null;
+	
+	$("#chat-facebook-login").removeAttr("disabled");
+	$("#chat-facebook-logout").attr("disabled","disabled");
+	$("#current-user").text("");
+	
+	$("#chat-main-div").css("display","none");
+}
+
+function updateStatusCallback(status){
+	console.log("used status callback, possible put into use for the login");
+	
+}
+
+function setUserDEMO(){
+	var input = $("#chat-user-id").attr("disabled","disabled");
+	userID = input.val();
+}
+

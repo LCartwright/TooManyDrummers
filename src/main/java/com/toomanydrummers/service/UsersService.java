@@ -6,6 +6,10 @@
 package com.toomanydrummers.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.stereotype.Service;
@@ -18,13 +22,15 @@ import com.toomanydrummers.bean.User;
  * @author john
  */
 @Service
-public class UsersService {
+public class UsersService
+{
 
-	private final ArrayList<User> users = new ArrayList<User>();
+	private static Map<String, User> users = new HashMap<String, User>();
+	// private final ArrayList<User> users = new ArrayList<User>();
 	private final ArrayList<CursorPosition> cursorPositions = new ArrayList<CursorPosition>();
 	private final ReentrantLock usersLock = new ReentrantLock();
 
-	//private SimpMessagingTemplate template;
+	// private SimpMessagingTemplate template;
 
 	// @Autowired
 	// public UsersService(SimpMessagingTemplate template) {
@@ -47,80 +53,6 @@ public class UsersService {
 	//
 	// }
 
-	public void addUser(User newUser) {
-
-		try {
-			usersLock.lock();
-			users.add(newUser);
-		} finally {
-			usersLock.unlock();
-		}
-	}
-
-	public void removeUser(User oldUser) {
-		try {
-			usersLock.lock();
-			users.remove(oldUser);
-		} finally {
-			usersLock.unlock();
-		}
-	}
-
-	public void removeUser(String oldUserId) {
-
-		for (int i = 0; i < users.size(); i++) {
-
-			if (users.get(i).getId().equals(oldUserId)) {
-
-				try {
-					usersLock.lock();
-					users.remove(i);
-				} finally {
-					usersLock.unlock();
-				}
-				break;
-			}
-		}
-
-	}
-
-	public String itemizeIDs() {
-		String allIDs = "";
-
-		try {
-			usersLock.lock();
-			for (User user : users) {
-
-				allIDs += user.getId() + ",";
-			}
-		} finally {
-			usersLock.unlock();
-		}
-
-		return allIDs;
-	}
-
-	public void updatePosition(CursorPosition cursorPosition) {
-
-		String id = cursorPosition.getId();
-
-		try {
-			usersLock.lock();
-
-			for (User user : users) {
-				if (user.getId().equals(id)) {
-					user.setX(cursorPosition.getX());
-					user.setY(cursorPosition.getY());
-					break;
-				}
-			}
-
-		} finally {
-			usersLock.unlock();
-		}
-
-	}
-
 	// public int getUsersCount() {
 	// try {
 	// usersLock.lock();
@@ -130,22 +62,121 @@ public class UsersService {
 	// }
 	// }
 
-	public ArrayList<CursorPosition> preparePositions() {
-		this.cursorPositions.clear();
-		// TODO May need to find a faster way of doing this... :(
-		try {
+	public void addUser(User newUser)
+	{
+		try
+		{
 			usersLock.lock();
-			
-			for (User user : users) {
-				this.cursorPositions.add(new CursorPosition(user.getId(), user
-						.getX(), user.getY()));
+			if (!users.containsKey(newUser.getId()))
+			{
+				users.put(newUser.getId(), newUser);
 			}
-		} finally {
+		}
+		finally
+		{
 			usersLock.unlock();
 		}
-		
-		return this.cursorPositions;
+	}
 
+	public void removeUser(String id)
+	{
+		try
+		{
+			usersLock.lock();
+			users.remove(id);
+		}
+		finally
+		{
+			usersLock.unlock();
+		}
+	}
+
+	public void removeUser(User oldUser)
+	{
+		removeUser(oldUser.getId());
+	}
+
+	public User getUser(String id)
+	{
+		User userOUT = null;
+		if (id != null && id.length() > 0)
+		{
+			userOUT = users.get(id);
+		}
+		return userOUT;
+	}
+
+	/**
+	 * gets a 'List' of the users
+	 * 
+	 * @return - List<User> allusers
+	 */
+	public List<User> getUsers()
+	{
+		List<User> result = new ArrayList<User>();
+		for (User user : users.values())
+		{
+			result.add(user);
+		}
+		return result;
+	}
+
+	public Collection<User> getUserCollection()
+	{
+		return users.values();
+	}
+
+	public void updatePosition(CursorPosition cursorPosition)
+	{
+		String id = cursorPosition.getId();
+		try
+		{
+			usersLock.lock();
+			User user = getUser(id);
+			user.setX(cursorPosition.getX());
+			user.setY(cursorPosition.getY());
+		}
+		finally
+		{
+			usersLock.unlock();
+		}
+	}
+
+	public ArrayList<CursorPosition> preparePositions()
+	{
+		this.cursorPositions.clear();
+		// TODO May need to find a faster way of doing this... :(
+		try
+		{
+			usersLock.lock();
+			for (User user : getUserCollection())
+			{
+				this.cursorPositions.add(new CursorPosition(user.getId(), user.getX(), user.getY()));
+			}
+		}
+		finally
+		{
+			usersLock.unlock();
+		}
+		return this.cursorPositions;
+	}
+
+	public String itemizeIDs()
+	{
+		String allIDs = "";
+		try
+		{
+			usersLock.lock();
+			for (User user : getUserCollection())
+			{
+				allIDs += user.getId() + ",";
+			}
+		}
+		finally
+		{
+			usersLock.unlock();
+		}
+		return allIDs;
 	}
 
 }
