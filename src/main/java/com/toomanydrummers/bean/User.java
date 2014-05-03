@@ -24,12 +24,12 @@ public class User
 	
 	public User(String first_name, String last_name, String id)
 	{
-		this(first_name, last_name, id, 0, 0);
+		this(first_name, last_name, id, "http://graph.facebook.com/" + id + "/picture", 0, 0);
 	}
 	
 	public User(String first_name, String last_name, String id, int x, int y)
 	{
-		this(first_name, last_name, id, "", x, y);
+		this(first_name, last_name, id, "http://graph.facebook.com/" + id + "/picture", x, y);
 	}
 	
 	public User(String first_name, String last_name, String id, String picture_url, int x, int y)

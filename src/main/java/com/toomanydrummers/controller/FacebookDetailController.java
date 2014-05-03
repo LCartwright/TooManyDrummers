@@ -19,9 +19,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.toomanydrummers.dao.Data;
 import com.toomanydrummers.bean.User;
 import com.toomanydrummers.service.FacebookCookieManager;
+import com.toomanydrummers.service.UsersService;
 
 /**
  * @author Henry Tesei
@@ -35,6 +35,9 @@ public class FacebookDetailController
 
 	@Autowired
 	private FacebookCookieManager facebookCookieManager;
+	
+	@Autowired
+	private UsersService usersService;
 
 	/**
 	 * This method checks if the user is signed in and redirects them accordingly
@@ -52,7 +55,7 @@ public class FacebookDetailController
 		if (facebookCookieManager.checkSignedIn(request, response))
 		{
 			addUser();
-			List<User> details = Data.getUsers();
+			List<User> details = usersService.getUsers();
 			//Add the list of users so that they can be displayed on the jsp page
 			model.addAttribute("details", details);
 			nextView = "show-details";
@@ -72,6 +75,6 @@ public class FacebookDetailController
 	{
 		Connection<Facebook> connection = connectionRepository.findPrimaryConnection(Facebook.class);
 		FacebookProfile fbp = connection.getApi().userOperations().getUserProfile();
-		Data.addUser(new User(fbp.getFirstName(), fbp.getLastName(), fbp.getId()));
+		usersService.addUser(new User(fbp.getFirstName(), fbp.getLastName(), fbp.getId()));
 	}
 }
