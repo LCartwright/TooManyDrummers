@@ -18,6 +18,11 @@ public class CursorPosition {
 	private int x;
 	private int y;
 
+	//Needed for JSON Mapper
+	public CursorPosition(){
+		
+	}
+	
 	/**
 	 * A full constructor, specifying all of a CursorPosition's attributes.
 	 * 
@@ -36,6 +41,7 @@ public class CursorPosition {
 	}
 
 	// TODO: Do we even need setters?
+	// @JhonnyJhone Yes, for the JSON mapper 
 	public void setId(String id) {
 		this.id = id;
 	}
