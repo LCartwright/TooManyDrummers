@@ -24,6 +24,8 @@ var user_list = [];
 
 var user_id_list = [];
 
+var message_send_blocker = false;
+
 function joinRoom(room_id) {
 	
 	clearInterval(message_fetch_interval);
@@ -34,7 +36,7 @@ function joinRoom(room_id) {
 	var getting = $.get(getRoomURI);
 	
 	getting.done(function(data) {
-		alert("done");
+		//alert("done");
 		var room = JSON.parse(JSON.stringify(data));
 		activateRoom(room_id);
 		$("#chat-message-area-div").empty(); // empty the area
@@ -108,6 +110,7 @@ function generateNewRoom(name){
 function initChat(){
 	updateUsers();
 	updateRooms();
+	joinRoom(1);
 	//hacky for now
 
 }
@@ -139,18 +142,23 @@ function fetchMessages(room_id) {
 			//Add to chat
 			
 			console.log("MESSAGE ADDING");
-			addChatMessageToArea(messages[i]);
 			
-			if (messages[i].messageId > currentRoomLastMessageId) {
-				//update last message displayed
-				currentRoomLastMessageId = messages[i].messageId;
+			if($("div[message_id=" + messages[i].messageId + "]").length){
+				console.log("MESSAGE ALREADY EXISTS");
+			} else {
+				addChatMessageToArea(messages[i]);
+				if (messages[i].messageId > currentRoomLastMessageId) {
+					//update last message displayed
+					currentRoomLastMessageId = messages[i].messageId;
+				}
 			}
+
 		}
 	});
 }
 
 function addRoom() {
-	alert(roomsAddURI);
+	//alert(roomsAddURI);
 	var roomName = $('#add-room-name').val();
 	var posting = $.post(roomsAddURI, {
 		name : roomName
@@ -166,6 +174,14 @@ function addRoom() {
 }
 
 function sendMessage(room_id, user_id) {
+	
+	message_send_blocker = true;
+	
+//	setTimeout(new function(){
+//		message_send_blocker = false;
+//	}, 2000);
+	
+	setTimeout(function(){message_send_blocker = false;}, 3000);
 	
 	var sendmessageRoomURI = roomsURI + "/" + room_id + "/messages" 
 	$("#chat-room-send-input").val();
@@ -308,7 +324,7 @@ $( document ).ready(function() {
 	$.ajaxSetup({ cache: true });
 	$.getScript('//connect.facebook.net/en_UK/all.js', function(){
 	    FB.init({
-	      appId: '1483054771924097',
+	      appId: '233440613522080',
 	    });     
 	    $('#loginbutton,#feedbutton').removeAttr('disabled');
 	    FB.getLoginStatus(updateStatusCallback);
@@ -357,7 +373,14 @@ $( document ).ready(function() {
 	
 	$("#chat-room-send-button").click(function(){
 		console.log("chat room sent");
-		sendMessage(active_room_id, currentUserID);
+		
+		if(!message_send_blocker){
+			sendMessage(active_room_id, currentUserID);
+			$("#chat-room-send-input").val("");
+		} else {
+			alert("SLOW DOWN");
+		}
+		
 	});
 	
 	initChat();
@@ -397,7 +420,7 @@ function setLoggedIn(response){
 		});
 		
 		posting.done(function(data) {
-			alert(JSON.stringify(data));
+			//alert(JSON.stringify(data));
 		});
 	});
 	

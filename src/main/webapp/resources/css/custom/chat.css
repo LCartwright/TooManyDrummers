@@ -1,14 +1,27 @@
 @CHARSET "US-ASCII";
+html,body {
+    height:90%;
+}
+
 #chat-message-area-div{
 	width: 500px;
-	position: absolute;
-    top: 50%;
+	/*position: absolute;*/
+    /* top: 50%;
     left: 25%;
     margin-top: -50px;
-    margin-left: -50px;
+    margin-left: -50px; */
+    overflow-y: scroll;
+    height: 80%;
 }
 
 #chat-main-div{
 	width: 500px;
 	display: none;
+	position: relative;
+	height: 100%;
+}
+
+#chat-message-controls-div{
+	position:absolute;
+	bottom:0;
 }

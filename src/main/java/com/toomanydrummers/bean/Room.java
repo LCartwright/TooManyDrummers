@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.toomanydrummers.bean.Message;
-
-public class Room implements Comparable{
+public class Room implements Comparable<Room>{
 	
 	private static AtomicInteger counter = new AtomicInteger(0);
     private final String name;
@@ -57,8 +55,7 @@ public class Room implements Comparable{
     }
 
 	@Override
-	public int compareTo(Object arg0) {
-		Room compare = (Room) arg0;
+	public int compareTo(Room compare) {
 		final int BEFORE = -1;
 	    final int EQUAL = 0;
 	    final int AFTER = 1;
@@ -73,5 +70,4 @@ public class Room implements Comparable{
 	    	return EQUAL;
 	    }
 	}
-    
 }

@@ -79,7 +79,7 @@ public class RestController {
 
 		if (selectedRoom != null) {
 			returnMessage = new Message(
-					Integer.parseInt(Jsoup.clean(userId, Whitelist.none()))
+					Jsoup.clean(userId, Whitelist.none())
 				,	Jsoup.clean(messageContent, Whitelist.none())
 			);
 			selectedRoom.addMessage(returnMessage);
