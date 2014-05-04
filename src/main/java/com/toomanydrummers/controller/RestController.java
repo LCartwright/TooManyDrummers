@@ -154,7 +154,7 @@ public class RestController {
     		,	@RequestParam("last_name") String last_name
     		, 	@RequestParam("id") String id
     		) throws Exception {
-    	String pictureURL = "https://graph.facebook.com" + id +"/picture";
+    	String pictureURL = "https://graph.facebook.com/" + id +"/picture";
     	User user = new User(
     			Jsoup.clean(first_name, Whitelist.none())
     		, 	Jsoup.clean(last_name, Whitelist.none())

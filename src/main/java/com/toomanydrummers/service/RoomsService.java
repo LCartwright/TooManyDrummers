@@ -1,12 +1,14 @@
 package com.toomanydrummers.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.toomanydrummers.bean.Message;
 import com.toomanydrummers.bean.Room;
 
 
@@ -32,7 +34,9 @@ public class RoomsService {
 	}
 	
 	public List<Room> getRooms(){
-		return (new ArrayList<Room>(roomMap.values()));
+		List<Room> roomList = new ArrayList<Room>(roomMap.values());
+		Collections.sort(roomList);
+		return roomList;
 	}
 	
 	public void removeRoom(String room_id){

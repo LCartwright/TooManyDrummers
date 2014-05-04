@@ -6,8 +6,6 @@ var currentRoomName;
 var currentRoomLastMessageId;
 
 var roomsURI = "REST/rooms";
-var roomsAddURI = roomsURI + "/add";
-
 var usersURI = "REST/users";
 	
 var currentUserID;
@@ -16,33 +14,43 @@ var currentUserLastName;
 var currentUserFullName;
 var currentUserPictureURL;
 
+var active_room_id = 1;
+
 var room_id_list = [];
 
+var message_fetch_interval;
+
+var user_list = [];
+
+var user_id_list = [];
+
 function joinRoom(room_id) {
-	currentRoomId = roomId;
+	
+	clearInterval(message_fetch_interval);
+	
+	currentRoomId = room_id;
 	currentRoomLastMessageId = -1;
 	var getRoomURI = roomsURI + "/" + room_id
 	var getting = $.get(getRoomURI);
 	
-	$('#current-room-name').text(currentRoomName);
-	
 	getting.done(function(data) {
-		var room = JSON.parse(data);
+		alert("done");
+		var room = JSON.parse(JSON.stringify(data));
+		activateRoom(room_id);
+		$("#chat-message-area-div").empty(); // empty the area
+		message_fetch_interval = setInterval(function() {
+			fetchMessages(room_id);
+		}, 100);
 	});
 	
 	//window.setInterval(fetchMessages(), 100);
-	setInterval(function() {
-		fetchMessages();
-	}, 100);
+
 }
 
-function changeToRoom(room){
-	//{"name":"default","roomID":1,"messages":[]}
-	name = room.name;
-	room_id = room.roomID;
-	messages = room.messages;
-	
-	//switch the tabs
+function activateRoom(room_id){
+	active_room_id = room_id;
+	$("#chat-rooms-list > li").removeAttr("class");
+	$("li[room_id='" + room_id +  "']").attr("class","active");
 }
 
 function updateRooms(){
@@ -56,18 +64,18 @@ function updateRooms(){
 		var new_room_id_list = []; //used to add new elements to switch too
 		for(var i = 0; i < rooms.length; i++){
 			
-			console.log(rooms[i].roomID);
-			
-			$.inArray(rooms[i].roomID, room_id_list);
-			if(!(true)){
-				console.log("test passed");
-				room_id_list.push(room[i].roomID); //add to global list
-				new_room_id_list.push(room[i].roomID); //add to local list
-				$("#chat-rooms-list").append(createRoomElement(room)); //add to screen
+//			console.log(rooms[i].roomID);
+//			console.log(room_id_list);
+//			console.log($.inArray(rooms[i].roomID, room_id_list));
+
+			if($.inArray(rooms[i].roomID, room_id_list) == -1){ //-1 is false check
+				room_id_list.push(rooms[i].roomID); //add to global list
+				new_room_id_list.push(rooms[i].roomID); //add to local list
+				$("#chat-rooms-list").append(createRoomElement(rooms[i])); //add to screen
 			}
 		}
 		
-		
+		activateRoom(active_room_id);
 	});
 }
 
@@ -79,11 +87,31 @@ function createRoomElement(room){
 	.attr("room_id", room.roomID)
 	.append(
 			$(document.createElement("a"))
-			.attr("onclick","alert();")
 			.text(room.name)
+			.click(function (event){
+				joinRoom($(event.target).parent().attr("room_id"));
+			})
 	);
 	return room_li;
 }
+
+function generateNewRoom(name){
+	var posting = $.post(roomsURI + "/add", {name : name});
+	
+	posting.done(function(data){
+		var room = JSON.parse(JSON.stringify(data));
+		$("#chat-rooms-list").append(createRoomElement(room));
+		room_id_list.push(room.roomID);
+	});
+}
+
+function initChat(){
+	updateUsers();
+	updateRooms();
+	//hacky for now
+
+}
+
 
 /* function startInterval(){
 	window.setInterval(fuction(){
@@ -91,20 +119,30 @@ function createRoomElement(room){
 	},100);
 } */
 
-function fetchMessages() {
-	var currentRoomURI = roomsURI + "/" + currentRoomId;
+function fetchMessages(room_id) {
+	var currentRoomURI = roomsURI + "/" + room_id + "/messages";
 	//alert(currentRoomURI);
 	var getting = $.get(currentRoomURI, {
 		messageId : currentRoomLastMessageId
 	});
+	
+	//console.log(currentRoomURI);
+	//console.log(currentRoomLastMessageId);
 	getting.done(function(data) {
 		//alert(JSON.stringify(data));
 		var messages = JSON.parse(JSON.stringify(data));
+		
+		//[{"messageId":1,"userId":1,"messageContent":"hello"},{"messageId":2,"userId":2,"messageContent":"goodbye"}]
+		// WRITE MESSAGES TO MESSAGE AREA
 		//alert(messages[0].messageContent);
-		for (i = 0; i < messages.length; i++) {
-			$('#current-room-messages').append(
-					"<p>" + messages[i].messageContent + "</p>");
+		for (var i = 0; i < messages.length; i++) {
+			//Add to chat
+			
+			console.log("MESSAGE ADDING");
+			addChatMessageToArea(messages[i]);
+			
 			if (messages[i].messageId > currentRoomLastMessageId) {
+				//update last message displayed
 				currentRoomLastMessageId = messages[i].messageId;
 			}
 		}
@@ -127,21 +165,17 @@ function addRoom() {
 	});
 }
 
-function sendMessage() {
-	//var roomId = $('#send-room-id').val();
-	//var userId = $('#send-user-id').val();
-	var roomId = currentRoomId;
-	var userId = 1; //dummy
-	var messageContent = $('#send-message-content').val();
-	var currentRoomURI = roomsURI + "/" + roomId;
-	//alert(roomURI);
-	var posting = $.post(currentRoomURI, {
-		userId : userId,
-		messageContent : messageContent
+function sendMessage(room_id, user_id) {
+	
+	var sendmessageRoomURI = roomsURI + "/" + room_id + "/messages" 
+	$("#chat-room-send-input").val();
+	
+	console.log(sendmessageRoomURI);
+	var posting = $.post(sendmessageRoomURI, {
+		userId : user_id,
+		messageContent : $("#chat-room-send-input").val()
 	});
-	posting.done(function(data) {
-		//alert(JSON.stringify(data));
-	});
+	
 }
 
 function addDummyMessage(){
@@ -159,10 +193,46 @@ function tryJoinRoom() {
 
 function getUserInfoForMessage(user_id){
 	var user_info = {
-			name : "Henry Tesei"
-		,	profile_img_src : "http://graph.facebook.com/518733135/picture"
+			name : "UNKNOWN_USER" //"Henry Tesei"
+		,	profile_img_src : "" //"http://graph.facebook.com/518733135/picture"
 	};
+	
+	
+	for(var i = 0; i < user_list.length; i++){
+		if(user_list[i].id == user_id){
+			user_info.name = user_list[i].firstName + " " + user_list[i].lastName;
+			user_info.profile_img_src = user_list[i].pictureURL;
+			break;
+		}
+	}
+	
+	if($.inArray(user_id, user_id_list) != -1){
+		for(var i = 0; i < user_list.length; i++){
+			if(user_list[i].id == user_id){
+				user_info.name = user_list[i].firstName + " " + user_list[i].lastName;
+				user_info.profile_img_src = user_list[i].pictureURL;
+				break;
+			}
+		}
+	} else {
+		updateUsers();
+	}
+
 	return user_info;
+}
+
+function updateUsers(){
+	
+	var getting = $.get(usersURI);
+	
+	getting.done(function (data){
+		user_list = JSON.parse(JSON.stringify(data));
+		for(var i = 0; i < user_list.length; i++){
+			if($.inArray(user_list[i].id, user_id_list) == -1){
+				user_id_list.push(user_list[i].id);
+			}
+		}
+	});
 }
 
 function createNewRoom(){
@@ -171,12 +241,12 @@ function createNewRoom(){
 
 var message_counter = 0;
 
-function createMessageElement(user_id, room_id, message_text){
-	var user_info = getUserInfoForMessage(0);
+function createMessageElement(message){
+	var user_info = getUserInfoForMessage(message.userId);
 	var name = user_info.name;
 	var img_src = user_info.profile_img_src;
 	var message_div = 
-	$(document.createElement("div")).attr("id","message-" + message_counter)
+	$(document.createElement("div")).attr("message_id",message.messageId)
 	.append(
 			$(document.createElement("div"))
 			.attr("class","media well well-sm")
@@ -193,7 +263,7 @@ function createMessageElement(user_id, room_id, message_text){
 			).append(
 					$(document.createElement("div"))
 					.attr("class", "media-body")
-					.text(message_text)
+					.text(message.messageContent)
 					.prepend(
 							$(document.createElement("h4"))
 							.attr("class", "media-heading")
@@ -206,8 +276,10 @@ function createMessageElement(user_id, room_id, message_text){
 	return message_div;
 }
 
-function addChatMessageToArea(user_id, room_id, message){
-	$("#chat-message-area-div").append(createMessageElement(0,0,"FUCKING BACON"));
+function addChatMessageToArea(message){
+	$("#chat-message-area-div").append(
+			createMessageElement(message)
+	);
 }
 
 $( document ).ready(function() {
@@ -278,6 +350,17 @@ $( document ).ready(function() {
 			  }
 		});
 	});
+	
+	$("#chat-room-add-button").click(function(){
+		generateNewRoom($("#chat-room-add-input").val());
+	});
+	
+	$("#chat-room-send-button").click(function(){
+		console.log("chat room sent");
+		sendMessage(active_room_id, currentUserID);
+	});
+	
+	initChat();
 });
 
 

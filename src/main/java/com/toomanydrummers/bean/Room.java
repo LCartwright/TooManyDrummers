@@ -3,9 +3,10 @@ package com.toomanydrummers.bean;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import com.toomanydrummers.bean.Message;
 
-public class Room {
+public class Room implements Comparable{
 	
 	private static AtomicInteger counter = new AtomicInteger(0);
     private final String name;
@@ -54,5 +55,23 @@ public class Room {
     	}
     	return returnMessage;
     }
+
+	@Override
+	public int compareTo(Object arg0) {
+		Room compare = (Room) arg0;
+		final int BEFORE = -1;
+	    final int EQUAL = 0;
+	    final int AFTER = 1;
+	    
+	    int id = Integer.parseInt(roomId);
+	    int comp_id = Integer.parseInt(compare.roomId);
+	    if(id > comp_id){
+	    	return AFTER;
+	    } else if (id < comp_id){
+	    	return BEFORE;
+	    } else {
+	    	return EQUAL;
+	    }
+	}
     
 }

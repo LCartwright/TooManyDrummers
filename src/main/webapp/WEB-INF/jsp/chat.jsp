@@ -83,21 +83,21 @@
 			<div id="chat-rooms-create-div" class="input-group">
 				<span class="input-group-btn"><button
 						id="chat-room-add-button" class="btn btn-success">Create</button></span>
-				<input id="chat-room-add-name" type="text" class="form-control" placeholder="enter a room name here"/>
+				<input id="chat-room-add-input" type="text" class="form-control" placeholder="enter a room name here"/>
 			</div>
 			<div id="chat-rooms-list-div">
 				<ul id="chat-rooms-list" class="nav nav-tabs nav-justified">
-					<li class="active"><a onclick="alert();">Default</a></li>
+<!-- 					<li class="active"><a onclick="alert();">Default</a></li>
 					<li><a onclick="alert();">dummy</a></li>
-					<li><a onclick="alert();">dummy</a></li>
+					<li><a onclick="alert();">dummy</a></li> -->
 				</ul>
 			</div>
 			<!-- /input-group -->
 			<div id="chat-message-controls-div" class="input-group input-group-md">
 				<span class="input-group-btn">
-					<button id="chat-room-add-button" class="btn btn-primary btn-md">Send</button>
+					<button id="chat-room-send-button" class="btn btn-primary btn-md">Send</button>
 				</span>
-				<input id="chat-room-add-name" type="text" class="form-control" placeholder="enter your message here"/>
+				<input id="chat-room-send-input" type="text" class="form-control" placeholder="enter your message here"/>
 			</div>
 <!-- 			<div class="input-group input-group-md">
           		<span class="input-group-btn">
