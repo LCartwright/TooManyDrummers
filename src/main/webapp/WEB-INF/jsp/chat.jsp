@@ -71,35 +71,33 @@
 	
 	
 	 -->
-	 	<div id="testing">
-	 		<button id="das-boot" onclick="" class="btn btn-warning">Das Boot</button>
-	 		<button id="das-add-message" onclick="" class="btn btn-warning">Das Add Message</button>
-	 	</div>
+<!-- 		<div id="testing">
+			<button id="das-boot" onclick="" class="btn btn-warning">Das
+				Boot</button>
+			<button id="das-add-message" onclick="" class="btn btn-warning">Das
+				Add Message</button>
+		</div> -->
 		<div id="chat-control-area-div">
-<!-- 			<div id="chat-signin-div">
+			<!-- 			<div id="chat-signin-div">
 				User ID: <input id="chat-user-id" type="text" />
 				<button id="chat-signin-button" class="btn btn-primary">Sign-In ID</button>
 			</div> -->
 			<div id="chat-rooms-create-div" class="input-group">
 				<span class="input-group-btn"><button
 						id="chat-room-add-button" class="btn btn-success">Create</button></span>
-				<input id="chat-room-add-name" type="text" class="form-control" placeholder="enter a room name here"/>
+				<input id="chat-room-add-input" type="text" class="form-control"
+					placeholder="enter a room name here" />
 			</div>
 			<div id="chat-rooms-list-div">
 				<ul id="chat-rooms-list" class="nav nav-tabs nav-justified">
-					<li class="active"><a onclick="alert();">Default</a></li>
+					<!-- 					<li class="active"><a onclick="alert();">Default</a></li>
 					<li><a onclick="alert();">dummy</a></li>
-					<li><a onclick="alert();">dummy</a></li>
+					<li><a onclick="alert();">dummy</a></li> -->
 				</ul>
 			</div>
 			<!-- /input-group -->
-			<div id="chat-message-controls-div" class="input-group input-group-md">
-				<span class="input-group-btn">
-					<button id="chat-room-add-button" class="btn btn-primary btn-md">Send</button>
-				</span>
-				<input id="chat-room-add-name" type="text" class="form-control" placeholder="enter your message here"/>
-			</div>
-<!-- 			<div class="input-group input-group-md">
+
+			<!-- 			<div class="input-group input-group-md">
           		<span class="input-group-btn">
             		<button id="ButtonSearch" class="btn btn-success btn-md" onclick="SearchItem()" title="Suchen">Hello</button>
             	</span>
@@ -107,10 +105,16 @@
         	</div> -->
 		</div>
 		<div id="chat-message-area-div"></div>
-		
+		<div id="chat-message-controls-div" class="input-group input-group-md">
+			<span class="input-group-btn">
+				<button id="chat-room-send-button" class="btn btn-primary btn-md">Send</button>
+			</span> <input id="chat-room-send-input" type="text" class="form-control"
+				placeholder="enter your message here" />
+		</div>
+
 	</div>
-	
-<fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+
+	<fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
 </fb:login-button>
 
 <div id="status">
