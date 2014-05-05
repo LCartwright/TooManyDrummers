@@ -6,9 +6,16 @@
 
 package com.toomanydrummers.bean;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class User
 {
 
+	private static AtomicInteger counter = new AtomicInteger(0);
 	private String firstName;
 	private String lastName;
 	private String id;
@@ -18,6 +25,8 @@ public class User
 	private int y;
 	
 	private long lastOnline = System.currentTimeMillis();
+	
+	private boolean isTimedOut = false;
 
 	public User() {
 		super();
@@ -33,6 +42,7 @@ public class User
 		this(first_name, last_name, id, "http://graph.facebook.com/" + id + "/picture", x, y);
 	}
 	
+	//FB
 	public User(String first_name, String last_name, String id, String picture_url, int x, int y)
 	{
 		this.firstName = first_name;
@@ -41,6 +51,16 @@ public class User
 		this.picture_url = picture_url;
 		this.x = x;
 		this.y = y;
+	}
+	
+	//Guest
+	public User(String name){
+		this.firstName = name;
+		this.lastName = "";
+		this.id = "GUEST" + String.valueOf(counter.getAndIncrement());
+		this.picture_url = "http://www.gravatar.com/avatar/" + generateGravatarURL(this.id + String.valueOf(lastOnline)) + "?s=50&d=identicon&r=PG";
+		this.x = 0;
+		this.y = 0;
 	}
 	
 	
@@ -109,4 +129,59 @@ public class User
 	public void setLastOnline(long lastOnline) {
 		this.lastOnline = lastOnline;
 	}
+	
+	public boolean getIsTimedOut(){
+		return this.isTimedOut;
+	}
+	
+	public void setIsTimedOut(boolean isTimedOut){
+		this.isTimedOut = isTimedOut;
+	}
+	
+	
+	/**
+	 * Adapted from Gravatar implementation guide
+	 * Availible: http://en.gravatar.com/site/implement/images/java/
+	 * @author http://en.gravatar.com
+	 * @param input
+	 * @return
+	 */
+	public String generateGravatarURL(String input){
+		return md5Hex(input);
+	}
+	
+	/**
+	 * Adapted from Gravatar implementation guide 
+	 * Availible: http://en.gravatar.com/site/implement/images/java/
+	 * @author http://en.gravatar.com
+	 * @param array
+	 * @return
+	 */
+	private String hex(byte[] inputArray) {
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < inputArray.length; ++i) {
+			sb.append(Integer.toHexString((inputArray[i] & 0xFF) | 0x100).substring(1,3));
+		}
+		return sb.toString();
+	}
+	
+	/**
+	 * Adapted from Gravatar implementation guide
+	 * Availible: http://en.gravatar.com/site/implement/images/java/
+	 * @author http://en.gravatar.com
+	 * @param message
+	 * @return
+	 */
+	private String md5Hex(String message) {
+		try {
+			MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+			return hex(messageDigest.digest(message.getBytes("CP1252")));
+		} catch (NoSuchAlgorithmException e) {
+			//do nothing
+		} catch (UnsupportedEncodingException e) {
+			//do nothing
+		}
+		return null;
+	}
+
 }
