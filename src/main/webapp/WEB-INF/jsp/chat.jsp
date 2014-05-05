@@ -54,55 +54,80 @@
 <title>Chatroom</title>
 </head>
 <body>
-	<h2>CHAT</h2><!-- 
-	<div id="fb-root"><div class="fb-login-button" data-max-rows="1" data-size="xlarge" data-show-faces="false" data-auto-logout-link="false"></div></div>
-	 -->
-	 <div id="current-user">
-	 	
-	 </div>
-	 <div id="facebook-buttons">
-		<button id="chat-facebook-login" class="btn btn-success">Login</button>
-		<button id="chat-facebook-logout" class="btn btn-danger">Logout</button>
+
+   <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse"
+				data-target=".navbar-collapse">
+				<span class="sr-only">Toggle navigation</span> <span
+					class="icon-bar"></span> <span class="icon-bar"></span> <span
+					class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="#">Too Many Drummers</a>
+		</div>
+		<div class="collapse navbar-collapse">
+			<ul class="nav navbar-nav">
+				<li class="active">
+				<li>
+					<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+  						Launch demo modal
+					</button>
+				</li>
+			</ul>
+		</div>
+		<!--/.nav-collapse -->
 	</div>
+</div>
+
+
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+       <!--  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> -->
+        <h4 class="modal-title" id="myModalLabel">Choose login service</h4>
+      </div>
+      <div class="modal-body">
+		<div id="facebook-buttons">
+			
+<!-- 			<button id="chat-facebook-logout" class="btn btn-danger">Logout</button> -->
+		</div>
+		<div id="login-buttons">
+			<button id="chat-facebook-login" class="btn btn-primary">Facebook</button>
+			<button id="chat-guest-login" class="btn btn-success" data-toggle="button">Guest</button>
+		</div>
+
+		<div id="guest-inputs" class="input-group">
+			<input id="fack" type="text" class="form-control" placeholder="enter a username here" />
+			<span class="input-group-btn">
+				<button id="fuck" class="btn btn-success">Go!</button>
+			</span>
+		</div>
+      </div>
+<!--       <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div> -->
+    </div>
+  </div>
+</div>
+
 	<div id="chat-main-div">
-		<!-- 
-	https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/t1.0-1/s50x50/1467218_10152405394208136_831500500_t.jpg
-	
-	
-	
-	 -->
-<!-- 		<div id="testing">
-			<button id="das-boot" onclick="" class="btn btn-warning">Das
-				Boot</button>
-			<button id="das-add-message" onclick="" class="btn btn-warning">Das
-				Add Message</button>
-		</div> -->
+
 		<div id="chat-control-area-div">
-			<!-- 			<div id="chat-signin-div">
-				User ID: <input id="chat-user-id" type="text" />
-				<button id="chat-signin-button" class="btn btn-primary">Sign-In ID</button>
-			</div> -->
 			<div id="chat-rooms-create-div" class="input-group">
-				<span class="input-group-btn"><button
-						id="chat-room-add-button" class="btn btn-success">Create</button></span>
+				<span class="input-group-btn">
+					<button id="chat-room-add-button" class="btn btn-success">Create Room</button>
+				</span>
 				<input id="chat-room-add-input" type="text" class="form-control"
 					placeholder="enter a room name here" />
 			</div>
 			<div id="chat-rooms-list-div">
 				<ul id="chat-rooms-list" class="nav nav-tabs nav-justified">
-					<!-- 					<li class="active"><a onclick="alert();">Default</a></li>
-					<li><a onclick="alert();">dummy</a></li>
-					<li><a onclick="alert();">dummy</a></li> -->
 				</ul>
 			</div>
-			<!-- /input-group -->
-
-			<!-- 			<div class="input-group input-group-md">
-          		<span class="input-group-btn">
-            		<button id="ButtonSearch" class="btn btn-success btn-md" onclick="SearchItem()" title="Suchen">Hello</button>
-            	</span>
-          		<input class="form-control" placeholder="search" type="text">
-        	</div> -->
 		</div>
 		<div id="chat-message-area-div"></div>
 		<div id="chat-message-controls-div" class="input-group input-group-md">
@@ -111,15 +136,7 @@
 			</span> <input id="chat-room-send-input" type="text" class="form-control"
 				placeholder="enter your message here" />
 		</div>
-
 	</div>
-
-	<fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
-</fb:login-button>
-
-<div id="status">
-</div>
-
 </body>
 </body>
 </html>
