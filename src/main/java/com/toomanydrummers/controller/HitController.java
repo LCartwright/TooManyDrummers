@@ -1,8 +1,5 @@
 package com.toomanydrummers.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -51,11 +48,15 @@ public class HitController {
 	 * @return
 	 * @throws Exception
 	 */
+//	@MessageMapping("/newuser")
+//	@SendTo("/topic/allusers")
+//	public List<User> newUser(User user) throws Exception {
+//		usersService.addUser(user);
+//		return usersService.getUsers();
+//	}
 	@MessageMapping("/newuser")
-	@SendTo("/topic/allusers")
-	public List<User> newUser(User user) throws Exception {
+	public void newUser(User user) throws Exception {
 		usersService.addUser(user);
-		return usersService.getUsers();
 	}
 
 	/**
@@ -65,11 +66,15 @@ public class HitController {
 	 * @return
 	 * @throws Exception
 	 */
+//	@MessageMapping("/finished")
+//	@SendTo("/topic/allusers")
+//	public List<User> removeUser(User user) throws Exception {
+//		usersService.removeUser(user.getId());
+//		return usersService.getUsers();
+//	}
 	@MessageMapping("/finished")
-	@SendTo("/topic/allusers")
-	public List<User> removeUser(User user) throws Exception {
+	public void removeUser(User user) throws Exception {
 		usersService.removeUser(user.getId());
-		return usersService.getUsers();
 	}
 
 	// TODO: Provide a better way of checking ids...?

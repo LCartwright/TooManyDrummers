@@ -52,6 +52,13 @@ public class UsersService {
 		} finally {
 			usersLock.unlock();
 		}
+		
+		try {
+			template.convertAndSend("/topic/allusers", getUsers());
+		} catch (MessageDeliveryException e) {
+			// e.printStackTrace();
+		}
+		
 	}
 
 	public void removeUser(String id) {
@@ -61,10 +68,22 @@ public class UsersService {
 		} finally {
 			usersLock.unlock();
 		}
+		
+		try {
+			template.convertAndSend("/topic/allusers", getUsers());
+		} catch (MessageDeliveryException e) {
+			// e.printStackTrace();
+		}
 	}
 
 	public void removeUser(User oldUser) {
 		removeUser(oldUser.getId());
+		
+		try {
+			template.convertAndSend("/topic/allusers", getUsers());
+		} catch (MessageDeliveryException e) {
+			// e.printStackTrace();
+		}
 	}
 
 	public User getUser(String id) {

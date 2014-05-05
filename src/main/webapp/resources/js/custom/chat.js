@@ -461,6 +461,10 @@ function setLoggedIn(response){
 		currentUserFullName = response.first_name + " " + response.last_name;
 		currentUserPictureURL = response.picture.data.url;
 		
+		////
+		connect();
+		////
+		
 		console.log("currentUserID: " + currentUserID);
 		console.log("currentUserFirstName: " + currentUserFirstName);
 		console.log("currentUserLastName: " + currentUserLastName);

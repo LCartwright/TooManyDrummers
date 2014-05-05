@@ -4,7 +4,7 @@ var stompClient;
 // To relieve some load from the server, we retain a copy of this client's id
 // and filter it out on this end. This must be unique or we may wrongly ignore
 // another user's information.
-var myId;
+// var myId;
 
 // An array of identifiers for all users connected to the service.
 var users = new Array();
@@ -15,6 +15,11 @@ var mousePos = {
 	x : 0,
 	y : 0
 };
+
+var drumkitLeft;
+var drumkitTop;
+var drumkitRight;
+var drumkitBottom;
 
 // How many milliseconds between each cursor location send.
 var mouseDelay = 30;
@@ -51,18 +56,19 @@ function setConnected(connected) {
 
 	// Hide the enterUsername field once a connection is established.
 	// Changes wouldn't make a difference from this point on.
-	document.getElementById('enterUsername').style.visibility = connected ? 'hidden'
-			: 'visible';
+	// document.getElementById('enterUsername').style.visibility = connected ?
+	// 'hidden'
+	// : 'visible';
 
 	// Show the list of connected users so the user can see who's online.
 	document.getElementById('connectedUsers').style.visibility = connected ? 'visible'
 			: 'hidden';
 
 	// A connected user can't connect if they're already connected!
-	document.getElementById('connect').disabled = connected;
+	// document.getElementById('connect').disabled = connected;
 
 	// A disconnected user can't connect if they're already disconnected!
-	document.getElementById('disconnect').disabled = !connected;
+	// document.getElementById('disconnect').disabled = !connected;
 
 	// If we're connected, show the drumkit so the user can play!
 	document.getElementById('drumkit_div').style.visibility = connected ? 'visible'
@@ -73,90 +79,94 @@ function setConnected(connected) {
 // application.
 function connect() {
 
-	// TODO: Make this element less of a nightmare to use by emptying it of the
-	// hint when clicked.
 	// TODO: Check for validity both here and on the serverside, even if
 	// facebook is supplying the info.
-	if (document.getElementById('enterUsername').value === "") {
-		alert('Please enter a username before connecting');
-	} else {
+	// if (document.getElementById('enterUsername').value === "") {
+	// alert('Please enter a username before connecting');
+	// } else {
 
-		if (stompClient != null) {
-			stompClient.disconnect();
-		}
-
-		// TODO: As above, get this from another source.
-		myId = document.getElementById('enterUsername').value;
-
-		// Create a socket which looks for the 'hit' endpoint.
-		var socket = new SockJS('./hit');
-
-		socket.addEventListener('error', function() {
-			disconnect();
-			connect();
-		});
-
-		// Prepare for full Stomp communication.
-		stompClient = Stomp.over(socket);
-
-		stompClient.debug = function() {
-		};
-
-		// Make the connection!
-		stompClient.connect({}, function(frame) {
-
-			// Let the user know we're connected!
-			setConnected(true);
-
-			// Register for hitreports so the user can hear other users playing
-			// and join in!
-			hitreportsSubscription = stompClient.subscribe('/topic/hitreports',
-					function(drumhit) {
-						drumhit.ack();
-						play(JSON.parse(drumhit.body).name);
-					}, {
-						'ack' : 'client'
-					});
-
-			// Subscribe for changes in the room's users so new users can join
-			// in
-			// and old users don't fill up the room with artifacts.
-			allusersSubscription = stompClient.subscribe('/topic/allusers',
-					function(allUsers) {
-						allUsers.ack();
-						refreshUsers(JSON.parse(allUsers.body));
-					}, {
-						'ack' : 'client'
-					});
-
-			// TODO: Replace 'myId' with Facebook details
-			// TODO: Maybe we just need to send the ID and the server can pick
-			// up everything else.
-			// Let the Server know I've joined!
-			stompClient.send('/app/newuser', {}, JSON.stringify({
-				'id' : myId,
-				'firstName' : myId,
-				'lastName' : 'LastCustomName'
-			}));
-
-			// Subscribe for updates on the cursor positions of other users.
-			motionSubscription = stompClient.subscribe('/topic/motion',
-					function(cursorPositions) {
-						cursorPositions.ack();
-						moveDrumsticks(JSON.parse(cursorPositions.body));
-					}, {
-						'ack' : 'client'
-					});
-
-			// Fire off your location 5 times per second
-			// Increase this time for better performance
-			cursorPositionRunner = setInterval(sendMousePosition, mouseDelay);
-
-			// Clear dead users every 10 seconds.
-			deadCursorRunner = setInterval(cleanDeadDrumsticks, cleanupDelay);
-
-		});
+	if (stompClient != null) {
+		stompClient.disconnect();
 	}
+
+	// TODO: Auto generate the id
+	// myId = document.getElementById('enterUsername').value;
+	//alert("Connecting");
+	
+	var x = "http:\/\/" + $(location).attr("host") + contextPath + "/hit/";
+
+	//console.log(x);
+	
+	// Create a socket which looks for the 'hit' endpoint.
+	var socket = new SockJS(x);
+	//var socket = new SockJS("./hit/");
+	//var socket = new WebSocket(x);
+
+	socket.addEventListener('error', function() {
+		disconnect();
+		connect();
+	});
+
+	// Prepare for full Stomp communication.
+	stompClient = Stomp.over(socket);
+	//stompClient = Stomp.client(x);
+
+	stompClient.debug = function() {
+	};
+
+	// Make the connection!
+	stompClient.connect({}, function(frame) {
+
+		// Let the user know we're connected!
+		// setConnected(true);
+
+		// Register for hitreports so the user can hear other users playing
+		// and join in!
+		hitreportsSubscription = stompClient.subscribe('/topic/hitreports',
+				function(drumhit) {
+					drumhit.ack();
+					play(JSON.parse(drumhit.body).name);
+				}, {
+					'ack' : 'client'
+				});
+
+		// Subscribe for changes in the room's users so new users can join
+		// in
+		// and old users don't fill up the room with artifacts.
+		allusersSubscription = stompClient.subscribe('/topic/allusers',
+				function(allUsers) {
+					allUsers.ack();
+					refreshUsers(JSON.parse(allUsers.body));
+				}, {
+					'ack' : 'client'
+				});
+
+		// TODO: Sort this out!
+		// Let the Server know I've joined!
+		stompClient.send('/app/newuser', {}, JSON.stringify({
+			'id' : currentUserID,
+			'firstName' : null,
+			'lastName' : null
+		}));
+
+		// Subscribe for updates on the cursor positions of other users.
+		motionSubscription = stompClient.subscribe('/topic/motion', function(
+				cursorPositions) {
+			cursorPositions.ack();
+			moveDrumsticks(JSON.parse(cursorPositions.body));
+		}, {
+			'ack' : 'client'
+		});
+
+		// Fire off your location 5 times per second
+		// Increase this time for better performance
+		cursorPositionRunner = setInterval(sendMousePosition, mouseDelay);
+
+		// Clear dead users every 10 seconds.
+		deadCursorRunner = setInterval(cleanDeadDrumsticks, cleanupDelay);
+
+	});
+	// }
 
 }
 
@@ -173,7 +183,8 @@ function disconnect() {
 	motionSubscription.unsubscribe();
 
 	stompClient.send('/app/finished', {}, JSON.stringify({
-		'id' : myId,
+		// 'id' : myId,
+		'id' : currentUserID,
 		'firstName' : null,
 		'lastName' : null
 	}));
@@ -254,16 +265,16 @@ function refreshUsers(lastUsers) {
 	// Clear the ids array - we have more recent information.
 	users = new Array();
 
-	//document.getElementById('connectedUsers').innerHTML = "";
-	
+	// document.getElementById('connectedUsers').innerHTML = "";
+
 	// For all users
 	for (var i = 0; i < lastUsers.length; i++) {
 
-		//document.getElementById('connectedUsers').innerHTML += " "
-		//		+ lastUsers[i].firstName;
+		// document.getElementById('connectedUsers').innerHTML += " "
+		// + lastUsers[i].firstName;
 
 		// Filter out my own username and the empty value at the end
-		if (lastUsers[i].id != myId && lastUsers[i].id != "") {
+		if (lastUsers[i].id != currentUserID && lastUsers[i].id != "") {
 
 			// Add it to the array of connected users!
 			users.push(lastUsers[i]);
@@ -273,7 +284,8 @@ function refreshUsers(lastUsers) {
 
 			for (var j = 0; j < drumsticks.length; j++) {
 				// If we can find a drumstick for this user, we're done
-				if (drumsticks[j].getAttribute("id") === drumstickPrefix + lastUsers[i].id) {
+				if (drumsticks[j].getAttribute("id") === drumstickPrefix
+						+ lastUsers[i].id) {
 					noDrumstick = false;
 					break;
 				}
@@ -337,7 +349,7 @@ function moveDrumsticks(positions) {
 		var currentId = positions[i].id;
 
 		// Filter out my own id.
-		if (currentId === myId) {
+		if (currentId === currentUserID) {
 			continue;
 		}
 
@@ -345,23 +357,19 @@ function moveDrumsticks(positions) {
 		for (var j = 0; j < jMax; j++) {
 
 			// If we've landed on the right drumstick
-			if (drumsticks[j].getAttribute("id") === (drumstickPrefix
-					+ currentId)) {
+			if (drumsticks[j].getAttribute("id") === (drumstickPrefix + currentId)) {
 				drumsticks[j].style.left = positions[i].x + 'px';
 				drumsticks[j].style.top = positions[i].y + 'px';
 
-				if (positions[i].x > $('#drumkit').position().left
-						&& positions[i].y > $('#drumkit').position().top
-						&& (positions[i].x < $('#drumkit').position().left
-								+ $('#drumkit').width())
-						&& (positions[i].y < $('#drumkit').position().top
-								+ $('#drumkit').height())) {
+				if (positions[i].x > drumkitLeft
+						&& positions[i].y > drumkitTop
+						&& positions[i].x < drumkitRight
+						&& positions[i].y < drumkitBottom) {
 					drumsticks[j].style.opacity = 1.0;
 				} else {
 					drumsticks[j].style.opacity = 0.2;
 				}
 
-				// Change its position then break to the next id.
 				break;
 			}
 
@@ -391,7 +399,7 @@ function moveDrumsticks(positions) {
 // Fire off this client's mouse location to the server
 function sendMousePosition() {
 	stompClient.send('/app/motion', {}, JSON.stringify({
-		'id' : myId,
+		'id' : currentUserID,
 		'x' : mousePos.x,
 		'y' : mousePos.y
 	}));
@@ -603,6 +611,12 @@ function initialize(contextPath) {
 	$("#drummap").on('dragstart', function(event) {
 		event.preventDefault();
 	});
+	
+	drumkitLeft = $('#drumkit').position().left;
+	drumkitTop = $('#drumkit').position().top;
+	drumkitRight = drumkitLeft + $('#drumkit').width();
+	drumkitBottom = drumkitTop + $('#drumkit').height();
+	
 
 	// Make sure the user is not initially connected
 	setConnected(false);

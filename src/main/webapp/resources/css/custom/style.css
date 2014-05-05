@@ -7,13 +7,14 @@
 }
 
 #mainheading {
+	margin-top: 55px;
 	color: lime;
 }
 
 #drumkit {
 	position: absolute;
 	top: 200;
-	left: 100;
+	left: /*100*/auto;
 }
 
 #effects {

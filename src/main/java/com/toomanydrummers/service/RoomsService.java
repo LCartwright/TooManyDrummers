@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import com.toomanydrummers.bean.Message;
 import com.toomanydrummers.bean.Room;
 
 

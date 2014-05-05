@@ -62,6 +62,10 @@
     			<prop key="home.htm">homeController</prop>
     			<prop key="show-details.htm">showDetailsController</prop>
     			<prop key="chat.htm">chatController</prop>
+    			
+    			<!-- TODO: Temporary -->
+    			<prop key="combine.htm">combineController</prop>
+    			
     		</props>
     	</property>
     </bean>
@@ -77,6 +81,9 @@
     <bean name="showDetailsController" class="org.springframework.web.servlet.mvc.ParameterizableViewController" p:viewName="show-details"/>
     
     <bean name="chatController" class="org.springframework.web.servlet.mvc.ParameterizableViewController" p:viewName="chat"/>
+    
+    <!-- TODO: Temporary -->
+    <bean name="combineController" class="org.springframework.web.servlet.mvc.ParameterizableViewController" p:viewName="combine"/>
     
     <bean id="viewResolver"
           class="org.springframework.web.servlet.view.InternalResourceViewResolver"
