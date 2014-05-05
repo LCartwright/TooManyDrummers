@@ -12,6 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.MessageDeliveryException;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.toomanydrummers.bean.CursorPosition;
@@ -25,42 +29,24 @@ import com.toomanydrummers.bean.User;
 public class UsersService
 {
 
+	// Defines how frequently to broadcast the room's members' cursor locations.
+	private static final int REFRESH_RATE_MILLIS = 30;
+	private SimpMessagingTemplate template;
+	private static final int TIMEOUT_MILLIS = 5000;
+	private static final int CHECK_FOR_TIMEOUT_MILLIS = 1000;
+
+	private final ArrayList<User> users = new ArrayList<User>();
 	private static Map<String, User> users = new HashMap<String, User>();
 	// private final ArrayList<User> users = new ArrayList<User>();
 	private final ArrayList<CursorPosition> cursorPositions = new ArrayList<CursorPosition>();
 	private final ReentrantLock usersLock = new ReentrantLock();
 
-	// private SimpMessagingTemplate template;
+	@Autowired
+	public UsersService(SimpMessagingTemplate template) {
+		this.template = template;
+	}
 
-	// @Autowired
-	// public UsersService(SimpMessagingTemplate template) {
-	//
-	// //System.out.println("JS: " +
-	// template==null?"template is null":"template is not null");
-	//
-	// if (template != null) {
-	// this.template = template;
-	//
-	// this.cursorPositions = new ArrayList<CursorPosition>();
-	//
-	// // Thread tracker = new Thread(new MotionRunner(template));
-	// // tracker.setDaemon(true);
-	// // tracker.start();
-	//
-	// } else {
-	// this.cursorPositions = null;
-	// }
-	//
-	// }
-
-	// public int getUsersCount() {
-	// try {
-	// usersLock.lock();
-	// return users.size();
-	// } finally {
-	// usersLock.unlock();
-	// }
-	// }
+	public void addUser(User newUser) {
 
 	public void addUser(User newUser)
 	{
@@ -106,17 +92,15 @@ public class UsersService
 		return userOUT;
 	}
 
-	/**
-	 * gets a 'List' of the users
-	 * 
-	 * @return - List<User> allusers
-	 */
-	public List<User> getUsers()
-	{
-		List<User> result = new ArrayList<User>();
-		for (User user : users.values())
-		{
-			result.add(user);
+	public List<User> listUsers() {
+
+		try {
+			usersLock.lock();
+
+			return users;
+
+		} finally {
+			usersLock.unlock();
 		}
 		return result;
 	}
@@ -132,22 +116,79 @@ public class UsersService
 		try
 		{
 			usersLock.lock();
-			User user = getUser(id);
-			user.setX(cursorPosition.getX());
-			user.setY(cursorPosition.getY());
-		}
-		finally
-		{
+
+			for (User user : users) {
+				if (user.getId().equals(id)) {
+					user.setLastOnline(System.currentTimeMillis());
+					user.setX(cursorPosition.getX());
+					user.setY(cursorPosition.getY());
+					break;
+				}
+			}
+
+		} finally {
 			usersLock.unlock();
 		}
 	}
 
-	public ArrayList<CursorPosition> preparePositions()
-	{
+	@Scheduled(fixedRate = CHECK_FOR_TIMEOUT_MILLIS)
+	public void checkForTimeouts() {
+
+		boolean somebodyKilled = false;
+
+		try {
+			usersLock.lock();
+
+			long now = System.currentTimeMillis();
+
+			for (int i = 0; i < users.size(); i++) {
+				if (users.get(i).getLastOnline() + TIMEOUT_MILLIS < now) {
+					removeUser(users.get(i));
+					i--;
+					somebodyKilled = true;
+				}
+			}
+
+			if (somebodyKilled) {
+				try {
+					template.convertAndSend("/topic/allusers", listUsers());
+				} catch (MessageDeliveryException e) {
+					// e.printStackTrace();
+				}
+			}
+
+		} finally {
+			usersLock.unlock();
+		}
+
+	}
+
+	// public int getUsersCount() {
+	// try {
+	// usersLock.lock();
+	// return users.size();
+	// } finally {
+	// usersLock.unlock();
+	// }
+	// }
+
+	@Scheduled(fixedRate = REFRESH_RATE_MILLIS)
+	public void provideMotionService() {
+
+		try {
+			// Package the information into an appropriate object.
+			template.convertAndSend("/topic/motion", preparePositions());
+		} catch (MessageDeliveryException e) {
+			// e.printStackTrace();
+		}
+
+	}
+
+	private ArrayList<CursorPosition> preparePositions() {
 		this.cursorPositions.clear();
 		// TODO May need to find a faster way of doing this... :(
-		try
-		{
+
+		try {
 			usersLock.lock();
 			for (User user : getUserCollection())
 			{
@@ -178,5 +219,78 @@ public class UsersService
 		}
 		return allIDs;
 	}
+
+	// @Override
+	// public void onApplicationEvent(ApplicationEvent event) {
+	//
+	// if (event instanceof SessionDisconnectEvent) {
+	// SessionDisconnectEvent sde = (SessionDisconnectEvent) event;
+	// System.out.println("JSD: " + sde.getSessionId());
+	// System.out.println("JSD: " + sde.getCloseStatus().getCode());
+	// System.out.println("JSD: " + sde.getCloseStatus().getReason());
+	// } else if (event instanceof SessionConnectedEvent) {
+	// SessionConnectedEvent sce = (SessionConnectedEvent) event;
+	// StompHeaderAccessor headers = StompHeaderAccessor.wrap(sce.getMessage());
+	// System.out.println("JSC: " + headers.getSessionId());
+	// System.out.println("JSC: " + headers.getSessionAttributes());
+	// System.out.println("JSC: " + headers.getMessage());
+	// }
+	//
+	// }
+
+	// private void startMotionService() {
+	// if (motionService == null || !motionService.isAlive()) {
+	// motionService = new Thread(new MotionRunner());
+	// motionService.setDaemon(true);
+	// motionService.start();
+	// }
+	// }
+	//
+	// @Override
+	// public void onApplicationEvent(ApplicationEvent event) {
+	//
+	// if (event instanceof BrokerAvailabilityEvent) {
+	// if (((BrokerAvailabilityEvent) event).isBrokerAvailable()) {
+	// startMotionService();
+	// } else {
+	// motionService.interrupt();
+	// }
+	//
+	// }
+	//
+	// }
+
+	/**
+	 * This Runnable defines the behaviour of a thread that will repeatedly
+	 * broadcast the positions of the mouse cursors of all the connected users.
+	 * 
+	 * @author john
+	 */
+	// private class MotionRunner implements Runnable {
+	//
+	// @Override
+	// public void run() {
+	//
+	// try {
+	// while (true) {
+	//
+	// Thread.sleep(REFRESH_RATE_MILLIS);
+	//
+	// try {
+	// // Use usersService to package the information into an
+	// // appropriate object.
+	// template.convertAndSend("/topic/motion", preparePositions());
+	//
+	// } catch (MessageDeliveryException e) {
+	// // e.printStackTrace();
+	// }
+	// }
+	// } catch (InterruptedException e) {
+	// e.printStackTrace();
+	// }
+	//
+	// }
+	//
+	// }
 
 }

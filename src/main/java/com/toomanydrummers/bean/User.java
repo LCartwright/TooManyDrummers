@@ -16,9 +16,10 @@ public class User
 
 	private int x;
 	private int y;
+	
+	private long lastOnline = System.currentTimeMillis();
 
-	public User()
-	{
+	public User() {
 		super();
 	}
 	
@@ -42,8 +43,11 @@ public class User
 		this.y = y;
 	}
 	
-	public String getFirstName()
-	{
+	public void setId(String id) {
+		this.id = id;
+	}
+	
+	public String getFirstName() {
 		return firstName;
 	}
 	
@@ -52,8 +56,7 @@ public class User
 		this.firstName = firstName;
 	}
 
-	public String getLastName()
-	{
+	public String getLastName()	{
 		return lastName;
 	}
 	
@@ -102,14 +105,11 @@ public class User
 		this.picture_url = picture_url;
 	}
 
-
+	public long getLastOnline() {
+		return lastOnline;
+	}
 	
-
-
-
-
-
-
-
-
+	public void setLastOnline(long lastOnline) {
+		this.lastOnline = lastOnline;
+	}
 }
