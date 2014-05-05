@@ -13,7 +13,10 @@
 <!--     <context:component-scan base-package="com.toomanydrummers.service, com.toomanydrummers.dao" />
     <context:component-scan base-package="com.toomanydrummers.config" />
     <context:component-scan base-package="com.toomanydrummers" /> -->
-    <import resource="data.xml" />
-    <context:component-scan base-package="com.toomanydrummers.service" />
+
+
+    <!-- <context:component-scan base-package="com.toomanydrummers.config" /> --><!-- 
+    <context:component-scan base-package="com.toomanydrummers.service" /> -->
     
+    <context:component-scan base-package="com.toomanydrummers" />
 </beans>

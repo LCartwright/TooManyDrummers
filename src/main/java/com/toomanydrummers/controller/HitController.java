@@ -1,11 +1,11 @@
 package com.toomanydrummers.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import com.toomanydrummers.bean.CursorPosition;
@@ -28,22 +28,7 @@ public class HitController {
 	// This service keeps a list of all the connected users of the drumkit.
 	@Autowired
 	private UsersService usersService;
-
-	/**
-	 * This constructor injects a SimpMessagingTemplate so it can broadcast
-	 * cursor locations independently of the activities of any participants.
-	 * 
-	 * @param template
-	 */
-	@Autowired
-	public HitController(SimpMessagingTemplate template) {
-
-		// Start the thread which broadcasts cursor locations.
-		// Thread motionService = new Thread(new MotionRunner(template));
-		// motionService.setDaemon(true);
-		// motionService.start();
-
-	}
+	
 
 	/**
 	 * Listen for hits and broadcast them for everyone to hear
@@ -70,7 +55,7 @@ public class HitController {
 	@SendTo("/topic/allusers")
 	public List<User> newUser(User user) throws Exception {
 		usersService.addUser(user);
-		return usersService.listUsers();
+		return usersService.getUsers();
 	}
 
 	/**
@@ -84,7 +69,7 @@ public class HitController {
 	@SendTo("/topic/allusers")
 	public List<User> removeUser(User user) throws Exception {
 		usersService.removeUser(user.getId());
-		return usersService.listUsers();
+		return usersService.getUsers();
 	}
 
 	// TODO: Provide a better way of checking ids...?
