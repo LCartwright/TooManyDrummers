@@ -8,84 +8,83 @@ package com.toomanydrummers.bean;
 
 public class User
 {
-
+	private String id;
 	private String firstName;
 	private String lastName;
-	private String id;
-
+	
 	private int x;
 	private int y;
+	
+	private long lastOnline = System.currentTimeMillis();
 
-	public User()
-	{
+	public User() {
 		super();
 	}
 	
-	public User(String first_name, String last_name, String id)
-	{
+	public User(String first_name, String last_name, String id) {
+		this.id = id;
 		this.firstName = first_name;
 		this.lastName = last_name;
-		this.id = id;
 		x = 0;
 		y = 0;
 	}
 	
-	public User(String first_name, String last_name, String id, int x, int y)
-	{
+	public User(String first_name, String last_name, String id, int x, int y) {
+		this.id = id;
 		this.firstName = first_name;
 		this.lastName = last_name;
-		this.id = id;
 		this.x = x;
 		this.y = y;
 	}
-
-	public void setX(int x) {
-		this.x = x;
-	}
 	
-	public String getFirstName()
-	{
-		return firstName;
-	}
-
-	public String getLastName()
-	{
-		return lastName;
-	}
-
-	public String getId()
-	{
+	public String getId() {
 		return id;
 	}
+	
+	public void setId(String id) {
+		this.id = id;
+	}
+	
+	public String getFirstName() {
+		return firstName;
+	}
+	
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
 
+	public String getLastName()	{
+		return lastName;
+	}
+	
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+	
 	public int getX()
 	{
 		return x;
 	}
-
+	
+	public void setX(int x) {
+		this.x = x;
+	}
+	
 	public int getY()
 	{
 		return y;
 	}
 
-	public void setY(int y)
-	{
+	public void setY(int y)	{
 		this.y = y;
 	}
-
-	public void setFirstName(String firstName)
-	{
-		this.firstName = firstName;
+	
+	public long getLastOnline() {
+		return lastOnline;
 	}
-
-	public void setLastName(String lastName)
-	{
-		this.lastName = lastName;
-	}
-
-	public void setId(String id)
-	{
-		this.id = id;
+	
+	public void setLastOnline(long lastOnline) {
+		this.lastOnline = lastOnline;
 	}
 
 }

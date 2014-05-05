@@ -1,0 +1,30 @@
+.unselectable {
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+}
+
+#mainheading {
+	color: fuchsia;
+}
+
+#drummap {
+	z-index: 999;
+}
+
+.drumstick {
+	
+}
+
+.cursornames {
+	float: right;
+	color: white;
+	text-shadow: 1px 1px 4px #000000;
+	size: 8px;
+}
+
+body {
+	background-color: grey;
+}

@@ -6,8 +6,13 @@
 package com.toomanydrummers.service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.MessageDeliveryException;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.toomanydrummers.bean.CursorPosition;
@@ -20,50 +25,38 @@ import com.toomanydrummers.bean.User;
 @Service
 public class UsersService {
 
+	// Defines how frequently to broadcast the room's members' cursor locations.
+	private static final int REFRESH_RATE_MILLIS = 30;
+	private SimpMessagingTemplate template;
+	private static final int TIMEOUT_MILLIS = 5000;
+	private static final int CHECK_FOR_TIMEOUT_MILLIS = 1000;
+
 	private final ArrayList<User> users = new ArrayList<User>();
 	private final ArrayList<CursorPosition> cursorPositions = new ArrayList<CursorPosition>();
 	private final ReentrantLock usersLock = new ReentrantLock();
 
-	//private SimpMessagingTemplate template;
-
-	// @Autowired
-	// public UsersService(SimpMessagingTemplate template) {
-	//
-	// //System.out.println("JS: " +
-	// template==null?"template is null":"template is not null");
-	//
-	// if (template != null) {
-	// this.template = template;
-	//
-	// this.cursorPositions = new ArrayList<CursorPosition>();
-	//
-	// // Thread tracker = new Thread(new MotionRunner(template));
-	// // tracker.setDaemon(true);
-	// // tracker.start();
-	//
-	// } else {
-	// this.cursorPositions = null;
-	// }
-	//
-	// }
+	@Autowired
+	public UsersService(SimpMessagingTemplate template) {
+		this.template = template;
+	}
 
 	public void addUser(User newUser) {
 
-		try {
-			usersLock.lock();
-			users.add(newUser);
-		} finally {
-			usersLock.unlock();
-		}
+		 try {
+		 usersLock.lock();
+		users.add(newUser);
+		 } finally {
+		 usersLock.unlock();
+		 }
 	}
 
 	public void removeUser(User oldUser) {
-		try {
-			usersLock.lock();
-			users.remove(oldUser);
-		} finally {
-			usersLock.unlock();
-		}
+		 try {
+		 usersLock.lock();
+		users.remove(oldUser);
+		 } finally {
+		 usersLock.unlock();
+		 }
 	}
 
 	public void removeUser(String oldUserId) {
@@ -72,48 +65,90 @@ public class UsersService {
 
 			if (users.get(i).getId().equals(oldUserId)) {
 
-				try {
-					usersLock.lock();
-					users.remove(i);
-				} finally {
-					usersLock.unlock();
-				}
+				 try {
+				 usersLock.lock();
+				users.remove(i);
+				 } finally {
+				 usersLock.unlock();
+				 }
 				break;
 			}
 		}
 
 	}
 
-	public String itemizeIDs() {
-		String allIDs = "";
-
+	public List<User> listUsers() {
+		
 		try {
 			usersLock.lock();
-			for (User user : users) {
-
-				allIDs += user.getId() + ",";
-			}
+			
+			return users;
+			
 		} finally {
 			usersLock.unlock();
 		}
-
-		return allIDs;
+		
+//		String allIDs = "";
+//
+//		 try {
+//		 usersLock.lock();
+//		for (User user : users) {
+//			allIDs += user.getId() + ",";
+//		}
+//		 } finally {
+//		 usersLock.unlock();
+//		 }
+//
+//		return allIDs;
 	}
 
 	public void updatePosition(CursorPosition cursorPosition) {
 
 		String id = cursorPosition.getId();
 
-		try {
-			usersLock.lock();
+		 try {
+		 usersLock.lock();
 
-			for (User user : users) {
-				if (user.getId().equals(id)) {
-					user.setX(cursorPosition.getX());
-					user.setY(cursorPosition.getY());
-					break;
-				}
+		for (User user : users) {
+			if (user.getId().equals(id)) {
+				user.setLastOnline(System.currentTimeMillis());
+				user.setX(cursorPosition.getX());
+				user.setY(cursorPosition.getY());
+				break;
 			}
+		}
+
+		 } finally {
+		 usersLock.unlock();
+		 }
+
+	}
+
+	@Scheduled(fixedRate = CHECK_FOR_TIMEOUT_MILLIS)
+	public void checkForTimeouts() {
+		
+		boolean somebodyKilled = false;
+
+		 try {
+		 usersLock.lock();
+
+		long now = System.currentTimeMillis();
+
+		for (int i = 0; i < users.size(); i++) {
+			if (users.get(i).getLastOnline() + TIMEOUT_MILLIS < now) {
+				removeUser(users.get(i));
+				i--;
+				somebodyKilled = true;
+			}
+		}
+
+		if (somebodyKilled) {
+			try {
+				template.convertAndSend("/topic/allusers", listUsers());
+			} catch (MessageDeliveryException e) {
+				// e.printStackTrace();
+			}
+		}
 
 		} finally {
 			usersLock.unlock();
@@ -130,22 +165,100 @@ public class UsersService {
 	// }
 	// }
 
-	public ArrayList<CursorPosition> preparePositions() {
+	@Scheduled(fixedRate = REFRESH_RATE_MILLIS)
+	public void provideMotionService() {
+
+		try {
+			// Package the information into an appropriate object.
+			template.convertAndSend("/topic/motion", preparePositions());
+		} catch (MessageDeliveryException e) {
+			// e.printStackTrace();
+		}
+
+	}
+
+	private ArrayList<CursorPosition> preparePositions() {
 		this.cursorPositions.clear();
 		// TODO May need to find a faster way of doing this... :(
-		try {
-			usersLock.lock();
-			
-			for (User user : users) {
-				this.cursorPositions.add(new CursorPosition(user.getId(), user
-						.getX(), user.getY()));
-			}
-		} finally {
-			usersLock.unlock();
+		for (User user : users) {
+			this.cursorPositions.add(new CursorPosition(user.getId(), user.getX(), user.getY()));
 		}
-		
+
 		return this.cursorPositions;
 
 	}
+
+	// @Override
+	// public void onApplicationEvent(ApplicationEvent event) {
+	//
+	// if (event instanceof SessionDisconnectEvent) {
+	// SessionDisconnectEvent sde = (SessionDisconnectEvent) event;
+	// System.out.println("JSD: " + sde.getSessionId());
+	// System.out.println("JSD: " + sde.getCloseStatus().getCode());
+	// System.out.println("JSD: " + sde.getCloseStatus().getReason());
+	// } else if (event instanceof SessionConnectedEvent) {
+	// SessionConnectedEvent sce = (SessionConnectedEvent) event;
+	// StompHeaderAccessor headers = StompHeaderAccessor.wrap(sce.getMessage());
+	// System.out.println("JSC: " + headers.getSessionId());
+	// System.out.println("JSC: " + headers.getSessionAttributes());
+	// System.out.println("JSC: " + headers.getMessage());
+	// }
+	//
+	// }
+
+	// private void startMotionService() {
+	// if (motionService == null || !motionService.isAlive()) {
+	// motionService = new Thread(new MotionRunner());
+	// motionService.setDaemon(true);
+	// motionService.start();
+	// }
+	// }
+	//
+	// @Override
+	// public void onApplicationEvent(ApplicationEvent event) {
+	//
+	// if (event instanceof BrokerAvailabilityEvent) {
+	// if (((BrokerAvailabilityEvent) event).isBrokerAvailable()) {
+	// startMotionService();
+	// } else {
+	// motionService.interrupt();
+	// }
+	//
+	// }
+	//
+	// }
+
+	/**
+	 * This Runnable defines the behaviour of a thread that will repeatedly
+	 * broadcast the positions of the mouse cursors of all the connected users.
+	 * 
+	 * @author john
+	 */
+	// private class MotionRunner implements Runnable {
+	//
+	// @Override
+	// public void run() {
+	//
+	// try {
+	// while (true) {
+	//
+	// Thread.sleep(REFRESH_RATE_MILLIS);
+	//
+	// try {
+	// // Use usersService to package the information into an
+	// // appropriate object.
+	// template.convertAndSend("/topic/motion", preparePositions());
+	//
+	// } catch (MessageDeliveryException e) {
+	// // e.printStackTrace();
+	// }
+	// }
+	// } catch (InterruptedException e) {
+	// e.printStackTrace();
+	// }
+	//
+	// }
+	//
+	// }
 
 }

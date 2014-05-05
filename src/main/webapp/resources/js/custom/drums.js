@@ -1,38 +1,32 @@
 // Necessary for websocket communication with the server.
-var stompClient = null;
+var stompClient;
 
 // To relieve some load from the server, we retain a copy of this client's id
 // and filter it out on this end. This must be unique or we may wrongly ignore
 // another user's information.
-var myId = null;
+var myId;
 
 // An array of identifiers for all users connected to the service.
-var ids = new Array();
-
-// Modified version of the code available at this address:
-// http://www.storiesinflight.com/html5/audio.html
-// Updated: October 31, 2010
-// Implementation of Rotating Audio Channels
-// If a request is made for an audio element to play a file while
-// already playing one, the request will be dropped.
-// This array contains channel_max audio channels and the earliest
-// 'free' channel is used to handle a sound request.
-// TODO: var audio_channel_max = 5;
-// TODO: var audiochannels = new Array();
+var users = new Array();
 
 // A holder for the x,y coordinates of this user's cursor so it can be relayed
 // to the server every so often
-var mousePos;
+var mousePos = {
+	x : 0,
+	y : 0
+};
 
 // How many milliseconds between each cursor location send.
-var mouseDelay = 200;
+var mouseDelay = 30;
 // How many milliseconds between each cleanup of dead drumsticks.
-var cleanupDelay = 10000;
+var cleanupDelay = 1000;
 
 var cursorPositionRunner;
 var deadCursorRunner;
 
 var contextPath;
+
+var drumstickPrefix = "drumstick";
 
 var snare; // snare
 var kick; // kick
@@ -42,7 +36,14 @@ var hatc; // hatc
 var hato; // hato
 var crash; // crash
 var ride; // ride
-// var cuica; // cuica
+var cuica1; // cuica
+var cuica2; // cuica
+var cuica3; // cuica
+var cuica4; // cuica
+
+var hitreportsSubscription;
+var allusersSubscription;
+var motionSubscription;
 
 // Change the UI to better represent the options available to a
 // connected/disconnected user.
@@ -70,18 +71,19 @@ function setConnected(connected) {
 
 // This function is fired when the user tries to connect via a websocket to the
 // application.
-// TODO: This step should be automated with information from facebook.
-// function connect(facebookId) {
 function connect() {
 
 	// TODO: Make this element less of a nightmare to use by emptying it of the
-	// hint
-	// when clicked.
+	// hint when clicked.
 	// TODO: Check for validity both here and on the serverside, even if
 	// facebook is supplying the info.
 	if (document.getElementById('enterUsername').value === "") {
 		alert('Please enter a username before connecting');
 	} else {
+
+		if (stompClient != null) {
+			stompClient.disconnect();
+		}
 
 		// TODO: As above, get this from another source.
 		myId = document.getElementById('enterUsername').value;
@@ -89,8 +91,16 @@ function connect() {
 		// Create a socket which looks for the 'hit' endpoint.
 		var socket = new SockJS('./hit');
 
+		socket.addEventListener('error', function() {
+			disconnect();
+			connect();
+		});
+
 		// Prepare for full Stomp communication.
 		stompClient = Stomp.over(socket);
+
+		stompClient.debug = function() {
+		};
 
 		// Make the connection!
 		stompClient.connect({}, function(frame) {
@@ -100,17 +110,24 @@ function connect() {
 
 			// Register for hitreports so the user can hear other users playing
 			// and join in!
-			// TODO:
-			stompClient.subscribe('/topic/hitreports', function(drumhit) {
-				play(JSON.parse(drumhit.body).name);
-			});
+			hitreportsSubscription = stompClient.subscribe('/topic/hitreports',
+					function(drumhit) {
+						drumhit.ack();
+						play(JSON.parse(drumhit.body).name);
+					}, {
+						'ack' : 'client'
+					});
 
 			// Subscribe for changes in the room's users so new users can join
 			// in
 			// and old users don't fill up the room with artifacts.
-			stompClient.subscribe('/topic/allusers', function(allUsers) {
-				refreshUsers(JSON.parse(allUsers.body));
-			});
+			allusersSubscription = stompClient.subscribe('/topic/allusers',
+					function(allUsers) {
+						allUsers.ack();
+						refreshUsers(JSON.parse(allUsers.body));
+					}, {
+						'ack' : 'client'
+					});
 
 			// TODO: Replace 'myId' with Facebook details
 			// TODO: Maybe we just need to send the ID and the server can pick
@@ -119,17 +136,18 @@ function connect() {
 			stompClient.send('/app/newuser', {}, JSON.stringify({
 				'id' : myId,
 				'firstName' : myId,
-				'lastName' : myId
+				'lastName' : 'LastCustomName'
 			}));
 
 			// Subscribe for updates on the cursor positions of other users.
-			// TODO:
-			stompClient.subscribe('/topic/motion', function(cursorPositions) {
-				moveDrumsticks(JSON.parse(cursorPositions.body));
-			});
+			motionSubscription = stompClient.subscribe('/topic/motion',
+					function(cursorPositions) {
+						cursorPositions.ack();
+						moveDrumsticks(JSON.parse(cursorPositions.body));
+					}, {
+						'ack' : 'client'
+					});
 
-			// Listen for mouse movements
-			window.onmousemove = handleMouseMove;
 			// Fire off your location 5 times per second
 			// Increase this time for better performance
 			cursorPositionRunner = setInterval(sendMousePosition, mouseDelay);
@@ -147,130 +165,104 @@ function connect() {
 // 'close' too
 function disconnect() {
 
-	// TODO Rather than sending a message, it would be much better to react to
-	// disconnections on the serverside...
+	clearInterval(cursorPositionRunner);
+	clearInterval(deadCursorRunner);
+
+	hitreportsSubscription.unsubscribe();
+	allusersSubscription.unsubscribe();
+	motionSubscription.unsubscribe();
+
 	stompClient.send('/app/finished', {}, JSON.stringify({
 		'id' : myId,
 		'firstName' : null,
 		'lastName' : null
 	}));
 
-	clearInterval(cursorPositionRunner);
-	clearInterval(deadCursorRunner);
-
 	// Cleanly disconnect and inform the user.
-	stompClient.disconnect();
 	setConnected(false);
+	// stompClient.disconnect();
+
 }
 
-// //TODO: Play a sound!
 function play(message) {
 
 	switch (message) {
-
-	case "hato": {
+	case "hato":
 		hato.play();
 		hatc.stop();
 		break;
-	}
-
-	case "hatc": {
+	case "hatc":
 		hatc.play();
 		hato.stop();
 		break;
-	}
-
-	case "snare": {
+	case "snare":
 		snare.play();
 		break;
-	}
-
-	case "kick": {
+	case "kick":
 		kick.play();
 		break;
-	}
-
-	case "rtom": {
+	case "rtom":
 		rtom.play();
 		break;
-	}
-
-	case "ftom": {
+	case "ftom":
 		ftom.play();
 		break;
-	}
-
-	case "crash": {
+	case "crash":
 		crash.play();
 		break;
-	}
-
-	case "ride": {
+	case "ride":
 		ride.play();
 		break;
+	case "cuica1":
+		cuica1.play();
+		break;
+	case "cuica2":
+		cuica2.play();
+		break;
+	case "cuica3":
+		cuica3.play();
+		break;
+	case "cuica4":
+		cuica4.play();
+		break;
 	}
-
-	}
-
-	// This will (must) be the id of the appropriate <audio /> element
-	// var audio = message + 'sound';
-
-	// Modified version of the code available at this address:
-	// http://www.storiesinflight.com/html5/audio.html
-	// Updated: October 31, 2010
-	// Implementation of Rotating Audio Channels
-	// Searches audiochannels for a free channel to play the
-	// drum sound.
-	// for (var a = 0; a < audio_channel_max; a++) {
-	// var thistime = new Date();
-	//
-	// if (audiochannels[a]['finished'] < thistime.getTime()) {
-	// audiochannels[a]['finished'] = thistime.getTime()
-	// + document.getElementById(audio).duration * 1000;
-	// audiochannels[a]['channel'].src = document.getElementById(audio).src;
-	// audiochannels[a]['channel'].load();
-	// audiochannels[a]['channel'].play();
-	// break;
-	// }
-	//
-	// }
-
 }
 
 // Called whenever a user joins or leaves.
-function refreshUsers(users) {
+function refreshUsers(lastUsers) {
 
 	// TODO: Do something better with the list of connected users than just
 	// print them.
 	// TODO: Move this into the loop so this client's name is not displayed.
-	document.getElementById('connectedUsers').innerHTML = users;
+	// document.getElementById('connectedUsers').innerHTML = users;
 
 	// Get the array of drumsticks. One is needed to track each user's mouse
 	// movements.
 	var drumsticks = document.getElementById('drumsticks').childNodes;
 
-	// Get all the ids provided
-	var allIds = users.split(",");
-
 	// Clear the ids array - we have more recent information.
-	// TODO: Is there a cheaper clear() that can be used?
-	ids = new Array();
+	users = new Array();
+
+	document.getElementById('connectedUsers').innerHTML = "";
 
 	// For all users
-	for (var i = 0; i < allIds.length; i++) {
+	for (var i = 0; i < lastUsers.length; i++) {
+
+		document.getElementById('connectedUsers').innerHTML += " "
+				+ lastUsers[i].firstName;
 
 		// Filter out my own username and the empty value at the end
-		if (allIds[i] != myId && allIds[i] != "") {
+		if (lastUsers[i].id != myId && lastUsers[i].id != "") {
 
 			// Add it to the array of connected users!
-			ids.push(allIds[i]);
+			users.push(lastUsers[i]);
 
 			// Ensure this id has a drumstick, else create one
 			var noDrumstick = true;
 
 			for (var j = 0; j < drumsticks.length; j++) {
 				// If we can find a drumstick for this user, we're done
-				if (drumsticks[j].getAttribute("id") == allIds[i]) {
+				if (drumsticks[j].getAttribute("id") === lastUsers[i].id) {
 					noDrumstick = false;
 					break;
 				}
@@ -278,30 +270,47 @@ function refreshUsers(users) {
 
 			if (noDrumstick) {
 
-				// Create a new image
-				var newChild = document.createElement("img");
+				var newChild = document.createElement("div");
 
-				// Make it display the correct image
-				newChild.setAttribute("src", contextPath
-						+ "/resources/images/drumstick.png");
 				// Give it the appropriate id so it can be found by other
 				// methods
-				newChild.setAttribute("id", allIds[i]);
+				newChild.setAttribute("id", drumstickPrefix + lastUsers[i].id);
 
-				// TODO: Find a better way of scaling down
-				newChild.setAttribute("width", "80");
-				newChild.setAttribute("width", "50");
+				$("#" + drumstickPrefix + lastUsers[i].id).on('dragstart',
+						function(event) {
+							event.preventDefault();
+						});
+
+				newChild.setAttribute("class", "unselectable");
 
 				// Needed for positions to work
-				newChild.setAttribute("style", "position:absolute;");
+				newChild.setAttribute("style",
+						"position:absolute; pointer-events:none;");
+
+				// Create a new image
+				var newImage = document.createElement("img");
+
+				// Make it display the correct image
+				newImage.setAttribute("src", contextPath
+						+ "/resources/images/drumstick.png");
+
+				// TODO: Find a better way of scaling down
+				newImage.setAttribute("width", "80");
+				newImage.setAttribute("height", "50");
+
+				var newName = document.createElement("p");
+				newName.setAttribute("class", "cursornames");
+				var newNameText = document
+						.createTextNode(lastUsers[i].firstName);
+				newName.appendChild(newNameText);
+
+				newChild.appendChild(newImage);
+				newChild.appendChild(newName);
 
 				document.getElementById('drumsticks').appendChild(newChild);
 			}
-
 		}
-
 	}
-
 }
 
 // This method is NOT responsible for creating/removing drumsticks.
@@ -325,15 +334,21 @@ function moveDrumsticks(positions) {
 		for (var j = 0; j < jMax; j++) {
 
 			// If we've landed on the right drumstick
-			if (drumsticks[j].getAttribute("id") == currentId) {
-
-				// TODO: Make movement smooth
-				// $("#" + drumsticks[j].getAttribute("id")).animate({
-				// left : "'" + positions[i].x + "px'",
-				// top : "'" + positions[i].y + "px'"
-				// });
+			if (drumsticks[j].getAttribute("id") === drumstickPrefix
+					+ currentId) {
 				drumsticks[j].style.left = positions[i].x + 'px';
 				drumsticks[j].style.top = positions[i].y + 'px';
+
+				if (positions[i].x > $('#drumkit').position().left
+						&& positions[i].y > $('#drumkit').position().top
+						&& (positions[i].x < $('#drumkit').position().left
+								+ $('#drumkit').width())
+						&& (positions[i].y < $('#drumkit').position().top
+								+ $('#drumkit').height())) {
+					drumsticks[j].style.opacity = 1.0;
+				} else {
+					drumsticks[j].style.opacity = 0.2;
+				}
 
 				// Change its position then break to the next id.
 				break;
@@ -345,33 +360,30 @@ function moveDrumsticks(positions) {
 
 }
 
-function handleMouseMove(event) {
-	event = event || window.event; // IE
-
-	// TODO: Consider nullifying mousePos if it hasn't changed
-	// so sendMousePosition() won't send an update
-	// if (mousePos.x == event.clientX && mousePos.y == event.clientY) {
-	// mousePos = null;
-	// } else {
-
-	// Update mousePos
-	mousePos = {
-		y : event.clientY,
-		x : event.clientX
-	};
-
-	// }
-}
+// function handleMouseMove(event) {
+// event = event || window.event; // IE
+//
+// // so sendMousePosition() won't send an update
+// // if (mousePos.x == event.clientX && mousePos.y == event.clientY) {
+// // mousePos = null;
+// // } else {
+//
+// // Update mousePos
+// mousePos = {
+// y : event.clientY,
+// x : event.clientX
+// };
+//
+// // }
+// }
 
 // Fire off this client's mouse location to the server
 function sendMousePosition() {
-	if (mousePos) {
-		stompClient.send('/app/motion', {}, JSON.stringify({
-			'id' : myId,
-			'x' : mousePos.x,
-			'y' : mousePos.y
-		}));
-	}
+	stompClient.send('/app/motion', {}, JSON.stringify({
+		'id' : myId,
+		'x' : mousePos.x,
+		'y' : mousePos.y
+	}));
 }
 
 // Every now and then, delete the drumsticks belonging to disconnected users
@@ -385,10 +397,11 @@ function cleanDeadDrumsticks() {
 
 		var drumstickMatchesDeadConnection = true;
 
-		for (var j = 0; j < ids.length; j++) {
+		for (var j = 0; j < users.length; j++) {
 
 			// if we find a live user for this drumstick, we're done.
-			if (drumsticks[i].getAttribute("id") == ids[j]) {
+			if (drumsticks[i].getAttribute("id") == drumstickPrefix
+					+ users[j].id) {
 				drumstickMatchesDeadConnection = false;
 				break;
 			}
@@ -448,6 +461,18 @@ function initialize(contextPath) {
 			{
 				id : "ride",
 				src : "resources/sounds/slingerland-kit/Slingerland-Kit-Sabian-Ride-A.ogg"
+			}, {
+				id : "cuica1",
+				src : "resources/sounds/cuica/cuica1.ogg"
+			}, {
+				id : "cuica2",
+				src : "resources/sounds/cuica/cuica2.ogg"
+			}, {
+				id : "cuica3",
+				src : "resources/sounds/cuica/cuica3.ogg"
+			}, {
+				id : "cuica4",
+				src : "resources/sounds/cuica/cuica4.ogg"
 			} ];
 
 	createjs.Sound.registerManifest(manifest, contextPath + "/");
@@ -460,80 +485,122 @@ function initialize(contextPath) {
 	ride = createjs.Sound.createInstance("ride");
 	hatc = createjs.Sound.createInstance("hatc");
 	hato = createjs.Sound.createInstance("hato");
+	cuica1 = createjs.Sound.createInstance("cuica1");
+	cuica2 = createjs.Sound.createInstance("cuica2");
+	cuica3 = createjs.Sound.createInstance("cuica3");
+	cuica4 = createjs.Sound.createInstance("cuica4");
 
-	$('#hato').mousedown(function() {
+	snare.volume = 0.9;
+	kick.volume = 1.0;
+	ftom.volume = 1.0;
+	rtom.volume = 1.0;
+	crash.volume = 0.4;
+	ride.volume = 1.0;
+	hatc.volume = 0.8;
+	hato.volume = 0.6;
+
+	$('#hato').mousedown(function(e) {
+		e.originalEvent.preventDefault();
 		stompClient.send("/app/hit", {}, JSON.stringify({
 			'name' : 'hato'
 		}));
-		// hato.play();
-		// hatc.stop();
 	});
 
-	$('#hatc').mousedown(function() {
+	$('#hatc').mousedown(function(e) {
+		e.originalEvent.preventDefault();
 		stompClient.send("/app/hit", {}, JSON.stringify({
 			'name' : 'hatc'
 		}));
-		// hatc.play();
-		// hato.stop();
 	});
 
-	$('#snare').mousedown(function() {
+	$('#snare').mousedown(function(e) {
+		e.originalEvent.preventDefault();
 		stompClient.send("/app/hit", {}, JSON.stringify({
 			'name' : 'snare'
 		}));
-		// snare.play();
 	});
 
-	$('#kick').mousedown(function() {
+	$('#kick').mousedown(function(e) {
+		e.originalEvent.preventDefault();
 		stompClient.send("/app/hit", {}, JSON.stringify({
 			'name' : 'kick'
 		}));
-		// kick.play();
 	});
 
-	$('#rtom').mousedown(function() {
+	$('#rtom').mousedown(function(e) {
+		e.originalEvent.preventDefault();
 		stompClient.send("/app/hit", {}, JSON.stringify({
 			'name' : 'rtom'
 		}));
-		// rtom.play();
 	});
 
-	$('#ftom').mousedown(function() {
+	$('#ftom').mousedown(function(e) {
+		e.originalEvent.preventDefault();
 		stompClient.send("/app/hit", {}, JSON.stringify({
 			'name' : 'ftom'
 		}));
-		// ftom.play();
 	});
 
-	$('#crash').mousedown(function() {
+	$('#crash').mousedown(function(e) {
+		e.originalEvent.preventDefault();
 		stompClient.send("/app/hit", {}, JSON.stringify({
 			'name' : 'crash'
 		}));
-		// crash.play();
 	});
 
-	$('#ride').mousedown(function() {
+	$('#ride').mousedown(function(e) {
+		e.originalEvent.preventDefault();
 		stompClient.send("/app/hit", {}, JSON.stringify({
 			'name' : 'ride'
 		}));
-		// ride.play();
+	});
+	$('#cuica1').mousedown(function(e) {
+		e.originalEvent.preventDefault();
+		stompClient.send("/app/hit", {}, JSON.stringify({
+			'name' : 'cuica1'
+		}));
+	});
+	$('#cuica2').mousedown(function(e) {
+		e.originalEvent.preventDefault();
+		stompClient.send("/app/hit", {}, JSON.stringify({
+			'name' : 'cuica2'
+		}));
+	});
+	$('#cuica3').mousedown(function(e) {
+		e.originalEvent.preventDefault();
+		stompClient.send("/app/hit", {}, JSON.stringify({
+			'name' : 'cuica3'
+		}));
+	});
+	$('#cuica4').mousedown(function(e) {
+		e.originalEvent.preventDefault();
+		stompClient.send("/app/hit", {}, JSON.stringify({
+			'name' : 'cuica4'
+		}));
+	});
+
+	// Listen for mouse movements
+	// window.onmousemove = handleMouseMove;
+	$(window).mousemove(function(event) {
+		mousePos = {
+			x : event.pageX,
+			y : event.pageY
+		};
+	});
+
+	$("#drumkit").on('dragstart', function(event) {
+		event.preventDefault();
+	});
+	$("#drummap").on('dragstart', function(event) {
+		event.preventDefault();
 	});
 
 	// Make sure the user is not initially connected
 	setConnected(false);
 
-	// Modified version of the code available at this address:
-	// http://www.storiesinflight.com/html5/audio.html
-	// Updated: October 31, 2010
-	// Implementation of Rotating Audio Channels
-	// If a request is made for an audio element to play a file while
-	// already playing one, the request will be dropped.
-	// This array contains channel_max audio channels and the earliest
-	// 'free' channel is used to handle a sound request.
-	// TODO:
-	// for (var a = 0; a < audio_channel_max; a++) {
-	// audiochannels[a] = new Array();
-	// audiochannels[a]['channel'] = new Audio();
-	// audiochannels[a]['finished'] = -1;
-	// }
 }
+
+$(window).on('beforeunload', function() {
+	disconnect();
+	return;
+});
