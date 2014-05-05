@@ -305,13 +305,18 @@ function sendButtonPressed(){
 	
 	if(!message_send_blocker){
 		
-		message_send_blocker = true;
+		var message_contents = $("#chat-room-send-input").val();
 		
-		setTimeout(function(){message_send_blocker = false;}, 3000);
-		
-		sendMessage(active_room_id, currentUserID);
-		
-		$("#chat-room-send-input").val("");
+		if(message_contents !== ""){
+			
+			message_send_blocker = true;
+			
+			setTimeout(function(){message_send_blocker = false;}, 3000);
+			
+			sendMessage(active_room_id, currentUserID);
+			
+			$("#chat-room-send-input").val("");
+		}
 		
 	} else {
 		alert("SLOW DOWN"); // DO something else
@@ -320,16 +325,22 @@ function sendButtonPressed(){
 }
 
 function createRoomButtonPressed(){
-	
+
 	if(!create_room_blocker){
 		
-		create_room_blocker = true;
-		
-		setTimeout(function(){create_room_blocker = false;}, 3000);
-		
-		generateNewRoom($("#chat-room-add-input").val());
-		
-		$("#chat-room-add-input").val("");
+		var room_name = $("#chat-room-add-input").val();
+
+		if(room_name !== ""){
+
+			create_room_blocker = true;
+			
+			setTimeout(function(){create_room_blocker = false;}, 3000);
+			
+			generateNewRoom(room_name);
+			
+			$("#chat-room-add-input").val("");
+			
+		}
 		
 	} else {
 		alert("STOP CREATING ROOMS");
@@ -338,7 +349,7 @@ function createRoomButtonPressed(){
 
 $( document ).ready(function() {
 	
-	
+	// BUTTON_ASSIGNMENTS
 	//First set the user as logged out
 	setLoggedOut();
 	
@@ -396,6 +407,7 @@ $( document ).ready(function() {
 	});
 	
 	$("#chat-room-add-button").click(function(){
+		alert("clicked chat");
 		createRoomButtonPressed();
 	});
 	
@@ -414,6 +426,18 @@ $( document ).ready(function() {
 			sendButtonPressed();
 		}
 	});
+	
+	$("#chat-guest-login").click(function(event){
+		if($(event.target).hasClass('active')){
+			$("#guest-inputs").css("display", "none");
+		} else {
+			$("#guest-inputs").css("display", "table");
+		}
+//		$(this).hasClass('disabled') // for disabled states
+//		$(this).hasClass('active') // for active states
+//		$(this).is(':disabled') // for disabled buttons only
+	});
+	
 	
 	initChat();
 });

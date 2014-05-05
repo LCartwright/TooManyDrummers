@@ -2,7 +2,7 @@
 
 
 html,body {
-	background-color: #FFFF00;
+	background-color: #D6D4D9;
 }
 
 
@@ -15,7 +15,7 @@ div#chat-main-div {
     /* width: 25%; */
     
     /* height: 550px; */
-    height: 100%;
+    height: calc(100% - 50px);
 }
 /* 	div#facebook-buttons{
 		height: 100px;
@@ -42,6 +42,13 @@ div#chat-main-div {
 	}
 
 
+div#guest-inputs{
+	display: none;
+}
+
+.modal-dialog {
+  width: 300px;
+}
 
 
 /* @CHARSET "US-ASCII";

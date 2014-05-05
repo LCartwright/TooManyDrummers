@@ -54,31 +54,55 @@
 <title>Chatroom</title>
 </head>
 <body>
-<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
-  Launch demo modal
-</button>
 
-<!-- Modal -->
+   <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse"
+				data-target=".navbar-collapse">
+				<span class="sr-only">Toggle navigation</span> <span
+					class="icon-bar"></span> <span class="icon-bar"></span> <span
+					class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="#">Too Many Drummers</a>
+		</div>
+		<div class="collapse navbar-collapse">
+			<ul class="nav navbar-nav">
+				<li class="active">
+				<li>
+					<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+  						Launch demo modal
+					</button>
+				</li>
+			</ul>
+		</div>
+		<!--/.nav-collapse -->
+	</div>
+</div>
+
+
+
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
        <!--  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> -->
-        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+        <h4 class="modal-title" id="myModalLabel">Choose login service</h4>
       </div>
       <div class="modal-body">
 		<div id="facebook-buttons">
-			<button id="chat-facebook-login" class="btn btn-primary">facebook</button>
-			<button id="chat-facebook-logout" class="btn btn-danger">Logout</button>
+			
+<!-- 			<button id="chat-facebook-logout" class="btn btn-danger">Logout</button> -->
 		</div>
-		<div id="guest-buttons">
-			<button id="chat-guest-login" class="btn btn-success">Guest</button>
+		<div id="login-buttons">
+			<button id="chat-facebook-login" class="btn btn-primary">Facebook</button>
+			<button id="chat-guest-login" class="btn btn-success" data-toggle="button">Guest</button>
 		</div>
+
 		<div id="guest-inputs" class="input-group">
-			<input id="chat-room-add-input" type="text" class="form-control"
-				placeholder="enter a room name here" />
+			<input id="fack" type="text" class="form-control" placeholder="enter a username here" />
 			<span class="input-group-btn">
-				<button id="chat-room-add-button" class="btn btn-success">Go!</button>
+				<button id="fuck" class="btn btn-success">Go!</button>
 			</span>
 		</div>
       </div>
