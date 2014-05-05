@@ -77,7 +77,7 @@ function setConnected(connected) {
 
 // This function is fired when the user tries to connect via a websocket to the
 // application.
-function connect() {
+function drumsConnect() {
 
 	// TODO: Check for validity both here and on the serverside, even if
 	// facebook is supplying the info.
@@ -103,8 +103,8 @@ function connect() {
 	//var socket = new WebSocket(x);
 
 	socket.addEventListener('error', function() {
-		disconnect();
-		connect();
+		drumsDisconnect();
+		drumsConnect();
 	});
 
 	// Prepare for full Stomp communication.
@@ -173,7 +173,7 @@ function connect() {
 // This is fired when the user hits 'Disconnect'
 // This would be preferable everytime but the user is likely to hit 'back' or
 // 'close' too
-function disconnect() {
+function drumsDisconnect() {
 
 	clearInterval(cursorPositionRunner);
 	clearInterval(deadCursorRunner);
@@ -315,7 +315,7 @@ function refreshUsers(lastUsers) {
 
 				// Make it display the correct image
 				newImage.setAttribute("src", contextPath
-						+ "/resources/images/drumstick5.png");
+						+ "/resources/images/drumstick.png");
 
 				// TODO: Find a better way of scaling down
 				newImage.setAttribute("width", "60px");
@@ -624,6 +624,6 @@ function initialize(contextPath) {
 }
 
 $(window).on('beforeunload', function() {
-	disconnect();
+	drumsDisconnect();
 	return;
 });

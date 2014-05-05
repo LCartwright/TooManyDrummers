@@ -11,32 +11,9 @@
        http://www.springframework.org/schema/mvc
        http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
 
-    
-
-<!--     <import resource="data.xml" />
-     -->
     <context:annotation-config />
     <!-- <context:component-scan base-package="com.toomanydrummers.controller,com.toomanydrummers.service" /> -->
     <context:component-scan base-package="com.toomanydrummers" />
-    
-<!--     <context:component-scan base-package="com.toomanydrummers.controller" />
-    <context:component-scan base-package="com.toomanydrummers.config" />
-	<context:component-scan base-package="com.toomanydrummers" /> -->
-    
-    
-    <!-- Another way to handle JSON -->
-<!--     <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
-      <property name = "mediaTypes">
-        <map>
-          <entry key="json" value="application/json"/>
-          <entry key="xml" value="text/xml"/>
-          <entry key="htm" value="text/html"/>
-        </map>
-      </property>
-      <property name="defaultContentType" value="text/html"/>
-      <property name="ignoreAcceptHeader" value="true" />
-    </bean>
-    -->
     
     <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
         <property name="messageConverters">
@@ -52,38 +29,15 @@
     
     <bean class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping"/>
 
-    
-    
     <bean id="urlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
     	<property name="mappings">
     		<props>
     			<prop key="index.htm">indexController</prop>
-    			<prop key="sockets.htm">socketsController</prop>
-    			<prop key="home.htm">homeController</prop>
-    			<prop key="show-details.htm">showDetailsController</prop>
-    			<prop key="chat.htm">chatController</prop>
-    			
-    			<!-- TODO: Temporary -->
-    			<prop key="combine.htm">combineController</prop>
-    			
     		</props>
     	</property>
     </bean>
-   
-    <!-- <bean name="roomController" class="com.toomanydrummers.controller.RoomController"/> -->
     
     <bean name="indexController" class="org.springframework.web.servlet.mvc.ParameterizableViewController" p:viewName="index"/>
-    	
-    <bean name="socketsController" class="org.springframework.web.servlet.mvc.ParameterizableViewController" p:viewName="sockets"/>
-    	
-   <bean name="homeController" class="org.springframework.web.servlet.mvc.ParameterizableViewController" p:viewName="home"/>
-    	
-    <bean name="showDetailsController" class="org.springframework.web.servlet.mvc.ParameterizableViewController" p:viewName="show-details"/>
-    
-    <bean name="chatController" class="org.springframework.web.servlet.mvc.ParameterizableViewController" p:viewName="chat"/>
-    
-    <!-- TODO: Temporary -->
-    <bean name="combineController" class="org.springframework.web.servlet.mvc.ParameterizableViewController" p:viewName="combine"/>
     
     <bean id="viewResolver"
           class="org.springframework.web.servlet.view.InternalResourceViewResolver"
@@ -96,6 +50,4 @@
 		<mvc:async-support default-timeout="3000" />
 	</mvc:annotation-driven>
 	
-	
-    
 </beans>

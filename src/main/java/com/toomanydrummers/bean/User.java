@@ -141,7 +141,7 @@ public class User
 	
 	/**
 	 * Adapted from Gravatar implementation guide
-	 * Availible: http://en.gravatar.com/site/implement/images/java/
+	 * Available: http://en.gravatar.com/site/implement/images/java/
 	 * @author http://en.gravatar.com
 	 * @param input
 	 * @return
@@ -152,7 +152,7 @@ public class User
 	
 	/**
 	 * Adapted from Gravatar implementation guide 
-	 * Availible: http://en.gravatar.com/site/implement/images/java/
+	 * Available: http://en.gravatar.com/site/implement/images/java/
 	 * @author http://en.gravatar.com
 	 * @param array
 	 * @return
@@ -167,7 +167,7 @@ public class User
 	
 	/**
 	 * Adapted from Gravatar implementation guide
-	 * Availible: http://en.gravatar.com/site/implement/images/java/
+	 * Available: http://en.gravatar.com/site/implement/images/java/
 	 * @author http://en.gravatar.com
 	 * @param message
 	 * @return
