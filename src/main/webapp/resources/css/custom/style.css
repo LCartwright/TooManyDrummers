@@ -7,15 +7,24 @@
 }
 
 #mainheading {
-	color: fuchsia;
+	color: lime;
 }
 
-#drummap {
-	z-index: 999;
+#drumkit {
+	position: absolute;
+	top: 200;
+	left: 100;
 }
 
-.drumstick {
-	
+#effects {
+	pointer-events: none;
+	position: absolute;
+	top: 200;
+	left: 100;
+}
+
+.eff {
+	opacity: 0;
 }
 
 .cursornames {

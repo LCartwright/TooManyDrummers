@@ -190,28 +190,44 @@ function play(message) {
 	case "hato":
 		hato.play();
 		hatc.stop();
+		$("#effhato").css("opacity", 0.8);
+		$("#effhato").stop().fadeTo("fast", 0);
 		break;
 	case "hatc":
 		hatc.play();
 		hato.stop();
+		$("#effhatc").css("opacity", 0.6);
+		$("#effhatc").stop().fadeTo("fast", 0);
 		break;
 	case "snare":
 		snare.play();
+		$("#effsnare").css("opacity", 0.8);
+		$("#effsnare").stop().fadeTo("fast", 0);
 		break;
 	case "kick":
 		kick.play();
+		$("#effkick").css("opacity", 0.5);
+		$("#effkick").stop().fadeTo("fast", 0);
 		break;
 	case "rtom":
 		rtom.play();
+		$("#effrtom").css("opacity", 0.8);
+		$("#effrtom").stop().fadeTo("fast", 0);
 		break;
 	case "ftom":
 		ftom.play();
+		$("#effftom").css("opacity", 0.8);
+		$("#effftom").stop().fadeTo("fast", 0);
 		break;
 	case "crash":
 		crash.play();
+		$("#effcrash").css("opacity", 0.8);
+		$("#effcrash").stop().fadeTo("fast", 0);
 		break;
 	case "ride":
 		ride.play();
+		$("#effride").css("opacity", 0.8);
+		$("#effride").stop().fadeTo("fast", 0);
 		break;
 	case "cuica1":
 		cuica1.play();
@@ -384,7 +400,7 @@ function sendMousePosition() {
 		'x' : mousePos.x,
 		'y' : mousePos.y
 	}));
-}
+}rtom
 
 // Every now and then, delete the drumsticks belonging to disconnected users
 // both to remove clutter and free up resources.
