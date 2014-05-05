@@ -50,6 +50,13 @@ div#guest-inputs{
   width: 300px;
 }
 
+#btnHelp, #btnAbout{
+	color: #888 !important;
+}
+
+#helpWindowModal, #aboutWindowModal {
+  width: 500px;
+}
 
 /* @CHARSET "US-ASCII";
 html,body {
