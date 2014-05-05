@@ -247,11 +247,6 @@ function play(message) {
 // Called whenever a user joins or leaves.
 function refreshUsers(lastUsers) {
 
-	// TODO: Do something better with the list of connected users than just
-	// print them.
-	// TODO: Move this into the loop so this client's name is not displayed.
-	// document.getElementById('connectedUsers').innerHTML = users;
-
 	// Get the array of drumsticks. One is needed to track each user's mouse
 	// movements.
 	var drumsticks = document.getElementById('drumsticks').childNodes;
@@ -259,13 +254,13 @@ function refreshUsers(lastUsers) {
 	// Clear the ids array - we have more recent information.
 	users = new Array();
 
-	document.getElementById('connectedUsers').innerHTML = "";
-
+	//document.getElementById('connectedUsers').innerHTML = "";
+	
 	// For all users
 	for (var i = 0; i < lastUsers.length; i++) {
 
-		document.getElementById('connectedUsers').innerHTML += " "
-				+ lastUsers[i].firstName;
+		//document.getElementById('connectedUsers').innerHTML += " "
+		//		+ lastUsers[i].firstName;
 
 		// Filter out my own username and the empty value at the end
 		if (lastUsers[i].id != myId && lastUsers[i].id != "") {
@@ -278,7 +273,7 @@ function refreshUsers(lastUsers) {
 
 			for (var j = 0; j < drumsticks.length; j++) {
 				// If we can find a drumstick for this user, we're done
-				if (drumsticks[j].getAttribute("id") === lastUsers[i].id) {
+				if (drumsticks[j].getAttribute("id") === drumstickPrefix + lastUsers[i].id) {
 					noDrumstick = false;
 					break;
 				}
@@ -308,11 +303,11 @@ function refreshUsers(lastUsers) {
 
 				// Make it display the correct image
 				newImage.setAttribute("src", contextPath
-						+ "/resources/images/drumstick.png");
+						+ "/resources/images/drumstick5.png");
 
 				// TODO: Find a better way of scaling down
-				newImage.setAttribute("width", "80");
-				newImage.setAttribute("height", "50");
+				newImage.setAttribute("width", "60px");
+				newImage.setAttribute("height", "80px");
 
 				var newName = document.createElement("p");
 				newName.setAttribute("class", "cursornames");
@@ -342,7 +337,7 @@ function moveDrumsticks(positions) {
 		var currentId = positions[i].id;
 
 		// Filter out my own id.
-		if (currentId == myId) {
+		if (currentId === myId) {
 			continue;
 		}
 
@@ -350,8 +345,8 @@ function moveDrumsticks(positions) {
 		for (var j = 0; j < jMax; j++) {
 
 			// If we've landed on the right drumstick
-			if (drumsticks[j].getAttribute("id") === drumstickPrefix
-					+ currentId) {
+			if (drumsticks[j].getAttribute("id") === (drumstickPrefix
+					+ currentId)) {
 				drumsticks[j].style.left = positions[i].x + 'px';
 				drumsticks[j].style.top = positions[i].y + 'px';
 
@@ -400,7 +395,7 @@ function sendMousePosition() {
 		'x' : mousePos.x,
 		'y' : mousePos.y
 	}));
-}rtom
+}
 
 // Every now and then, delete the drumsticks belonging to disconnected users
 // both to remove clutter and free up resources.
@@ -416,7 +411,7 @@ function cleanDeadDrumsticks() {
 		for (var j = 0; j < users.length; j++) {
 
 			// if we find a live user for this drumstick, we're done.
-			if (drumsticks[i].getAttribute("id") == drumstickPrefix
+			if (drumsticks[i].getAttribute("id") === drumstickPrefix
 					+ users[j].id) {
 				drumstickMatchesDeadConnection = false;
 				break;
@@ -427,8 +422,6 @@ function cleanDeadDrumsticks() {
 		// If this is still true, delete the node!
 		if (drumstickMatchesDeadConnection) {
 			document.getElementById('drumsticks').removeChild(drumsticks[i]);
-			// TODO: I'm not sure we need to step back.
-			// i--;
 		}
 
 	}

@@ -42,21 +42,21 @@ public class UsersService {
 
 	public void addUser(User newUser) {
 
-		 try {
-		 usersLock.lock();
-		users.add(newUser);
-		 } finally {
-		 usersLock.unlock();
-		 }
+		try {
+			usersLock.lock();
+			users.add(newUser);
+		} finally {
+			usersLock.unlock();
+		}
 	}
 
 	public void removeUser(User oldUser) {
-		 try {
-		 usersLock.lock();
-		users.remove(oldUser);
-		 } finally {
-		 usersLock.unlock();
-		 }
+		try {
+			usersLock.lock();
+			users.remove(oldUser);
+		} finally {
+			usersLock.unlock();
+		}
 	}
 
 	public void removeUser(String oldUserId) {
@@ -65,12 +65,12 @@ public class UsersService {
 
 			if (users.get(i).getId().equals(oldUserId)) {
 
-				 try {
-				 usersLock.lock();
-				users.remove(i);
-				 } finally {
-				 usersLock.unlock();
-				 }
+				try {
+					usersLock.lock();
+					users.remove(i);
+				} finally {
+					usersLock.unlock();
+				}
 				break;
 			}
 		}
@@ -78,77 +78,77 @@ public class UsersService {
 	}
 
 	public List<User> listUsers() {
-		
+
 		try {
 			usersLock.lock();
-			
+
 			return users;
-			
+
 		} finally {
 			usersLock.unlock();
 		}
-		
-//		String allIDs = "";
-//
-//		 try {
-//		 usersLock.lock();
-//		for (User user : users) {
-//			allIDs += user.getId() + ",";
-//		}
-//		 } finally {
-//		 usersLock.unlock();
-//		 }
-//
-//		return allIDs;
+
+		// String allIDs = "";
+		//
+		// try {
+		// usersLock.lock();
+		// for (User user : users) {
+		// allIDs += user.getId() + ",";
+		// }
+		// } finally {
+		// usersLock.unlock();
+		// }
+		//
+		// return allIDs;
 	}
 
 	public void updatePosition(CursorPosition cursorPosition) {
 
 		String id = cursorPosition.getId();
 
-		 try {
-		 usersLock.lock();
+		try {
+			usersLock.lock();
 
-		for (User user : users) {
-			if (user.getId().equals(id)) {
-				user.setLastOnline(System.currentTimeMillis());
-				user.setX(cursorPosition.getX());
-				user.setY(cursorPosition.getY());
-				break;
+			for (User user : users) {
+				if (user.getId().equals(id)) {
+					user.setLastOnline(System.currentTimeMillis());
+					user.setX(cursorPosition.getX());
+					user.setY(cursorPosition.getY());
+					break;
+				}
 			}
-		}
 
-		 } finally {
-		 usersLock.unlock();
-		 }
+		} finally {
+			usersLock.unlock();
+		}
 
 	}
 
 	@Scheduled(fixedRate = CHECK_FOR_TIMEOUT_MILLIS)
 	public void checkForTimeouts() {
-		
+
 		boolean somebodyKilled = false;
 
-		 try {
-		 usersLock.lock();
+		try {
+			usersLock.lock();
 
-		long now = System.currentTimeMillis();
+			long now = System.currentTimeMillis();
 
-		for (int i = 0; i < users.size(); i++) {
-			if (users.get(i).getLastOnline() + TIMEOUT_MILLIS < now) {
-				removeUser(users.get(i));
-				i--;
-				somebodyKilled = true;
+			for (int i = 0; i < users.size(); i++) {
+				if (users.get(i).getLastOnline() + TIMEOUT_MILLIS < now) {
+					removeUser(users.get(i));
+					i--;
+					somebodyKilled = true;
+				}
 			}
-		}
 
-		if (somebodyKilled) {
-			try {
-				template.convertAndSend("/topic/allusers", listUsers());
-			} catch (MessageDeliveryException e) {
-				// e.printStackTrace();
+			if (somebodyKilled) {
+				try {
+					template.convertAndSend("/topic/allusers", listUsers());
+				} catch (MessageDeliveryException e) {
+					// e.printStackTrace();
+				}
 			}
-		}
 
 		} finally {
 			usersLock.unlock();
@@ -180,8 +180,15 @@ public class UsersService {
 	private ArrayList<CursorPosition> preparePositions() {
 		this.cursorPositions.clear();
 		// TODO May need to find a faster way of doing this... :(
-		for (User user : users) {
-			this.cursorPositions.add(new CursorPosition(user.getId(), user.getX(), user.getY()));
+
+		try {
+			usersLock.lock();
+
+			for (User user : users) {
+				this.cursorPositions.add(new CursorPosition(user.getId(), user.getX(), user.getY()));
+			}
+		} finally {
+			usersLock.unlock();
 		}
 
 		return this.cursorPositions;
