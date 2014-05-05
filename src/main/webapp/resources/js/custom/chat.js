@@ -28,6 +28,8 @@ var message_send_blocker = false;
 
 var create_room_blocker = false;
 
+var default_room_id = 2;
+
 function joinRoom(room_id) {
 	
 	clearInterval(message_fetch_interval);
@@ -112,7 +114,13 @@ function generateNewRoom(name){
 function initChat(){
 	updateUsers();
 	updateRooms();
-	joinRoom(1);
+	
+	setInterval(function(){
+		console.log("UPDATING ROOMS AND USERS");
+		updateUsers();
+		updateRooms();
+	},1000);
+	//joinRoom(2);
 	//hacky for now
 
 }
@@ -210,46 +218,70 @@ function tryJoinRoom() {
 }
 
 function getUserInfoForMessage(user_id){
-	var user_info = {
-			name : "UNKNOWN_USER" //"Henry Tesei"
-		,	profile_img_src : "" //"http://graph.facebook.com/518733135/picture"
-	};
+//	var user_info = {
+//			name : "UNKNOWN_USER" //"Henry Tesei"
+//		,	profile_img_src : "" //"http://graph.facebook.com/518733135/picture"
+//	};
 	
 	
-	for(var i = 0; i < user_list.length; i++){
-		if(user_list[i].id == user_id){
-			user_info.name = user_list[i].firstName + " " + user_list[i].lastName;
-			user_info.profile_img_src = user_list[i].pictureURL;
-			break;
-		}
-	}
+	//user_info = null;
 	
+//	for(var i = 0; i < user_list.length; i++){
+//		if(user_list[i].id == user_id){
+//			user_info.name = user_list[i].firstName + " " + user_list[i].lastName;
+//			user_info.profile_img_src = user_list[i].pictureURL;
+//			break;
+//		}
+//	}
+	
+	var user_info = null;
+	
+	console.log("### START GET USER INFO ###");
+	console.log(user_id);
+	console.log(user_list);
+	console.log(user_id_list);
+	console.log($.inArray(user_id, user_id_list) != -1);
 	if($.inArray(user_id, user_id_list) != -1){
 		for(var i = 0; i < user_list.length; i++){
 			if(user_list[i].id == user_id){
-				user_info.name = user_list[i].firstName + " " + user_list[i].lastName;
-				user_info.profile_img_src = user_list[i].pictureURL;
+				user_info = {
+						name : user_list[i].firstName + " " + user_list[i].lastName
+					,	profile_img_src : user_list[i].pictureURL
+				};
 				break;
+				console.log("use found inside get user info");
 			}
 		}
-	} else {
-		updateUsers();
 	}
 
+	console.log("### END GET USER INFO ###");
 	return user_info;
 }
 
-function updateUsers(){
+function updateUsersFunc(func){
 	
 	var getting = $.get(usersURI);
 	
 	getting.done(function (data){
 		user_list = JSON.parse(JSON.stringify(data));
+		//alert(JSON.stringify(data));
 		for(var i = 0; i < user_list.length; i++){
 			if($.inArray(user_list[i].id, user_id_list) == -1){
 				user_id_list.push(user_list[i].id);
+				console.log("user " + user_list[i].id + " added");
 			}
 		}
+		
+		console.log(user_id_list);
+		console.log(user_list);
+		console.log("calling func");
+		func();
+	});
+}
+
+function updateUsers(){
+	updateUsersFunc(function (){
+		//do nothing
 	});
 }
 
@@ -259,8 +291,7 @@ function createNewRoom(){
 
 var message_counter = 0;
 
-function createMessageElement(message){
-	var user_info = getUserInfoForMessage(message.userId);
+function createMessageElement(message, user_info){
 	var name = user_info.name;
 	var img_src = user_info.profile_img_src;
 	var message_div = 
@@ -295,9 +326,28 @@ function createMessageElement(message){
 }
 
 function addChatMessageToArea(message){
-	$("#chat-message-area-div").append(
-			createMessageElement(message)
-	);
+	user_info_check =  getUserInfoForMessage(message.userId);
+	user_found = user_info_check == null ? false : true;
+	console.log(user_found);
+	
+	func = function(){
+		var user_info = getUserInfoForMessage(message.userId);
+		if(user_info == null){
+			console.log("user info is null when it should not be");
+		}
+		$("#chat-message-area-div").append(
+				createMessageElement(message, user_info)
+		);
+	};
+	
+	if (user_found){
+		console.log("user found");
+		console.log(user_info_check.name);
+		func();
+	} else {
+		console.log("user not found");
+		updateUsersFunc(func);
+	}
 }
 
 function sendButtonPressed(){
@@ -347,11 +397,61 @@ function createRoomButtonPressed(){
 	}
 }
 
+function setupLogin(){
+	$("#guest-username-input").val(""); //clear guest username
+	//REMOVE ATTRS ALSO
+}
+
+function loginGuest(){
+	var posting = $.post(usersURI + "/add_guest", {
+		name : $("#guest-username-input").val()
+	});
+	
+	posting.done(function(data){
+		alert(JSON.stringify(data));
+		setLoggedInGuest(JSON.parse(JSON.stringify(data)));
+	});
+}
+
+function setLoggedInGuest(user_response){
+console.log("function GUEST LOGGED IN called");
+	
+	currentUserID = user_response.id;
+	currentUserFirstName = user_response.firstName;
+	currentUserLastName = user_response.lastName;
+	currentUserFullName = user_response.first_name + " " + user_response.last_name;
+	currentUserPictureURL = user_response.pictureURL;
+	
+	console.log("currentUserID: " + currentUserID);
+	console.log("currentUserFirstName: " + currentUserFirstName);
+	console.log("currentUserLastName: " + currentUserLastName);
+	console.log("currentUserFullName: " + currentUserFullName);
+	console.log("currentUserPictureURL: " + currentUserPictureURL);
+	
+	user_list.push(user_response);
+	user_id_list.push(user_response.id);
+	
+	$("#chat-main-div").css("display","block");
+	joinRoom(default_room_id);
+	
+}
+
+function populateGuestNameRandom(){
+	var randomNameURI = usersURI + "/random_name";
+	var getting = $.get(randomNameURI);
+	
+	getting.done(function(data){
+		var name = JSON.parse(JSON.stringify(data));
+		$("#guest-username-input").val(name.fullname);
+	});
+}
+
 $( document ).ready(function() {
 	
 	// BUTTON_ASSIGNMENTS
 	//First set the user as logged out
 	setLoggedOut();
+	
 	
 	//Assign controls to all buttons
 	
@@ -407,7 +507,7 @@ $( document ).ready(function() {
 	});
 	
 	$("#chat-room-add-button").click(function(){
-		alert("clicked chat");
+		//alert("clicked chat");
 		createRoomButtonPressed();
 	});
 	
@@ -436,6 +536,14 @@ $( document ).ready(function() {
 //		$(this).hasClass('disabled') // for disabled states
 //		$(this).hasClass('active') // for active states
 //		$(this).is(':disabled') // for disabled buttons only
+	});
+	
+	$("#guest-username-random-button").click(function(event){
+		populateGuestNameRandom();
+	});
+	
+	$("#guest-username-submit-button").click(function(event){
+		loginGuest();
 	});
 	
 	
@@ -469,7 +577,7 @@ function setLoggedIn(response){
 		
 		$("#current-user").text("Welcome " + currentUserFullName);
 		
-		var posting = $.post(usersURI + "/add", {
+		var posting = $.post(usersURI + "/add_fb", {
 			first_name : currentUserFirstName,
 			last_name : currentUserLastName,
 			id : currentUserID
@@ -477,10 +585,16 @@ function setLoggedIn(response){
 		
 		posting.done(function(data) {
 			//alert(JSON.stringify(data));
+			var user = JSON.parse(JSON.stringify(data));
+			user_list.push(user);
+			user_id_list.push(user.id);
+			
+			$("#chat-main-div").css("display","block");
+			joinRoom(default_room_id);
 		});
 	});
 	
-	$("#chat-main-div").css("display","block");
+	
 	
 	//welcome message!
 	//disble login button

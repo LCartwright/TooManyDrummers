@@ -100,9 +100,12 @@
 		</div>
 
 		<div id="guest-inputs" class="input-group">
-			<input id="fack" type="text" class="form-control" placeholder="enter a username here" />
 			<span class="input-group-btn">
-				<button id="fuck" class="btn btn-success">Go!</button>
+				<button id="guest-username-random-button" class="btn btn-success">Random</button>
+			</span>
+			<input id="guest-username-input" type="text" class="form-control" placeholder="enter a username here" />
+			<span class="input-group-btn">
+				<button id="guest-username-submit-button" class="btn btn-success">Go!</button>
 			</span>
 		</div>
       </div>

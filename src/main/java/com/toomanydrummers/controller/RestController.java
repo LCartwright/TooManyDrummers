@@ -18,6 +18,7 @@ import com.toomanydrummers.bean.Picture;
 import com.toomanydrummers.bean.Room;
 import com.toomanydrummers.bean.User;
 import com.toomanydrummers.bean.XandY;
+import com.toomanydrummers.service.NameGeneratorService;
 import com.toomanydrummers.service.RoomsService;
 import com.toomanydrummers.service.UsersService;
 
@@ -32,6 +33,9 @@ public class RestController {
     
     @Autowired
     private RoomsService roomsService;
+    
+    @Autowired 
+    private NameGeneratorService nameGeneratorService;
 	
 	public RestController() {
 		System.out.println("REST CONTROLLER STARTED");
@@ -148,7 +152,7 @@ public class RestController {
         return pictureOUT;
     }
     
-    @RequestMapping( value = "/users/add", method = RequestMethod.POST)
+    @RequestMapping( value = "/users/add_fb", method = RequestMethod.POST)
     protected @ResponseBody User addUser(
     			@RequestParam("first_name") String first_name
     		,	@RequestParam("last_name") String last_name
@@ -164,7 +168,28 @@ public class RestController {
     		, 	0
     	);
     	usersService.addUser(user);
+    	
+    	System.out.println("USER HAS BEEN ADDED" + user.getId() + "NEW SIZE " + usersService.getUsers().size());
+    	
     	return user;
+    }
+    
+    @RequestMapping( value = "/users/add_guest", method = RequestMethod.POST)
+    protected @ResponseBody User addGuestUser(
+    			@RequestParam("name") String name
+    		) throws Exception {
+    	User user = new User(Jsoup.clean(name, Whitelist.none()));
+    	usersService.addUser(user);
+    	System.out.println("GUEST USER HAS BEEN ADDED" + user.getId() + "NEW SIZE " + usersService.getUsers().size());
+    	System.out.println("GUEST URL" + user.getPictureURL());
+    	return user;
+    }
+
+    @RequestMapping( value = "/users/random_name", method = RequestMethod.GET)
+    protected @ResponseBody Name randomName() throws Exception {
+    	String firstName = nameGeneratorService.generateFirstName();
+    	String lastName = nameGeneratorService.generateLastName();
+    	return new Name(firstName, lastName);
     }
     
 }

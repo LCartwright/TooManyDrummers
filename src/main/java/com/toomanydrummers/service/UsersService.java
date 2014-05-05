@@ -76,7 +76,6 @@ public class UsersService {
 	}
 
 	public List<User> getUsers() {
-
 		try {
 			usersLock.lock();
 
@@ -126,7 +125,7 @@ public class UsersService {
 		while (it.hasNext()) {
 			String key = it.next();
 			if (users.get(key).getLastOnline() + TIMEOUT_MILLIS < now) {
-				it.remove();
+				users.get(key).setIsTimedOut(true);
 				somebodyKilled = true;
 			}
 		}
