@@ -26,6 +26,8 @@ var user_id_list = [];
 
 var message_send_blocker = false;
 
+var create_room_blocker = false;
+
 function joinRoom(room_id) {
 	
 	clearInterval(message_fetch_interval);
@@ -138,6 +140,8 @@ function fetchMessages(room_id) {
 		//[{"messageId":1,"userId":1,"messageContent":"hello"},{"messageId":2,"userId":2,"messageContent":"goodbye"}]
 		// WRITE MESSAGES TO MESSAGE AREA
 		//alert(messages[0].messageContent);
+		
+		var message_added = false;
 		for (var i = 0; i < messages.length; i++) {
 			//Add to chat
 			
@@ -147,12 +151,18 @@ function fetchMessages(room_id) {
 				console.log("MESSAGE ALREADY EXISTS");
 			} else {
 				addChatMessageToArea(messages[i]);
+				message_added = true;
 				if (messages[i].messageId > currentRoomLastMessageId) {
 					//update last message displayed
 					currentRoomLastMessageId = messages[i].messageId;
 				}
 			}
 
+		}
+
+		//$("div[message_id=" + currentRoomLastMessageId+ "]").focus();
+		if(message_added){
+			$("#chat-message-area-div").scrollTop($("#chat-message-area-div")[0].scrollHeight);
 		}
 	});
 }
@@ -174,14 +184,6 @@ function addRoom() {
 }
 
 function sendMessage(room_id, user_id) {
-	
-	message_send_blocker = true;
-	
-//	setTimeout(new function(){
-//		message_send_blocker = false;
-//	}, 2000);
-	
-	setTimeout(function(){message_send_blocker = false;}, 3000);
 	
 	var sendmessageRoomURI = roomsURI + "/" + room_id + "/messages" 
 	$("#chat-room-send-input").val();
@@ -298,6 +300,42 @@ function addChatMessageToArea(message){
 	);
 }
 
+function sendButtonPressed(){
+	console.log("chat room sent");
+	
+	if(!message_send_blocker){
+		
+		message_send_blocker = true;
+		
+		setTimeout(function(){message_send_blocker = false;}, 3000);
+		
+		sendMessage(active_room_id, currentUserID);
+		
+		$("#chat-room-send-input").val("");
+		
+	} else {
+		alert("SLOW DOWN"); // DO something else
+	}
+	
+}
+
+function createRoomButtonPressed(){
+	
+	if(!create_room_blocker){
+		
+		create_room_blocker = true;
+		
+		setTimeout(function(){create_room_blocker = false;}, 3000);
+		
+		generateNewRoom($("#chat-room-add-input").val());
+		
+		$("#chat-room-add-input").val("");
+		
+	} else {
+		alert("STOP CREATING ROOMS");
+	}
+}
+
 $( document ).ready(function() {
 	
 	
@@ -305,16 +343,6 @@ $( document ).ready(function() {
 	setLoggedOut();
 	
 	//Assign controls to all buttons
-	$( "#das-boot" ).click(function() {
-		  //$( "#chat-message-area" ).animate({ "width": "+=50px" }, "slow" );
-		  console.log("booted");
-		  updateRooms();
-	});
-	
-	$( "#das-add-message" ).click(function() {
-		console.log("message added");
-		addChatMessageToArea();
-	});
 	
 	$("#chat-signin-button").click(function() {
 		setUserDEMO();
@@ -368,19 +396,23 @@ $( document ).ready(function() {
 	});
 	
 	$("#chat-room-add-button").click(function(){
-		generateNewRoom($("#chat-room-add-input").val());
+		createRoomButtonPressed();
+	});
+	
+	$( "#chat-room-add-input" ).on( "keydown", function( event ) {
+		if(event.which == 13){
+			createRoomButtonPressed();
+		}
 	});
 	
 	$("#chat-room-send-button").click(function(){
-		console.log("chat room sent");
-		
-		if(!message_send_blocker){
-			sendMessage(active_room_id, currentUserID);
-			$("#chat-room-send-input").val("");
-		} else {
-			alert("SLOW DOWN");
+		sendButtonPressed();
+	});
+	
+	$( "#chat-room-send-input" ).on( "keydown", function( event ) {
+		if(event.which == 13){
+			sendButtonPressed();
 		}
-		
 	});
 	
 	initChat();
