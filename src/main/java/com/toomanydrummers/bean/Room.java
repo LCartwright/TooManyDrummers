@@ -3,21 +3,21 @@ package com.toomanydrummers.bean;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import com.toomanydrummers.bean.Message;
 
-public class Room {
+public class Room implements Comparable<Room>{
 	
 	private static AtomicInteger counter = new AtomicInteger(0);
     private final String name;
-    private final int roomId;
+    private final String roomId;
     private List<Message> messageList = new ArrayList<Message>();
     
     public Room(String name) {
     	this.name = name;
-    	this.roomId = Room.counter.incrementAndGet();
+    	this.roomId = String.valueOf(Room.counter.incrementAndGet()) ;
+    	System.out.println("ROOM MADE" + name);
     }
     
-    public int getRoomId(){
+    public String getRoomID(){
     	return this.roomId;
     }
     
@@ -53,5 +53,21 @@ public class Room {
     	}
     	return returnMessage;
     }
-    
+
+	@Override
+	public int compareTo(Room compare) {
+		final int BEFORE = -1;
+	    final int EQUAL = 0;
+	    final int AFTER = 1;
+	    
+	    int id = Integer.parseInt(roomId);
+	    int comp_id = Integer.parseInt(compare.roomId);
+	    if(id > comp_id){
+	    	return AFTER;
+	    } else if (id < comp_id){
+	    	return BEFORE;
+	    } else {
+	    	return EQUAL;
+	    }
+	}
 }

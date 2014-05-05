@@ -6,7 +6,10 @@
 package com.toomanydrummers.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +26,8 @@ import com.toomanydrummers.bean.User;
  * @author john
  */
 @Service
-public class UsersService {
+public class UsersService
+{
 
 	// Defines how frequently to broadcast the room's members' cursor locations.
 	private static final int REFRESH_RATE_MILLIS = 30;
@@ -32,6 +36,8 @@ public class UsersService {
 	private static final int CHECK_FOR_TIMEOUT_MILLIS = 1000;
 
 	private final ArrayList<User> users = new ArrayList<User>();
+	private static Map<String, User> users = new HashMap<String, User>();
+	// private final ArrayList<User> users = new ArrayList<User>();
 	private final ArrayList<CursorPosition> cursorPositions = new ArrayList<CursorPosition>();
 	private final ReentrantLock usersLock = new ReentrantLock();
 
@@ -42,39 +48,48 @@ public class UsersService {
 
 	public void addUser(User newUser) {
 
-		try {
+	public void addUser(User newUser)
+	{
+		try
+		{
 			usersLock.lock();
-			users.add(newUser);
-		} finally {
-			usersLock.unlock();
-		}
-	}
-
-	public void removeUser(User oldUser) {
-		try {
-			usersLock.lock();
-			users.remove(oldUser);
-		} finally {
-			usersLock.unlock();
-		}
-	}
-
-	public void removeUser(String oldUserId) {
-
-		for (int i = 0; i < users.size(); i++) {
-
-			if (users.get(i).getId().equals(oldUserId)) {
-
-				try {
-					usersLock.lock();
-					users.remove(i);
-				} finally {
-					usersLock.unlock();
-				}
-				break;
+			if (!users.containsKey(newUser.getId()))
+			{
+				users.put(newUser.getId(), newUser);
 			}
 		}
+		finally
+		{
+			usersLock.unlock();
+		}
+	}
 
+	public void removeUser(String id)
+	{
+		try
+		{
+			usersLock.lock();
+			users.remove(id);
+		}
+		finally
+		{
+			usersLock.unlock();
+		}
+	}
+
+	public void removeUser(User oldUser)
+	{
+		removeUser(oldUser.getId());
+	}
+
+	public User getUser(String id)
+	{
+		User userOUT = null;
+		if (id != null && id.length() > 0)
+		{
+			userOUT = users.get(id);
+		}
+		return userOUT;
 	}
 
 	public List<User> listUsers() {
@@ -87,26 +102,19 @@ public class UsersService {
 		} finally {
 			usersLock.unlock();
 		}
-
-		// String allIDs = "";
-		//
-		// try {
-		// usersLock.lock();
-		// for (User user : users) {
-		// allIDs += user.getId() + ",";
-		// }
-		// } finally {
-		// usersLock.unlock();
-		// }
-		//
-		// return allIDs;
+		return result;
 	}
 
-	public void updatePosition(CursorPosition cursorPosition) {
+	public Collection<User> getUserCollection()
+	{
+		return users.values();
+	}
 
+	public void updatePosition(CursorPosition cursorPosition)
+	{
 		String id = cursorPosition.getId();
-
-		try {
+		try
+		{
 			usersLock.lock();
 
 			for (User user : users) {
@@ -121,7 +129,6 @@ public class UsersService {
 		} finally {
 			usersLock.unlock();
 		}
-
 	}
 
 	@Scheduled(fixedRate = CHECK_FOR_TIMEOUT_MILLIS)
@@ -183,16 +190,34 @@ public class UsersService {
 
 		try {
 			usersLock.lock();
-
-			for (User user : users) {
+			for (User user : getUserCollection())
+			{
 				this.cursorPositions.add(new CursorPosition(user.getId(), user.getX(), user.getY()));
 			}
-		} finally {
+		}
+		finally
+		{
 			usersLock.unlock();
 		}
-
 		return this.cursorPositions;
+	}
 
+	public String itemizeIDs()
+	{
+		String allIDs = "";
+		try
+		{
+			usersLock.lock();
+			for (User user : getUserCollection())
+			{
+				allIDs += user.getId() + ",";
+			}
+		}
+		finally
+		{
+			usersLock.unlock();
+		}
+		return allIDs;
 	}
 
 	// @Override

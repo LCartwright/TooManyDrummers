@@ -1,9 +1,83 @@
-@CHARSET "US-ASCII";
-#chat-message-area{
+
+
+
+html,body {
+	background-color: #D6D4D9;
+}
+
+
+div#chat-main-div {
+	background-color: #FFFFFF;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    width: 400px;
+    /* width: 25%; */
+    
+    /* height: 550px; */
+    height: calc(100% - 50px);
+}
+/* 	div#facebook-buttons{
+		height: 100px;
+    	background: #ccc;
+	}
+	 */
+	div#chat-control-area-div{
+		height: 30px;
+	}
+
+	div#chat-message-area-div{
+	    overflow-y: scroll;
+   		position: absolute;
+   		top: 80px;
+   		bottom: 30px;
+   		width: 100%;
+	}
+
+	div#chat-message-controls-div {
+		position: absolute;
+    	bottom: 0;
+    	width: 100%;
+    	height: 30px;
+	}
+
+
+div#guest-inputs{
+	display: none;
+}
+
+.modal-dialog {
+  width: 300px;
+}
+
+
+/* @CHARSET "US-ASCII";
+html,body {
+    height:100%;
+}
+
+#chat-message-area-div{
 	width: 500px;
 	position: absolute;
     top: 50%;
     left: 25%;
     margin-top: -50px;
     margin-left: -50px;
+    overflow-y: scroll;
+    height: 500px;
 }
+
+#chat-main-div{
+	width: 500px;
+	display: none;
+	position: relative;
+	height: 100%;
+}
+
+#chat-message-controls-div{
+	position:absolute;
+	bottom:0;
+	position:fixed;bottom:0px;width:500px;
+} */
+
+

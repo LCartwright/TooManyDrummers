@@ -5,10 +5,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Message {
 	private final static AtomicInteger counter = new AtomicInteger(0);
 	private final int messageId;
-	private final int userId;
+	private final String userId;
 	private final String messageContent;
 	
-	public Message(int userId, String messageContent){
+	public Message(String userId, String messageContent){
 		this.messageId = Message.counter.incrementAndGet();
 		this.userId = userId;
 		this.messageContent = messageContent;
@@ -18,7 +18,7 @@ public class Message {
 		return this.messageId;
 	}
 	
-	public int getUserId(){
+	public String getUserId(){
 		return this.userId;
 	}
 	

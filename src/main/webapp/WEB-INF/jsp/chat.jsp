@@ -30,73 +30,113 @@
 
 <script
 	src="${pageContext.request.contextPath}/resources/js/custom/chat.js"></script>
+
+<!-- FACEBOOK -->
+<!-- <script>
+      window.fbAsyncInit = function() {
+        FB.init({
+          appId      : '1483054771924097',
+          xfbml      : true,
+          version    : 'v2.0',
+          status     : true
+        });
+      };
+
+      (function(d, s, id){
+         var js, fjs = d.getElementsByTagName(s)[0];
+         if (d.getElementById(id)) {return;}
+         js = d.createElement(s); js.id = id;
+         js.src = "//connect.facebook.net/en_US/sdk.js";
+         fjs.parentNode.insertBefore(js, fjs);
+       }(document, 'script', 'facebook-jssdk'));
+</script> -->
+
 <title>Chatroom</title>
 </head>
 <body>
-	<h2>CHAT</h2>
-	<div>
-		<!-- 
-	https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/t1.0-1/s50x50/1467218_10152405394208136_831500500_t.jpg
-	
-	
-	
-	 -->
-	 	<div id="testing">
-	 		<button id="das-boot" onclick="" class="btn btn-warning">Das Boot</button>
-	 		<button id="das-add-message" onclick="" class="btn btn-warning">Das Add Message</button>
-	 	</div>
-		<div id="user-adding-div" class="well well-sm">
-			Username: <input id="add-user-name" type="text" />
-			<button id="add-user" onclick="" class="btn btn-primary">Sign-In</button>
+
+   <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse"
+				data-target=".navbar-collapse">
+				<span class="sr-only">Toggle navigation</span> <span
+					class="icon-bar"></span> <span class="icon-bar"></span> <span
+					class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="#">Too Many Drummers</a>
+		</div>
+		<div class="collapse navbar-collapse">
+			<ul class="nav navbar-nav">
+				<li class="active">
+				<li>
+					<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+  						Launch demo modal
+					</button>
+				</li>
+			</ul>
+		</div>
+		<!--/.nav-collapse -->
+	</div>
+</div>
+
+
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+       <!--  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> -->
+        <h4 class="modal-title" id="myModalLabel">Choose login service</h4>
+      </div>
+      <div class="modal-body">
+		<div id="facebook-buttons">
+			
+<!-- 			<button id="chat-facebook-logout" class="btn btn-danger">Logout</button> -->
+		</div>
+		<div id="login-buttons">
+			<button id="chat-facebook-login" class="btn btn-primary">Facebook</button>
+			<button id="chat-guest-login" class="btn btn-success" data-toggle="button">Guest</button>
 		</div>
 
-		<div id="room-adding-div">
-			<button id="add-room" onclick="addRoom();">Add Room</button>
-			Name: <input id="add-room-name" type="text" />
+		<div id="guest-inputs" class="input-group">
+			<input id="fack" type="text" class="form-control" placeholder="enter a username here" />
+			<span class="input-group-btn">
+				<button id="fuck" class="btn btn-success">Go!</button>
+			</span>
 		</div>
-		<div id="room-joining-div">
-			<button id="join-room" onclick="tryJoinRoom();">Join Room</button>
-			id: <input id="join-room-id" type="text" />
-		</div>
-		<div id="message-sending-div">
-			<button id="send-message" onclick="sendMessage();">Send
-				Message</button>
-			<!--         <input id="send-room-id" type="text" />
-        <input id="send-user-id" type="text" /> -->
-			<input id="send-message-content" type="text" />
-		</div>
-		<div id="current-room-div">
-			<div id="current-room-name">Add a room to join a conversation</div>
-			<div id="current-room-messages"></div>
-			<button id="fetch-messages" onclick="fetchMessages();">FetchMessages</button>
-			<div />
-		</div>
+      </div>
+<!--       <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div> -->
+    </div>
+  </div>
+</div>
 
-		<div id="chat-message-area">
-			<div id="message1">
-				<div class="media well well-sm">
-					<a class="pull-left" href="#"> <img class="media-object"
-						src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/t1.0-1/s50x50/1467218_10152405394208136_831500500_t.jpg"
-						alt="pciture">
-					</a>
-					<div class="media-body">
-						<h4 class="media-heading">Henry Tesei</h4>
-						bacon bacon BACON!
-					</div>
-				</div>
+	<div id="chat-main-div">
+
+		<div id="chat-control-area-div">
+			<div id="chat-rooms-create-div" class="input-group">
+				<span class="input-group-btn">
+					<button id="chat-room-add-button" class="btn btn-success">Create Room</button>
+				</span>
+				<input id="chat-room-add-input" type="text" class="form-control"
+					placeholder="enter a room name here" />
 			</div>
-			<div id="message2">
-				<div class="media well well-sm">
-					<a class="pull-left" href="#"> <img class="media-object"
-						src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/t1.0-1/s50x50/1467218_10152405394208136_831500500_t.jpg"
-						alt="pciture">
-					</a>
-					<div class="media-body">
-						<h4 class="media-heading">Henry Tesei</h4>
-						bacon bacon BACON!
-					</div>
-				</div>
+			<div id="chat-rooms-list-div">
+				<ul id="chat-rooms-list" class="nav nav-tabs nav-justified">
+				</ul>
 			</div>
 		</div>
+		<div id="chat-message-area-div"></div>
+		<div id="chat-message-controls-div" class="input-group input-group-md">
+			<span class="input-group-btn">
+				<button id="chat-room-send-button" class="btn btn-primary btn-md">Send</button>
+			</span> <input id="chat-room-send-input" type="text" class="form-control"
+				placeholder="enter your message here" />
+		</div>
+	</div>
+</body>
 </body>
 </html>
