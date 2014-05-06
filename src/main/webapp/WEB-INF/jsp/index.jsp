@@ -169,53 +169,41 @@
 	<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 		<div class="container">
 			<div class="navbar-header">
-				<button type="button" class="navbar-toggle" data-toggle="collapse"
-					data-target=".navbar-collapse">
-					<span class="sr-only">Toggle navigation</span> <span
-						class="icon-bar"></span> <span class="icon-bar"></span> <span
-						class="icon-bar"></span>
-				</button>
 				<a class="navbar-brand" href="#">Too Many Drummers</a>
 			</div>
 			<div class="collapse navbar-collapse">
 				<ul class="nav navbar-nav">
-					<li class="active">
-					<li>
-						<button class="btn btn-primary btn-lg" data-toggle="modal"
-							data-target="#myModal">Launch demo modal</button>
-					</li>
+			<!--<button class="btn btn-primary btn-lg" data-toggle="modal"
+							data-target="#myModal">Launch demo modal</button> -->
+				<li><button id="btnHelp" class="btn btn-link navbar-btn" data-toggle="modal" data-target="#helpWindow">Help</button></li>
+				<li><button id="btnAbout" class="btn btn-link navbar-btn" data-toggle="modal" data-target="#aboutWindow">About</button></li>
 				</ul>
 			</div>
 			<!--/.nav-collapse -->
 		</div>
 	</div>
 	
-	<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+	<div class="modal fade" id="login-modal" tabindex="-1" role="dialog"
 		aria-labelledby="myModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
 					<!--  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> -->
-					<h4 class="modal-title" id="myModalLabel">Choose login service</h4>
+					<h4 class="modal-title"  align="center">Choose login service</h4>
 				</div>
 				<div class="modal-body">
-					<div id="facebook-buttons">
-
-						<!-- 			<button id="chat-facebook-logout" class="btn btn-danger">Logout</button> -->
-					</div>
-					<div id="login-buttons">
+					
+					<div id="login-buttons" style="float: none; margin: 0 auto;">
 						<button id="chat-facebook-login" class="btn btn-primary">Facebook</button>
-						<button id="chat-guest-login" class="btn btn-success"
-							data-toggle="button">Guest</button>
+						<button id="chat-guest-login" class="btn btn-success" data-toggle="button">Guest</button>
 					</div>
-
-					<div id="guest-inputs" class="input-group">
+					<div id="guest-inputs" class="input-group" style="margin-top: 20px;">
 						<span class="input-group-btn">
 							<button id="guest-username-random-button" class="btn btn-success">Random</button>
 						</span> <input id="guest-username-input" type="text" class="form-control"
 							placeholder="enter a username here" /> <span
 							class="input-group-btn">
-							<button id="guest-username-submit-button" class="btn btn-success">Go!</button>
+							<button id="guest-username-submit-button" class="btn btn-success" data-container="body" data-toggle="popover" data-placement="top" data-trigger="manual">Go!</button>
 						</span>
 					</div>
 				</div>
@@ -226,28 +214,106 @@
 			</div>
 		</div>
 	</div>
+	
+	<div class="modal fade" id="helpWindow" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog" id="helpWindowModal">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="helpWindowLabel">Help</h4>
+				</div>
+				<div class="modal-body">
+					<p>
+                        Click on the different components of the drum kit in order to play sound.<br/>
+                        <br/>
+						When you first connect you will be placed in the default room. While in this room you will only be able to hear sounds and see chat messages from other users in the same room.<br/>
+						<br/>
+						To change rooms use the tabs at the top right of the screen. If you wish to create a new tab type the name in the field above and press 'Create'.<br/>
+						<br/>
+					    To chat, type your message in the field and the bottom right of the screen and press 'Send'. This will send your message to all the users in the room you are in.<br/>
+					</p>
+				</div>
+				<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+		<div class="modal fade" id="aboutWindow" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog" id="aboutWindowModal">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="aboutWindowLabel">About</h4>
+				</div>
+				<div class="modal-body">
+					<p>
+						<b>Authors:</b><br/>
+						Henry Tesei<br/>
+						John Sharpe<br/>
+						Laurence Cartwright<br/>
+						Misha Colbourne<br/>
+						<br/>
+						<b>Libraries:</b><br/>
+                        <a href="http://www.createjs.com/#!/SoundJS" target="_blank">soundjs</a> <br/>
+                        <a href="http://jmesnil.net/stomp-websocket/doc/" target="_blank">stomp</a> <br/>
+                        <a href="https://github.com/sockjs/sockjs-client" target="_blank">sockjs</a> <br/>
+                        <a href="http://jquery.com/" target="_blank">jquery</a> <br/>
+                        <a href="http://getbootstrap.com/" target="_blank">bootstrap</a> <br/>
+					</p>
+				</div>
+				<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 
 	<div id="chat-main-div">
-
 		<div id="chat-control-area-div">
 			<div id="chat-rooms-create-div" class="input-group">
 				<span class="input-group-btn">
-					<button id="chat-room-add-button" class="btn btn-success">Create
+					<button id="chat-room-add-button" class="btn btn-success" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="manual">Create
 						Room</button>
 				</span> <input id="chat-room-add-input" type="text" class="form-control"
 					placeholder="enter a room name here" />
 			</div>
-			<div id="chat-rooms-list-div">
+			<div id="chat-rooms-list-div" class="tabbable">
 				<ul id="chat-rooms-list" class="nav nav-tabs nav-justified">
+					<li class="dropdown" >
+						<a class="dropdown-toggle"data-toggle="dropdown" href="#" id="chat-rooms-drop-down-toggle"><span class="caret"></span></a>
+						<ul class="dropdown-menu" id="chat-rooms-dropdown-list">
+							
+						</ul>
+					</li>
 				</ul>
 			</div>
 		</div>
 		<div id="chat-message-area-div"></div>
 		<div id="chat-message-controls-div" class="input-group input-group-md">
 			<span class="input-group-btn">
-				<button id="chat-room-send-button" class="btn btn-primary btn-md">Send</button>
+				<button id="chat-room-send-button" class="btn btn-primary btn-md"
+				data-container="body" data-toggle="popover" data-placement="top" data-trigger="manual">Send</button>
 			</span> <input id="chat-room-send-input" type="text" class="form-control"
-				placeholder="enter your message here" />
+				placeholder="enter your message here"
+				
+				 />
+		</div>
+	</div>
+
+	<div id="chat-current-user-div">
+		<a class="pull-left"><img id="current-user-picture" class="media-object"
+			src="http://www.gravatar.com/avatar/ce94470fe980adb2d4809719da745c5e?s=50&amp;d=identicon&amp;r=PG"
+			alt="profile"></a>
+		<div id="current-name-signout-container" class="media-body" style="padding-top: 15px; display: inline;">
+			<h4 id="current-user-name" class="media-heading" style="display: inline;"></h4>
+			<div style="display: inline;">
+				<button id="user-logout-button" class="btn btn-danger pull-right" style="display: inline;" >Sign Out</button>
+			</div>
 		</div>
 	</div>
 </body>

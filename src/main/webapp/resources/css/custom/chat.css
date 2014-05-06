@@ -3,6 +3,7 @@
 
 html,body {
 	background-color: #D6D4D9;
+	/*overflow:hidden;*/
 }
 
 
@@ -16,6 +17,8 @@ div#chat-main-div {
     
     /* height: 550px; */
     height: calc(100% - 50px);
+    z-index:100000000;
+    /*height: 100%;*/
 }
 /* 	div#facebook-buttons{
 		height: 100px;
@@ -47,37 +50,59 @@ div#guest-inputs{
 }
 
 .modal-dialog {
-  width: 300px;
+  width: 400px;
 }
 
+#btnHelp, #btnAbout{
+	color: #888 !important;
+}
+/* modal fix */
+.popover{
+    z-index:100000000;
+}
+
+#helpWindowModal, #aboutWindowModal {
+  width: 500px;
+}
 
 /* @CHARSET "US-ASCII";
 html,body {
     height:100%;
 }
 
-#chat-message-area-div{
-	width: 500px;
-	position: absolute;
-    top: 50%;
-    left: 25%;
-    margin-top: -50px;
-    margin-left: -50px;
-    overflow-y: scroll;
-    height: 500px;
+#chat-facebook-login {
+	margin-left: 100px;
 }
 
-#chat-main-div{
-	width: 500px;
-	display: none;
-	position: relative;
-	height: 100%;
+#chat-guest-login {
+	margin-left: 100px%;
 }
 
-#chat-message-controls-div{
-	position:absolute;
-	bottom:0;
-	position:fixed;bottom:0px;width:500px;
-} */
+#chat-current-user-div{
+	z-index:100000000;
+	top: 0;
+	right: 0;
+	position: fixed;
+	height: 50px;
+	width: 400px;
+	margin: auto;
+}
 
+#user-logout-button{
+	margin-right: 15px;
+}
 
+#current-user-name{
+	padding-top: 50px;
+	color: #fff;
+	margin-left: 20px;
+	display: inline;
+}
+
+#chat-current-user-div{
+	display:none;
+}
+
+#current-name-signout-container{
+	margin-top: 300px;
+}

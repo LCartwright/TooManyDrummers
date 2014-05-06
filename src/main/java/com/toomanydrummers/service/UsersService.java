@@ -30,7 +30,7 @@ public class UsersService {
 
 	// Defines how frequently to broadcast the room's members' cursor locations.
 	private static final int REFRESH_RATE_MILLIS = 30;
-	private static final int TIMEOUT_MILLIS = 60000;
+	private static final int TIMEOUT_MILLIS = 5000;
 	private static final int CHECK_FOR_TIMEOUT_MILLIS = 1000;
 
 	private SimpMessagingTemplate template;
@@ -43,17 +43,6 @@ public class UsersService {
 		this.template = template;
 	}
 
-//	public void addUser(String room_id, User newUser) {
-//		addUserCore(newUser);
-//		
-//		try {
-//			template.convertAndSend("/topic/" + room_id + "/allusers", getUsers());
-//		} catch (MessageDeliveryException e) {
-//			// e.printStackTrace();
-//		}
-//		
-//	}
-	
 	public void addUser(User newUser) {
 		addUserCore(newUser);
 	}
@@ -63,6 +52,7 @@ public class UsersService {
 			usersLock.lock();
 			if (!users.containsKey(newUser.getId())) {
 				users.put(newUser.getId(), newUser);
+				System.out.println("USER " + newUser.getId() + "ACTUALLY ADDED");
 			}
 		} finally {
 			usersLock.unlock();
@@ -181,8 +171,7 @@ public class UsersService {
 		while (it.hasNext()) {
 			String key = it.next();
 			if (users.get(key).getLastOnline() + TIMEOUT_MILLIS < now) {
-				//users.get(key).setIsTimedOut(true);
-				it.remove();
+				users.get(key).setIsTimedOut(true);
 				somebodyKilled = true;
 			}
 		}
