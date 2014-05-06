@@ -16,10 +16,12 @@ var mousePos = {
 	y : 0
 };
 
-var drumkitLeft;
-var drumkitTop;
-var drumkitRight;
-var drumkitBottom;
+var drumPos = {
+	left : 0,
+	top : 0,
+	right : 0,
+	bottom : 0
+};
 
 // How many milliseconds between each cursor location send.
 var mouseDelay = 30;
@@ -32,6 +34,8 @@ var deadCursorRunner;
 var contextPath;
 
 var drumstickPrefix = "drumstick";
+
+var lastRoomId = default_room_id;
 
 var snare; // snare
 var kick; // kick
@@ -61,8 +65,9 @@ function setConnected(connected) {
 	// : 'visible';
 
 	// Show the list of connected users so the user can see who's online.
-	document.getElementById('connectedUsers').style.visibility = connected ? 'visible'
-			: 'hidden';
+	// document.getElementById('connectedUsers').style.visibility = connected ?
+	// 'visible'
+	// : 'hidden';
 
 	// A connected user can't connect if they're already connected!
 	// document.getElementById('connect').disabled = connected;
@@ -71,36 +76,23 @@ function setConnected(connected) {
 	// document.getElementById('disconnect').disabled = !connected;
 
 	// If we're connected, show the drumkit so the user can play!
-	document.getElementById('drumkit_div').style.visibility = connected ? 'visible'
-			: 'hidden';
+	// document.getElementById('drumkit_div').style.visibility = connected ?
+	// 'visible'
+	// : 'hidden';
 }
 
 // This function is fired when the user tries to connect via a websocket to the
 // application.
 function drumsConnect() {
 
-	// TODO: Check for validity both here and on the serverside, even if
-	// facebook is supplying the info.
-	// if (document.getElementById('enterUsername').value === "") {
-	// alert('Please enter a username before connecting');
-	// } else {
-
 	if (stompClient != null) {
 		stompClient.disconnect();
 	}
 
-	// TODO: Auto generate the id
-	// myId = document.getElementById('enterUsername').value;
-	//alert("Connecting");
-	
 	var x = "http:\/\/" + $(location).attr("host") + contextPath + "/hit/";
 
-	//console.log(x);
-	
 	// Create a socket which looks for the 'hit' endpoint.
 	var socket = new SockJS(x);
-	//var socket = new SockJS("./hit/");
-	//var socket = new WebSocket(x);
 
 	socket.addEventListener('error', function() {
 		drumsDisconnect();
@@ -109,7 +101,7 @@ function drumsConnect() {
 
 	// Prepare for full Stomp communication.
 	stompClient = Stomp.over(socket);
-	//stompClient = Stomp.client(x);
+	// stompClient = Stomp.client(x);
 
 	stompClient.debug = function() {
 	};
@@ -121,33 +113,35 @@ function drumsConnect() {
 		// setConnected(true);
 
 		// Register for hitreports so the user can hear other users playing
-		// and join in!
-		hitreportsSubscription = stompClient.subscribe('/topic/hitreports',
-				function(drumhit) {
-					drumhit.ack();
-					play(JSON.parse(drumhit.body).name);
-				}, {
-					'ack' : 'client'
-				});
+		// and join in! Start with default room
+		// hitreportsSubscription = stompClient.subscribe('/topic/'
+		// + active_room_id + '/hitreports', function(drumhit) {
+		// drumhit.ack();
+		// play(JSON.parse(drumhit.body).name);
+		// }, {
+		// 'ack' : 'client'
+		// });
 
 		// Subscribe for changes in the room's users so new users can join
 		// in
 		// and old users don't fill up the room with artifacts.
-		allusersSubscription = stompClient.subscribe('/topic/allusers',
-				function(allUsers) {
-					allUsers.ack();
-					refreshUsers(JSON.parse(allUsers.body));
-				}, {
-					'ack' : 'client'
-				});
+		// allusersSubscription = stompClient.subscribe('/topic/' +
+		// active_room_id
+		// + '/allusers', function(allUsers) {
+		// allUsers.ack();
+		// refreshUsers(JSON.parse(allUsers.body));
+		// }, {
+		// 'ack' : 'client'
+		// });
 
 		// TODO: Sort this out!
 		// Let the Server know I've joined!
-		stompClient.send('/app/newuser', {}, JSON.stringify({
-			'id' : currentUserID,
-			'firstName' : null,
-			'lastName' : null
-		}));
+		// stompClient.send('/app/' + active_room_id + '/newuser', {}, JSON
+		// .stringify({
+		// 'id' : currentUserID,
+		// 'firstName' : null,
+		// 'lastName' : null
+		// }));
 
 		// Subscribe for updates on the cursor positions of other users.
 		motionSubscription = stompClient.subscribe('/topic/motion', function(
@@ -164,6 +158,8 @@ function drumsConnect() {
 
 		// Clear dead users every 10 seconds.
 		deadCursorRunner = setInterval(cleanDeadDrumsticks, cleanupDelay);
+
+		changeDrumRoom();
 
 	});
 	// }
@@ -207,7 +203,7 @@ function play(message) {
 	case "hatc":
 		hatc.play();
 		hato.stop();
-		$("#effhatc").css("opacity", 0.6);
+		$("#effhatc").css("opacity", 0.4);
 		$("#effhatc").stop().fadeTo("fast", 0);
 		break;
 	case "snare":
@@ -269,9 +265,6 @@ function refreshUsers(lastUsers) {
 
 	// For all users
 	for (var i = 0; i < lastUsers.length; i++) {
-
-		// document.getElementById('connectedUsers').innerHTML += " "
-		// + lastUsers[i].firstName;
 
 		// Filter out my own username and the empty value at the end
 		if (lastUsers[i].id != currentUserID && lastUsers[i].id != "") {
@@ -356,18 +349,20 @@ function moveDrumsticks(positions) {
 		// Find their drumstick
 		for (var j = 0; j < jMax; j++) {
 
+			var drumstickId = drumsticks[j].getAttribute("id");
 			// If we've landed on the right drumstick
-			if (drumsticks[j].getAttribute("id") === (drumstickPrefix + currentId)) {
-				drumsticks[j].style.left = positions[i].x + 'px';
-				drumsticks[j].style.top = positions[i].y + 'px';
+			if (drumstickId === (drumstickPrefix + currentId)) {
+				var posX = positions[i].x + drumPos.left;
+				var posY = positions[i].y + drumPos.top;
 
-				if (positions[i].x > drumkitLeft
-						&& positions[i].y > drumkitTop
-						&& positions[i].x < drumkitRight
-						&& positions[i].y < drumkitBottom) {
+				drumsticks[j].style.left = posX + 'px';
+				drumsticks[j].style.top = posY + 'px';
+
+				if (posX > drumPos.left && posY > drumPos.top
+						&& posX < drumPos.right && posY < drumPos.bottom) {
 					drumsticks[j].style.opacity = 1.0;
 				} else {
-					drumsticks[j].style.opacity = 0.2;
+					drumsticks[j].style.opacity = 0.3;
 				}
 
 				break;
@@ -378,23 +373,6 @@ function moveDrumsticks(positions) {
 	}
 
 }
-
-// function handleMouseMove(event) {
-// event = event || window.event; // IE
-//
-// // so sendMousePosition() won't send an update
-// // if (mousePos.x == event.clientX && mousePos.y == event.clientY) {
-// // mousePos = null;
-// // } else {
-//
-// // Update mousePos
-// mousePos = {
-// y : event.clientY,
-// x : event.clientX
-// };
-//
-// // }
-// }
 
 // Fire off this client's mouse location to the server
 function sendMousePosition() {
@@ -433,6 +411,56 @@ function cleanDeadDrumsticks() {
 		}
 
 	}
+
+}
+
+function changeDrumRoom() {
+
+	if (hitreportsSubscription) {
+		hitreportsSubscription.unsubscribe();
+		allusersSubscription.unsubscribe();
+
+		stompClient.send('/app/' + lastRoomId + '/finished', {}, JSON
+				.stringify({
+					'id' : currentUserID,
+					'firstName' : null,
+					'lastName' : null
+				}));
+	}
+
+	// Resubscribe
+
+	// Register for hitreports so the user can hear other users playing
+	// and join in! Start with default room
+	hitreportsSubscription = stompClient.subscribe('/topic/' + active_room_id
+			+ '/hitreports', function(drumhit) {
+		drumhit.ack();
+		play(JSON.parse(drumhit.body).name);
+	}, {
+		'ack' : 'client'
+	});
+
+	// Subscribe for changes in the room's users so new users can join
+	// in
+	// and old users don't fill up the room with artifacts.
+	allusersSubscription = stompClient.subscribe('/topic/' + active_room_id
+			+ '/allusers', function(allUsers) {
+		allUsers.ack();
+		refreshUsers(JSON.parse(allUsers.body));
+	}, {
+		'ack' : 'client'
+	});
+
+	// TODO: Sort this out!
+	// Let the Server know I've joined!
+	stompClient.send('/app/' + active_room_id + '/newuser', {}, JSON
+			.stringify({
+				'id' : currentUserID,
+				'firstName' : null,
+				'lastName' : null
+			}));
+
+	lastRoomId = active_room_id;
 
 }
 
@@ -516,93 +544,123 @@ function initialize(contextPath) {
 	hatc.volume = 0.8;
 	hato.volume = 0.6;
 
-	$('#hato').mousedown(function(e) {
-		e.originalEvent.preventDefault();
-		stompClient.send("/app/hit", {}, JSON.stringify({
-			'name' : 'hato'
-		}));
-	});
+	$('#hato').mousedown(
+			function(e) {
+				e.originalEvent.preventDefault();
+				stompClient.send("/app/" + active_room_id + "/hit", {}, JSON
+						.stringify({
+							'name' : 'hato'
+						}));
+			});
 
-	$('#hatc').mousedown(function(e) {
-		e.originalEvent.preventDefault();
-		stompClient.send("/app/hit", {}, JSON.stringify({
-			'name' : 'hatc'
-		}));
-	});
+	$('#hatc').mousedown(
+			function(e) {
+				e.originalEvent.preventDefault();
+				stompClient.send("/app/" + active_room_id + "/hit", {}, JSON
+						.stringify({
+							'name' : 'hatc'
+						}));
+			});
 
-	$('#snare').mousedown(function(e) {
-		e.originalEvent.preventDefault();
-		stompClient.send("/app/hit", {}, JSON.stringify({
-			'name' : 'snare'
-		}));
-	});
+	$('#snare').mousedown(
+			function(e) {
+				e.originalEvent.preventDefault();
+				stompClient.send("/app/" + active_room_id + "/hit", {}, JSON
+						.stringify({
+							'name' : 'snare'
+						}));
+			});
 
-	$('#kick').mousedown(function(e) {
-		e.originalEvent.preventDefault();
-		stompClient.send("/app/hit", {}, JSON.stringify({
-			'name' : 'kick'
-		}));
-	});
+	$('#kick').mousedown(
+			function(e) {
+				e.originalEvent.preventDefault();
+				stompClient.send("/app/" + active_room_id + "/hit", {}, JSON
+						.stringify({
+							'name' : 'kick'
+						}));
+			});
 
-	$('#rtom').mousedown(function(e) {
-		e.originalEvent.preventDefault();
-		stompClient.send("/app/hit", {}, JSON.stringify({
-			'name' : 'rtom'
-		}));
-	});
+	$('#rtom').mousedown(
+			function(e) {
+				e.originalEvent.preventDefault();
+				stompClient.send("/app/" + active_room_id + "/hit", {}, JSON
+						.stringify({
+							'name' : 'rtom'
+						}));
+			});
 
-	$('#ftom').mousedown(function(e) {
-		e.originalEvent.preventDefault();
-		stompClient.send("/app/hit", {}, JSON.stringify({
-			'name' : 'ftom'
-		}));
-	});
+	$('#ftom').mousedown(
+			function(e) {
+				e.originalEvent.preventDefault();
+				stompClient.send("/app/" + active_room_id + "/hit", {}, JSON
+						.stringify({
+							'name' : 'ftom'
+						}));
+			});
 
-	$('#crash').mousedown(function(e) {
-		e.originalEvent.preventDefault();
-		stompClient.send("/app/hit", {}, JSON.stringify({
-			'name' : 'crash'
-		}));
-	});
+	$('#crash').mousedown(
+			function(e) {
+				e.originalEvent.preventDefault();
+				stompClient.send("/app/" + active_room_id + "/hit", {}, JSON
+						.stringify({
+							'name' : 'crash'
+						}));
+			});
 
-	$('#ride').mousedown(function(e) {
-		e.originalEvent.preventDefault();
-		stompClient.send("/app/hit", {}, JSON.stringify({
-			'name' : 'ride'
-		}));
-	});
-	$('#cuica1').mousedown(function(e) {
-		e.originalEvent.preventDefault();
-		stompClient.send("/app/hit", {}, JSON.stringify({
-			'name' : 'cuica1'
-		}));
-	});
-	$('#cuica2').mousedown(function(e) {
-		e.originalEvent.preventDefault();
-		stompClient.send("/app/hit", {}, JSON.stringify({
-			'name' : 'cuica2'
-		}));
-	});
-	$('#cuica3').mousedown(function(e) {
-		e.originalEvent.preventDefault();
-		stompClient.send("/app/hit", {}, JSON.stringify({
-			'name' : 'cuica3'
-		}));
-	});
-	$('#cuica4').mousedown(function(e) {
-		e.originalEvent.preventDefault();
-		stompClient.send("/app/hit", {}, JSON.stringify({
-			'name' : 'cuica4'
-		}));
-	});
+	$('#ride').mousedown(
+			function(e) {
+				e.originalEvent.preventDefault();
+				stompClient.send("/app/" + active_room_id + "/hit", {}, JSON
+						.stringify({
+							'name' : 'ride'
+						}));
+			});
+	$('#cuica1').mousedown(
+			function(e) {
+				e.originalEvent.preventDefault();
+				stompClient.send("/app/" + active_room_id + "/hit", {}, JSON
+						.stringify({
+							'name' : 'cuica1'
+						}));
+			});
+	$('#cuica2').mousedown(
+			function(e) {
+				e.originalEvent.preventDefault();
+				stompClient.send("/app/" + active_room_id + "/hit", {}, JSON
+						.stringify({
+							'name' : 'cuica2'
+						}));
+			});
+	$('#cuica3').mousedown(
+			function(e) {
+				e.originalEvent.preventDefault();
+				stompClient.send("/app/" + active_room_id + "/hit", {}, JSON
+						.stringify({
+							'name' : 'cuica3'
+						}));
+			});
+	$('#cuica4').mousedown(
+			function(e) {
+				e.originalEvent.preventDefault();
+				stompClient.send("/app/" + active_room_id + "/hit", {}, JSON
+						.stringify({
+							'name' : 'cuica4'
+						}));
+			});
+
+	realignSVG();
 
 	// Listen for mouse movements
-	// window.onmousemove = handleMouseMove;
 	$(window).mousemove(function(event) {
 		mousePos = {
-			x : event.pageX,
-			y : event.pageY
+			x : (event.pageX - drumPos.left),
+			y : (event.pageY - drumPos.top - 50)
 		};
+	});
+
+	$(window).resize(function() {
+		console.log("resize");
+		realignSVG();
 	});
 
 	$("#drumkit").on('dragstart', function(event) {
@@ -611,16 +669,19 @@ function initialize(contextPath) {
 	$("#drummap").on('dragstart', function(event) {
 		event.preventDefault();
 	});
-	
-	drumkitLeft = $('#drumkit').position().left;
-	drumkitTop = $('#drumkit').position().top;
-	drumkitRight = drumkitLeft + $('#drumkit').width();
-	drumkitBottom = drumkitTop + $('#drumkit').height();
-	
 
 	// Make sure the user is not initially connected
 	setConnected(false);
 
+}
+
+function realignSVG() {
+	drumPos.left = $('#drumkit').position().left;
+	drumPos.top = $('#drumkit').position().top;
+	drumPos.right = drumPos.left + $('#drumkit').width();
+	drumPos.bottom = drumPos.top + $('#drumkit').height();
+	$("#effects").css("left", drumPos.left);
+	$("#effects").css("top", drumPos.top);
 }
 
 $(window).on('beforeunload', function() {
