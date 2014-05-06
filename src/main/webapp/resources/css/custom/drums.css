@@ -52,6 +52,8 @@ div.vertical {
 
 .cursornames {
 	float: right;
+	margin-left: -20px;
+	margin-top: 20px;
 	color: white;
 	text-shadow: 1px 1px 4px #000000;
 	size: 8px;

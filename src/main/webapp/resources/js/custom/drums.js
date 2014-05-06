@@ -16,10 +16,12 @@ var mousePos = {
 	y : 0
 };
 
-var drumkitLeft;
-var drumkitTop;
-var drumkitRight;
-var drumkitBottom;
+var drumPos = {
+	left : 0,
+	top : 0,
+	right : 0,
+	bottom : 0
+};
 
 // How many milliseconds between each cursor location send.
 var mouseDelay = 30;
@@ -350,14 +352,14 @@ function moveDrumsticks(positions) {
 			var drumstickId = drumsticks[j].getAttribute("id");
 			// If we've landed on the right drumstick
 			if (drumstickId === (drumstickPrefix + currentId)) {
-				var posX = positions[i].x + drumkitLeft;
-				var posY = positions[i].y + drumkitTop;
+				var posX = positions[i].x + drumPos.left;
+				var posY = positions[i].y + drumPos.top;
 
 				drumsticks[j].style.left = posX + 'px';
 				drumsticks[j].style.top = posY + 'px';
 
-				if (posX > drumkitLeft && posY > drumkitTop
-						&& posX < drumkitRight && posY < drumkitBottom) {
+				if (posX > drumPos.left && posY > drumPos.top
+						&& posX < drumPos.right && posY < drumPos.bottom) {
 					drumsticks[j].style.opacity = 1.0;
 				} else {
 					drumsticks[j].style.opacity = 0.3;
@@ -651,8 +653,8 @@ function initialize(contextPath) {
 	// Listen for mouse movements
 	$(window).mousemove(function(event) {
 		mousePos = {
-			x : (event.pageX - drumkitLeft),
-			y : (event.pageY - drumkitTop - 50)
+			x : (event.pageX - drumPos.left),
+			y : (event.pageY - drumPos.top - 50)
 		};
 	});
 
@@ -674,12 +676,12 @@ function initialize(contextPath) {
 }
 
 function realignSVG() {
-	drumkitLeft = $('#drumkit').position().left;
-	drumkitTop = $('#drumkit').position().top;
-	drumkitRight = drumkitLeft + $('#drumkit').width();
-	drumkitBottom = drumkitTop + $('#drumkit').height();
-	$("#effects").css("left", drumkitLeft);
-	$("#effects").css("top", drumkitTop);
+	drumPos.left = $('#drumkit').position().left;
+	drumPos.top = $('#drumkit').position().top;
+	drumPos.right = drumPos.left + $('#drumkit').width();
+	drumPos.bottom = drumPos.top + $('#drumkit').height();
+	$("#effects").css("left", drumPos.left);
+	$("#effects").css("top", drumPos.top);
 }
 
 $(window).on('beforeunload', function() {
