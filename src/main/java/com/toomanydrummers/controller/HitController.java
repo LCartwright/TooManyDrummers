@@ -56,7 +56,7 @@ public class HitController {
 //	}
 	@MessageMapping("/newuser")
 	public void newUser(User user) throws Exception {
-		usersService.addUser(user);
+		//usersService.addUser(user);
 	}
 
 	/**
@@ -74,7 +74,8 @@ public class HitController {
 //	}
 	@MessageMapping("/finished")
 	public void removeUser(User user) throws Exception {
-		usersService.removeUser(user.getId());
+		//usersService.removeUser(user.getId());
+		
 	}
 
 	// TODO: Provide a better way of checking ids...?
