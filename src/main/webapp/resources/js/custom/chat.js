@@ -30,6 +30,10 @@ var create_room_blocker = false;
 
 var default_room_id = 2;
 
+var stop_fetches = false;
+
+var chat_spam_timeout;
+
 function joinRoom(room_id) {
 	
 	clearInterval(message_fetch_interval);
@@ -45,8 +49,10 @@ function joinRoom(room_id) {
 		activateRoom(room_id);
 		$("#chat-message-area-div").empty(); // empty the area
 		message_fetch_interval = setInterval(function() {
-			fetchMessages(room_id);
-		}, 100);
+			if(!stop_fetches){
+				fetchMessages(room_id);
+			}
+		}, 500);
 	});
 	
 	//window.setInterval(fetchMessages(), 100);
@@ -56,7 +62,8 @@ function joinRoom(room_id) {
 function activateRoom(room_id){
 	active_room_id = room_id;
 	$("#chat-rooms-list > li").removeAttr("class");
-	$("li[room_id='" + room_id +  "']").attr("class","active");
+	$("#chat-rooms-dropdown-list > li").removeAttr("class");
+	$("#chat-rooms-list").children("li[room_id='" + room_id +  "']").attr("class","active");
 }
 
 function updateRooms(){
@@ -77,7 +84,8 @@ function updateRooms(){
 			if($.inArray(rooms[i].roomID, room_id_list) == -1){ //-1 is false check
 				room_id_list.push(rooms[i].roomID); //add to global list
 				new_room_id_list.push(rooms[i].roomID); //add to local list
-				$("#chat-rooms-list").append(createRoomElement(rooms[i])); //add to screen
+				$("#chat-rooms-list").append(createRoomElement(rooms[i]));//add to screen
+				$("#chat-rooms-dropdown-list").append(createRoomElement(rooms[i]));//add to screen
 			}
 		}
 		
@@ -93,8 +101,10 @@ function createRoomElement(room){
 	.attr("room_id", room.roomID)
 	.append(
 			$(document.createElement("a"))
+			.attr("data-toggle", "tab")
 			.text(room.name)
 			.click(function (event){
+				stop_fetches = false;
 				joinRoom($(event.target).parent().attr("room_id"));
 			})
 	);
@@ -107,7 +117,9 @@ function generateNewRoom(name){
 	posting.done(function(data){
 		var room = JSON.parse(JSON.stringify(data));
 		$("#chat-rooms-list").append(createRoomElement(room));
+		$("#chat-rooms-dropdown-list").append(createRoomElement(room));
 		room_id_list.push(room.roomID);
+		joinRoom(room.roomID);
 	});
 }
 
@@ -116,9 +128,12 @@ function initChat(){
 	updateRooms();
 	
 	setInterval(function(){
-		console.log("UPDATING ROOMS AND USERS");
-		updateUsers();
-		updateRooms();
+		
+		if(!stop_fetches){
+			console.log("UPDATING ROOMS AND USERS");
+			updateUsers();
+			updateRooms();
+		}
 	},1000);
 	//joinRoom(2);
 	//hacky for now
@@ -133,6 +148,7 @@ function initChat(){
 } */
 
 function fetchMessages(room_id) {
+	console.log("FETCH MESSAGE ENTERED");
 	var currentRoomURI = roomsURI + "/" + room_id + "/messages";
 	//alert(currentRoomURI);
 	var getting = $.get(currentRoomURI, {
@@ -144,18 +160,20 @@ function fetchMessages(room_id) {
 	getting.done(function(data) {
 		//alert(JSON.stringify(data));
 		var messages = JSON.parse(JSON.stringify(data));
+		console.log(JSON.stringify(data));
 		
 		//[{"messageId":1,"userId":1,"messageContent":"hello"},{"messageId":2,"userId":2,"messageContent":"goodbye"}]
 		// WRITE MESSAGES TO MESSAGE AREA
 		//alert(messages[0].messageContent);
 		
 		var message_added = false;
+		
 		for (var i = 0; i < messages.length; i++) {
 			//Add to chat
 			
 			console.log("MESSAGE ADDING");
 			
-			if($("div[message_id=" + messages[i].messageId + "]").length){
+			if($("#chat-message-area-div").children("div[message_id=" + messages[i].messageId + "]").length){
 				console.log("MESSAGE ALREADY EXISTS");
 			} else {
 				addChatMessageToArea(messages[i]);
@@ -361,15 +379,25 @@ function sendButtonPressed(){
 			
 			message_send_blocker = true;
 			
-			setTimeout(function(){message_send_blocker = false;}, 3000);
+			chat_spam_timeout = setTimeout(function(){message_send_blocker = false;}, 100);
 			
 			sendMessage(active_room_id, currentUserID);
 			
 			$("#chat-room-send-input").val("");
+		} else {
+			$("#chat-room-send-button").attr("data-content","Enter a message to send").popover("toggle");
+			setTimeout(function(){
+				$("#chat-room-send-button").popover("toggle");
+			}, 1000);
 		}
 		
 	} else {
-		alert("SLOW DOWN"); // DO something else
+		clearTimeout(chat_spam_timeout);
+		$("#chat-room-send-button").attr("data-content","You're entering messages too quickly").popover("toggle");
+		setTimeout(function(){
+			message_send_blocker = false;
+			$("#chat-room-send-button").popover("toggle");
+		},5000);
 	}
 	
 }
@@ -384,16 +412,26 @@ function createRoomButtonPressed(){
 
 			create_room_blocker = true;
 			
-			setTimeout(function(){create_room_blocker = false;}, 3000);
+			room_spam_timeout = setTimeout(function(){create_room_blocker = false;}, 3000);
 			
 			generateNewRoom(room_name);
 			
 			$("#chat-room-add-input").val("");
 			
+		} else {
+			$("#chat-room-add-button").attr("data-content","Enter a room name").popover("toggle");
+			setTimeout(function(){
+				$("#chat-room-add-button").popover("toggle");
+			},1000);
 		}
 		
 	} else {
-		alert("STOP CREATING ROOMS");
+		clearTimeout(room_spam_timeout);
+		$("#chat-room-add-button").attr("data-content","You're making rooms too quickly").popover("toggle");
+		setTimeout(function(){
+			create_room_blocker = false;
+			$("#chat-room-add-button").popover("toggle");
+		},10000);
 	}
 }
 
@@ -403,14 +441,33 @@ function setupLogin(){
 }
 
 function loginGuest(){
-	var posting = $.post(usersURI + "/add_guest", {
-		name : $("#guest-username-input").val()
-	});
 	
-	posting.done(function(data){
-		//alert(JSON.stringify(data));
-		setLoggedInGuest(JSON.parse(JSON.stringify(data)));
-	});
+	var username_input = $("#guest-username-input").val();
+	
+	if(username_input != ""){
+		var posting = $.post(usersURI + "/add_guest", {
+			name : username_input
+		});
+		
+		posting.done(function(data){
+			//alert(JSON.stringify(data));
+			setLoggedInGuest(JSON.parse(JSON.stringify(data)));
+		});
+	} else {
+		$("#guest-username-submit-button").attr("data-content","Enter a name").popover("toggle");
+		setTimeout(function(){
+			$("#guest-username-submit-button").popover("toggle");
+		}, 1000);
+	}
+	
+
+}
+
+function setCurrentUserInfo(){
+	$("#current-user-picture").attr("src", currentUserPictureURL);
+	$("#current-user-name").text(currentUserFullName);
+	$("#chat-current-user-div").css("display","block");
+	console.log("CURRENT USER INFO SET");
 }
 
 function setLoggedInGuest(user_response){
@@ -419,7 +476,7 @@ console.log("function GUEST LOGGED IN called");
 	currentUserID = user_response.id;
 	currentUserFirstName = user_response.firstName;
 	currentUserLastName = user_response.lastName;
-	currentUserFullName = user_response.first_name + " " + user_response.last_name;
+	currentUserFullName = user_response.firstName + " " + user_response.lastName;
 	currentUserPictureURL = user_response.pictureURL;
 	
 	console.log("currentUserID: " + currentUserID);
@@ -428,11 +485,15 @@ console.log("function GUEST LOGGED IN called");
 	console.log("currentUserFullName: " + currentUserFullName);
 	console.log("currentUserPictureURL: " + currentUserPictureURL);
 	
+	setCurrentUserInfo();
+	
 	user_list.push(user_response);
 	user_id_list.push(user_response.id);
 	
 	$("#chat-main-div").css("display","block");
+	$('#login-modal').modal('toggle');
 //	drumsDisconnect();
+	
 	stompClient = null;
 	drumsConnect();
 	joinRoom(default_room_id);
@@ -549,8 +610,29 @@ $( document ).ready(function() {
 		loginGuest();
 	});
 	
+	$( "#guest-username-input" ).on( "keydown", function( event ) {
+		if(event.which == 13){
+			loginGuest();
+		}
+	});
+	
+	$("#chat-rooms-drop-down-toggle").click(function(event){
+		//alert("You have been alerted");
+		stop_fetches = true;
+	});
+	
+	$("#login-modal").modal({
+		  backdrop: 'static',
+		  keyboard: false
+	});
+	
+	$("#user-logout-button").click(function(){
+		location.reload();
+	});
+
 	
 	initChat();
+	
 });
 
 
@@ -593,11 +675,13 @@ function setLoggedIn(response){
 			user_list.push(user);
 			user_id_list.push(user.id);
 			
+			setCurrentUserInfo();
 			$("#chat-main-div").css("display","block");
 //			drumsDisconnect();
 			stompClient = null;
 			drumsConnect();
 			joinRoom(default_room_id);
+			$('#login-modal').modal('toggle');
 		});
 	});
 	

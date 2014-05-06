@@ -88,7 +88,10 @@ public class RestController {
 			);
 			selectedRoom.addMessage(returnMessage);
 		}
-
+		
+		if(returnMessage != null){
+			System.out.println("MESSAGE ADDED " + userId + " " + messageContent);
+		}
 		return returnMessage;
 	}
 	
