@@ -171,7 +171,14 @@
 			<div class="navbar-header">
 				<a class="navbar-brand" href="#">Too Many Drummers</a>
 			</div>
-				
+			<div class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+			<!--<button class="btn btn-primary btn-lg" data-toggle="modal"
+							data-target="#myModal">Launch demo modal</button> -->
+				<li><button id="btnHelp" class="btn btn-link navbar-btn" data-toggle="modal" data-target="#helpWindow">Help</button></li>
+				<li><button id="btnAbout" class="btn btn-link navbar-btn" data-toggle="modal" data-target="#aboutWindow">About</button></li>
+				</ul>
+			</div>
 			<!--/.nav-collapse -->
 		</div>
 	</div>
@@ -207,6 +214,65 @@
 			</div>
 		</div>
 	</div>
+	
+	<div class="modal fade" id="helpWindow" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog" id="helpWindowModal">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="helpWindowLabel">Help</h4>
+				</div>
+				<div class="modal-body">
+					<p>
+                        Click on the different components of the drum kit in order to play sound.<br/>
+                        <br/>
+						When you first connect you will be placed in the default room. While in this room you will only be able to hear sounds and see chat messages from other users in the same room.<br/>
+						<br/>
+						To change rooms use the tabs at the top right of the screen. If you wish to create a new tab type the name in the field above and press 'Create'.<br/>
+						<br/>
+					    To chat, type your message in the field and the bottom right of the screen and press 'Send'. This will send your message to all the users in the room you are in.<br/>
+					</p>
+				</div>
+				<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+		<div class="modal fade" id="aboutWindow" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog" id="aboutWindowModal">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="aboutWindowLabel">About</h4>
+				</div>
+				<div class="modal-body">
+					<p>
+						<b>Authors:</b><br/>
+						Henry Tesei<br/>
+						John Sharpe<br/>
+						Laurence Cartwright<br/>
+						Misha Colbourne<br/>
+						<br/>
+						<b>Libraries:</b><br/>
+                        <a href="http://www.createjs.com/#!/SoundJS" target="_blank">soundjs</a> <br/>
+                        <a href="http://jmesnil.net/stomp-websocket/doc/" target="_blank">stomp</a> <br/>
+                        <a href="https://github.com/sockjs/sockjs-client" target="_blank">sockjs</a> <br/>
+                        <a href="http://jquery.com/" target="_blank">jquery</a> <br/>
+                        <a href="http://getbootstrap.com/" target="_blank">bootstrap</a> <br/>
+					</p>
+				</div>
+				<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
 	<div id="chat-main-div">
 		<div id="chat-control-area-div">
 			<div id="chat-rooms-create-div" class="input-group">

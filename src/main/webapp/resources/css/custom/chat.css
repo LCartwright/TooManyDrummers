@@ -53,13 +53,21 @@ div#guest-inputs{
   width: 400px;
 }
 
+#btnHelp, #btnAbout{
+	color: #888 !important;
+}
 /* modal fix */
 .popover{
     z-index:100000000;
 }
 
-#logged-in-user-div{
-	
+#helpWindowModal, #aboutWindowModal {
+  width: 500px;
+}
+
+/* @CHARSET "US-ASCII";
+html,body {
+    height:100%;
 }
 
 #chat-facebook-login {
