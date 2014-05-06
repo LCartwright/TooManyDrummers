@@ -11,22 +11,31 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class User
-{
+/**
+ * One User of the application. A User object is created and associated
+ * with every client. This class contains all necessary associated data.
+ */
+public class User {
 
+	// Ensures each User has a distinct ID
 	private static AtomicInteger counter = new AtomicInteger(0);
+	
 	private String firstName;
 	private String lastName;
 	private String id;
 	private String picture_url;
 
+	// Coordinates of this user's cursor
 	private int x;
 	private int y;
 	
+	// Keeps a note of the last communication from this user.
+	// If too long without communication, this object is
+	// marked as 'timed out' and is no longer used.
 	private long lastOnline = System.currentTimeMillis();
-	
 	private boolean isTimedOut = false;
 	
+	// The room this User is currently 'in'.
 	private String room;
 
 	public User() {
@@ -54,7 +63,7 @@ public class User
 		this.y = y;
 	}
 	
-	//Guest
+	// A Guest User with some sensible default values.
 	public User(String name){
 		this.firstName = name;
 		this.lastName = "";
@@ -189,8 +198,8 @@ public class User
 		return null;
 	}
 
-	public void setIsTimedOut(boolean isTimedOut) {
-		this.isTimedOut = isTimedOut;
+	public void timeOut() {
+		this.isTimedOut = true;
 	}
 	
 	public boolean isTimedOut() {

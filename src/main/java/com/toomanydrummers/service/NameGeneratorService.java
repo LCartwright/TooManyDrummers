@@ -1,12 +1,13 @@
 package com.toomanydrummers.service;
 
-import java.util.ArrayList;
 import java.util.Random;
-
-import javax.persistence.Tuple;
 
 import org.springframework.stereotype.Service;
 
+/**
+ * This service generates a name for a User who does not specify
+ * a name.
+ */
 @Service
 public class NameGeneratorService {
 

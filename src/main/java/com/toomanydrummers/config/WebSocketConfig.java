@@ -31,7 +31,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
 	/**
 	 * These are the app's Stomp endpoints and allow for a fallback to SockJS
-	 * technology.
+	 * technology when websockets are not available.
 	 */
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
