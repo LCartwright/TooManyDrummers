@@ -17,12 +17,17 @@ import com.toomanydrummers.bean.Name;
 import com.toomanydrummers.bean.Picture;
 import com.toomanydrummers.bean.Room;
 import com.toomanydrummers.bean.User;
-import com.toomanydrummers.bean.XandY;
 import com.toomanydrummers.service.NameGeneratorService;
 import com.toomanydrummers.service.RoomsService;
 import com.toomanydrummers.service.UsersService;
 
-
+/**
+ * A controller for the chat functionality of the application.
+ * Capable of receiving and distributing chat messages between
+ * Users in Rooms. Features JSoup cleaning of all data received
+ * to protect the application and its clients from malicious
+ * input.
+ */
 @Controller
 @RequestMapping("REST")
 public class RestController {
@@ -36,12 +41,14 @@ public class RestController {
     
     @Autowired 
     private NameGeneratorService nameGeneratorService;
-	
-	public RestController() {
-		System.out.println("REST CONTROLLER STARTED");
-		//Add default room to join
-	}
-	
+    
+	/**
+	 * This method is called when a request to create a new chatroom is 
+	 * received. The contents are cleaned for malicious values and
+	 * contain the desired name of the room.
+	 * @param name
+	 * @return
+	 */
 	@RequestMapping(value = "/rooms/add", method = RequestMethod.POST)
 	public @ResponseBody Room addRoom(@RequestParam(value = "name") String name) {
 		Room room = new Room(Jsoup.clean(name, Whitelist.none()));
@@ -49,14 +56,14 @@ public class RestController {
 		return room;
 	}
 	
-	@RequestMapping(value = "/rooms/remove", method = RequestMethod.POST)
-	public @ResponseBody Room removeRoom(@RequestParam("room_id") String room_id) {
-		String cleanedRoomID = Jsoup.clean(room_id, Whitelist.none());
-		roomsService.removeRoom(cleanedRoomID);
-		return roomsService.getRoom(cleanedRoomID);
-	}
-	
-	
+	/**
+	 * Fired when a request is received to draw all the messages associated with
+	 * a room. Necessary to update connected users and also caters for users
+	 * who were not connected at the room's inception.
+	 * @param room_id
+	 * @param messageId
+	 * @return
+	 */
 	@RequestMapping(value = "/rooms/{room_id}/messages", method = RequestMethod.GET)
 	public @ResponseBody List<Message> getRoomMessages(
 			@PathVariable String room_id,
@@ -72,6 +79,14 @@ public class RestController {
 		return returnMessages;
 	}
 	
+	/**
+	 * This method is fired when a user wants to send a new message to the chatroom
+	 * and contains the message they would like to post.
+	 * @param room_id
+	 * @param userId
+	 * @param messageContent
+	 * @return
+	 */
 	@RequestMapping(value = "/rooms/{room_id}/messages", method = RequestMethod.POST)
 	public @ResponseBody Message addRoomMessage(
 			@PathVariable String room_id,
@@ -89,41 +104,66 @@ public class RestController {
 			selectedRoom.addMessage(returnMessage);
 		}
 		
-		if(returnMessage != null){
-			System.out.println("MESSAGE ADDED " + userId + " " + messageContent);
-		}
 		return returnMessage;
 	}
 	
+	/**
+	 * Grab a room's name.
+	 * @param room_id
+	 * @return
+	 */
 	@RequestMapping(value = "/rooms/{room_id}/name", method = RequestMethod.GET)
 	public @ResponseBody String addRoomMessage(
 			@PathVariable String room_id) {
 		return roomsService.getRoom(Jsoup.clean(room_id, Whitelist.none())).getName();
 	}
 	
+	/**
+	 * View a list of all rooms.
+	 * @return
+	 */
 	@RequestMapping(value = "/rooms", method = RequestMethod.GET)
 	public @ResponseBody List<Room> rooms() {
 		return roomsService.getRooms();
 	}
 
+	/**
+	 * Return the details of a specified room.
+	 * @param room_id
+	 * @return
+	 */
 	@RequestMapping(value = "/rooms/{room_id}", method = RequestMethod.GET)
 	public @ResponseBody Room getRoom(@PathVariable String room_id) {
 		return roomsService.getRoom(Jsoup.clean(room_id, Whitelist.none()));
 	}
 	
-	
+	/**
+	 * Return a list of all users.
+	 * @return
+	 */
     @RequestMapping( value = "/users", method = RequestMethod.GET)
     protected @ResponseBody List<User> getUsers() {
-    	//Return a list of users
         return usersService.getUsers();
     }
     
+    /**
+     * Return the details of one user.
+     * @param id
+     * @return
+     * @throws Exception
+     */
     @RequestMapping( value = "/users/{id}", method = RequestMethod.GET)
     protected @ResponseBody User getUser(@PathVariable("id") String id) throws Exception {
     	//Return user from ID
         return usersService.getUser(Jsoup.clean(id, Whitelist.none()));
     }
     
+    /**
+     * Return the name of a specified user.
+     * @param id
+     * @return
+     * @throws Exception
+     */
     @RequestMapping( value = "/users/{id}/name", method = RequestMethod.GET)
     protected @ResponseBody Name getUserName(@PathVariable("id") String id) throws Exception {
     	//Return user firstname + lastname
@@ -135,16 +175,12 @@ public class RestController {
         return nameOUT;
     }
     
-    @RequestMapping( value = "/users/{id}/xy", method = RequestMethod.GET)
-    protected @ResponseBody XandY getUserXY(@PathVariable("id") String id) throws Exception {
-    	User user = usersService.getUser(Jsoup.clean(id, Whitelist.none())); //no null checking
-    	XandY xyOUT = null;
-    	if(user != null){
-    		xyOUT = new XandY(user.getX(), user.getY());
-    	}
-        return xyOUT;
-    }
-    
+    /**
+     * Return the image associated with a specified user.
+     * @param id
+     * @return
+     * @throws Exception
+     */
     @RequestMapping( value = "/users/{id}/picture", method = RequestMethod.GET)
     protected @ResponseBody Picture getUserPicture(@PathVariable("id") String id) throws Exception {
     	User user = usersService.getUser(Jsoup.clean(id, Whitelist.none())); //no null checking
@@ -155,6 +191,14 @@ public class RestController {
         return pictureOUT;
     }
     
+    /**
+     * Adds a user to the system who has connected through Facebook
+     * @param first_name
+     * @param last_name
+     * @param id
+     * @return
+     * @throws Exception
+     */
     @RequestMapping( value = "/users/add_fb", method = RequestMethod.POST)
     protected @ResponseBody User addUser(
     			@RequestParam("first_name") String first_name
@@ -172,22 +216,30 @@ public class RestController {
     	);
     	usersService.addUser(user);
     	
-    	System.out.println("USER HAS BEEN ADDED" + user.getId() + "NEW SIZE " + usersService.getUsers().size());
-    	
     	return user;
     }
     
+    /**
+     * Adds a user who connected anonymously.
+     * @param name
+     * @return
+     * @throws Exception
+     */
     @RequestMapping( value = "/users/add_guest", method = RequestMethod.POST)
     protected @ResponseBody User addGuestUser(
     			@RequestParam("name") String name
     		) throws Exception {
     	User user = new User(Jsoup.clean(name, Whitelist.none()));
     	usersService.addUser(user);
-    	System.out.println("GUEST USER HAS BEEN ADDED" + user.getId() + "NEW SIZE " + usersService.getUsers().size());
-    	System.out.println("GUEST URL" + user.getPictureURL());
     	return user;
     }
 
+    /**
+     * Gets a pseudo-random name for use by some clients who do not wish
+     * to provide their own.
+     * @return
+     * @throws Exception
+     */
     @RequestMapping( value = "/users/random_name", method = RequestMethod.GET)
     protected @ResponseBody Name randomName() throws Exception {
     	String firstName = nameGeneratorService.generateFirstName();

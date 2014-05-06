@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.toomanydrummers.service;
 
 import java.util.ArrayList;
@@ -22,20 +17,29 @@ import com.toomanydrummers.bean.CursorPosition;
 import com.toomanydrummers.bean.User;
 
 /**
- *
- * @author john
+ * This service is responsible for maintaining the list of Users associated
+ * with this application and manages their movement between rooms, as well
+ * as periodically broadcasting cursor-coordinates information and cleaning
+ * up Users who haven't contacted the application in a certain period of time.
  */
 @Service
 public class UsersService {
 
 	// Defines how frequently to broadcast the room's members' cursor locations.
 	private static final int REFRESH_RATE_MILLIS = 30;
+	
+	// A User has 5 seconds without communication before it is classed as TimedOut.
 	private static final int TIMEOUT_MILLIS = 5000;
+	// The check is performed once per second.
 	private static final int CHECK_FOR_TIMEOUT_MILLIS = 1000;
 
 	private SimpMessagingTemplate template;
+	
+	// Users are held in this map.
 	private final Map<String, User> users = new HashMap<String, User>();
 	private final ArrayList<CursorPosition> cursorPositions = new ArrayList<CursorPosition>();
+	
+	// This lock ensures thread-safe modification of the system's users.
 	private final ReentrantLock usersLock = new ReentrantLock();
 
 	@Autowired
@@ -44,61 +48,26 @@ public class UsersService {
 	}
 
 	public void addUser(User newUser) {
-		addUserCore(newUser);
-	}
-
-	private void addUserCore(User newUser) {
 		try {
 			usersLock.lock();
 			if (!users.containsKey(newUser.getId())) {
 				users.put(newUser.getId(), newUser);
-				System.out.println("USER " + newUser.getId() + "ACTUALLY ADDED");
 			}
 		} finally {
 			usersLock.unlock();
 		}
 	}
 
-	// public void removeUser(String room_id, String id) {
-	// removeUserCore(id);
-	//
-	// try {
-	// template.convertAndSend("/topic/" + room_id + "/allusers", getUsers());
-	// } catch (MessageDeliveryException e) {
-	// // e.printStackTrace();
-	// }
-	// }
-
-	// public void removeUser(User oldUser) {
-	// removeUserCore(oldUser.getId());
-	//
-	// // try {
-	// // template.convertAndSend("/topic/allusers", getUsers());
-	// // } catch (MessageDeliveryException e) {
-	// // // e.printStackTrace();
-	// // }
-	// }
-
-	// private void removeUserCore(String id) {
-	// try {
-	// usersLock.lock();
-	// users.remove(id);
-	// } finally {
-	// usersLock.unlock();
-	// }
-	// }
-
 	public User getUser(String id) {
-		User userOUT = null;
+		User user = null;
 		if (id != null && id.length() > 0) {
-			userOUT = users.get(id);
+			user = users.get(id);
 		}
-		return userOUT;
+		return user;
 	}
 
 	public List<User> getUsers() {
-
-		return (new ArrayList<User>(users.values()));
+		return new ArrayList<User>(users.values());
 	}
 
 	public void userHasJoinedRoom(String id, String room_id) {
@@ -109,25 +78,39 @@ public class UsersService {
 		users.get(id).clearRoom();
 	}
 
+	/**
+	 * This room has experienced a change in its membership. This
+	 * method gets all users still associated with the room provided
+	 * and informs them who is still connected.
+	 * @param room_id
+	 */
 	public void updateRoom(String room_id) {
 		List<User> usersInRoom = new ArrayList<User>();
 
+		// Collect all attached users
 		for (User user : users.values()) {
 
 			if (user.getRoom() != null && user.getRoom().equals(room_id)
 					&& !user.isTimedOut()) {
 				usersInRoom.add(user);
 			}
+			
 		}
 
+		// Send the users to all of them
 		try {
 			template.convertAndSend("/topic/" + room_id + "/allusers",
 					usersInRoom);
 		} catch (MessageDeliveryException e) {
-			// e.printStackTrace();
+			
 		}
 	}
 
+	/**
+	 * Update the position of a cursor for a User and update their
+	 * last communication time so they don't time out.
+	 * @param cursorPosition
+	 */
 	public void updatePosition(CursorPosition cursorPosition) {
 		String id = cursorPosition.getId();
 		try {
@@ -147,6 +130,10 @@ public class UsersService {
 		}
 	}
 
+	/**
+	 * Periodically check for timed-out users and flag them
+	 * appropriately.
+	 */
 	@Scheduled(fixedRate = CHECK_FOR_TIMEOUT_MILLIS)
 	public void checkForTimeouts() {
 
@@ -154,34 +141,29 @@ public class UsersService {
 
 		long now = System.currentTimeMillis();
 
-		// for (int i = 0; i < users.size(); i++) {
-		// if (users.get(i).getLastOnline() + TIMEOUT_MILLIS < now) {
-		// removeUser(users.get(i));
-		// i--;
-		// somebodyKilled = true;
-		// }
-		// }
-
 		Iterator<String> it = users.keySet().iterator();
 
 		while (it.hasNext()) {
 			String key = it.next();
 			if (users.get(key).getLastOnline() + TIMEOUT_MILLIS < now) {
-				users.get(key).setIsTimedOut(true);
+				users.get(key).timeOut();
 				somebodyKilled = true;
 			}
 		}
 
 		if (somebodyKilled) {
 
-			for (User u : users.values()) {
-				 updateRoom(u.getRoom());
+			for (User user : users.values()) {
+				 updateRoom(user.getRoom());
 			}
 
 		}
 
 	}
 
+	/**
+	 * Broadcast cursor information to everyone connected.
+	 */
 	@Scheduled(fixedRate = REFRESH_RATE_MILLIS)
 	public void provideMotionService() {
 
@@ -189,14 +171,12 @@ public class UsersService {
 			// Package the information into an appropriate object.
 			template.convertAndSend("/topic/motion", preparePositions());
 		} catch (MessageDeliveryException e) {
-			// e.printStackTrace();
 		}
 
 	}
 
 	private ArrayList<CursorPosition> preparePositions() {
 		this.cursorPositions.clear();
-		// TODO May need to find a faster way of doing this... :(
 
 		try {
 			usersLock.lock();

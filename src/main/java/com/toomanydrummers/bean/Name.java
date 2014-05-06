@@ -1,11 +1,15 @@
 package com.toomanydrummers.bean;
 
+/**
+ * Represents a user's name in a few useful forms.
+ */
 public class Name {
 	
 	private String fullname;
 	private String firstname;
 	private String lastname;
-	public Name(){
+	
+	public Name() {
 		
 	}
 	
@@ -34,6 +38,5 @@ public class Name {
 	public void setLastname(String lastname){
 		this.lastname = lastname;
 	}
-	
 	
 }

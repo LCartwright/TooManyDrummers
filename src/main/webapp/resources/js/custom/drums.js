@@ -16,6 +16,8 @@ var mousePos = {
 	y : 0
 };
 
+// Keep a record of the on-screen location of the drumkit for relative cursor
+// positions.
 var drumPos = {
 	left : 0,
 	top : 0,
@@ -28,13 +30,19 @@ var mouseDelay = 30;
 // How many milliseconds between each cleanup of dead drumsticks.
 var cleanupDelay = 1000;
 
+// Variables for autonomous processes
 var cursorPositionRunner;
 var deadCursorRunner;
 
+// The app's path for retrieving remote resources
 var contextPath;
 
+// Prefix for all cursor images
 var drumstickPrefix = "drumstick";
 
+// Keep a record of the last room this user was part of
+// so it can be disconnected from before connecting to a
+// new one.
 var lastRoomId = default_room_id;
 
 var snare; // snare
@@ -50,36 +58,10 @@ var cuica2; // cuica
 var cuica3; // cuica
 var cuica4; // cuica
 
+// Records which can be used to unsubscribe.
 var hitreportsSubscription;
 var allusersSubscription;
 var motionSubscription;
-
-// Change the UI to better represent the options available to a
-// connected/disconnected user.
-function setConnected(connected) {
-
-	// Hide the enterUsername field once a connection is established.
-	// Changes wouldn't make a difference from this point on.
-	// document.getElementById('enterUsername').style.visibility = connected ?
-	// 'hidden'
-	// : 'visible';
-
-	// Show the list of connected users so the user can see who's online.
-	// document.getElementById('connectedUsers').style.visibility = connected ?
-	// 'visible'
-	// : 'hidden';
-
-	// A connected user can't connect if they're already connected!
-	// document.getElementById('connect').disabled = connected;
-
-	// A disconnected user can't connect if they're already disconnected!
-	// document.getElementById('disconnect').disabled = !connected;
-
-	// If we're connected, show the drumkit so the user can play!
-	// document.getElementById('drumkit_div').style.visibility = connected ?
-	// 'visible'
-	// : 'hidden';
-}
 
 // This function is fired when the user tries to connect via a websocket to the
 // application.
@@ -89,11 +71,13 @@ function drumsConnect() {
 		stompClient.disconnect();
 	}
 
+	// Form the correct URL of the websocket endpoint.
 	var x = "http:\/\/" + $(location).attr("host") + contextPath + "/hit/";
 
 	// Create a socket which looks for the 'hit' endpoint.
 	var socket = new SockJS(x);
 
+	// Reconnect on error.
 	socket.addEventListener('error', function() {
 		drumsDisconnect();
 		drumsConnect();
@@ -101,47 +85,14 @@ function drumsConnect() {
 
 	// Prepare for full Stomp communication.
 	stompClient = Stomp.over(socket);
-	// stompClient = Stomp.client(x);
 
+	// Do nothing with debug messages. Keeps the console clear
+	// and is more performant than the default behaviour.
 	stompClient.debug = function() {
 	};
 
 	// Make the connection!
 	stompClient.connect({}, function(frame) {
-
-		// Let the user know we're connected!
-		// setConnected(true);
-
-		// Register for hitreports so the user can hear other users playing
-		// and join in! Start with default room
-		// hitreportsSubscription = stompClient.subscribe('/topic/'
-		// + active_room_id + '/hitreports', function(drumhit) {
-		// drumhit.ack();
-		// play(JSON.parse(drumhit.body).name);
-		// }, {
-		// 'ack' : 'client'
-		// });
-
-		// Subscribe for changes in the room's users so new users can join
-		// in
-		// and old users don't fill up the room with artifacts.
-		// allusersSubscription = stompClient.subscribe('/topic/' +
-		// active_room_id
-		// + '/allusers', function(allUsers) {
-		// allUsers.ack();
-		// refreshUsers(JSON.parse(allUsers.body));
-		// }, {
-		// 'ack' : 'client'
-		// });
-
-		// TODO: Sort this out!
-		// Let the Server know I've joined!
-		// stompClient.send('/app/' + active_room_id + '/newuser', {}, JSON
-		// .stringify({
-		// 'id' : currentUserID,
-		// 'firstName' : null,
-		// 'lastName' : null
-		// }));
 
 		// Subscribe for updates on the cursor positions of other users.
 		motionSubscription = stompClient.subscribe('/topic/motion', function(
@@ -152,45 +103,43 @@ function drumsConnect() {
 			'ack' : 'client'
 		});
 
-		// Fire off your location 5 times per second
-		// Increase this time for better performance
+		// Fire off your location x times per second
+		// Decrease this rate for better performance
 		cursorPositionRunner = setInterval(sendMousePosition, mouseDelay);
 
-		// Clear dead users every 10 seconds.
+		// Clear dead users every y seconds.
 		deadCursorRunner = setInterval(cleanDeadDrumsticks, cleanupDelay);
 
+		// Once fully connected 'change' to the current room
 		changeDrumRoom();
 
 	});
-	// }
 
 }
 
-// This is fired when the user hits 'Disconnect'
-// This would be preferable everytime but the user is likely to hit 'back' or
-// 'close' too
+// This is fired when the user hits 'Disconnect' or we otherwise
+// need the user to unsubscribe from the application
 function drumsDisconnect() {
 
+	// Stop the repeating functions
 	clearInterval(cursorPositionRunner);
 	clearInterval(deadCursorRunner);
 
+	// Unsubscribe from messages from the application
 	hitreportsSubscription.unsubscribe();
 	allusersSubscription.unsubscribe();
 	motionSubscription.unsubscribe();
 
+	// Let the app know that this user is done.
 	stompClient.send('/app/finished', {}, JSON.stringify({
-		// 'id' : myId,
 		'id' : currentUserID,
 		'firstName' : null,
 		'lastName' : null
 	}));
 
-	// Cleanly disconnect and inform the user.
-	setConnected(false);
-	// stompClient.disconnect();
-
 }
 
+// Play a sound!
 function play(message) {
 
 	switch (message) {
@@ -261,8 +210,6 @@ function refreshUsers(lastUsers) {
 	// Clear the ids array - we have more recent information.
 	users = new Array();
 
-	// document.getElementById('connectedUsers').innerHTML = "";
-
 	// For all users
 	for (var i = 0; i < lastUsers.length; i++) {
 
@@ -310,7 +257,6 @@ function refreshUsers(lastUsers) {
 				newImage.setAttribute("src", contextPath
 						+ "/resources/images/drumstick.png");
 
-				// TODO: Find a better way of scaling down
 				newImage.setAttribute("width", "60px");
 				newImage.setAttribute("height", "80px");
 
@@ -329,7 +275,8 @@ function refreshUsers(lastUsers) {
 	}
 }
 
-// This method is NOT responsible for creating/removing drumsticks.
+// This method is not responsible for creating/removing drumsticks but
+// only for moving them with new information.
 function moveDrumsticks(positions) {
 
 	var iMax = positions.length;
@@ -358,6 +305,7 @@ function moveDrumsticks(positions) {
 				drumsticks[j].style.left = posX + 'px';
 				drumsticks[j].style.top = posY + 'px';
 
+				// Make opaque when the cursor is within bounds, else dim.
 				if (posX > drumPos.left && posY > drumPos.top
 						&& posX < drumPos.right && posY < drumPos.bottom) {
 					drumsticks[j].style.opacity = 1.0;
@@ -414,8 +362,18 @@ function cleanDeadDrumsticks() {
 
 }
 
+function realignSVG() {
+	drumPos.left = $('#drumkit').position().left;
+	drumPos.top = $('#drumkit').position().top;
+	drumPos.right = drumPos.left + $('#drumkit').width();
+	drumPos.bottom = drumPos.top + $('#drumkit').height();
+	$("#effects").css("left", drumPos.left);
+	$("#effects").css("top", drumPos.top);
+}
+
 function changeDrumRoom() {
 
+	// Unsubscribe from the last room
 	if (hitreportsSubscription) {
 		hitreportsSubscription.unsubscribe();
 		allusersSubscription.unsubscribe();
@@ -428,10 +386,10 @@ function changeDrumRoom() {
 				}));
 	}
 
-	// Resubscribe
+	// Resubscribe to the new destination
 
 	// Register for hitreports so the user can hear other users playing
-	// and join in! Start with default room
+	// and join in!
 	hitreportsSubscription = stompClient.subscribe('/topic/' + active_room_id
 			+ '/hitreports', function(drumhit) {
 		drumhit.ack();
@@ -441,8 +399,7 @@ function changeDrumRoom() {
 	});
 
 	// Subscribe for changes in the room's users so new users can join
-	// in
-	// and old users don't fill up the room with artifacts.
+	// in and old users don't fill up the room with artifacts.
 	allusersSubscription = stompClient.subscribe('/topic/' + active_room_id
 			+ '/allusers', function(allUsers) {
 		allUsers.ack();
@@ -451,7 +408,6 @@ function changeDrumRoom() {
 		'ack' : 'client'
 	});
 
-	// TODO: Sort this out!
 	// Let the Server know I've joined!
 	stompClient.send('/app/' + active_room_id + '/newuser', {}, JSON
 			.stringify({
@@ -464,7 +420,7 @@ function changeDrumRoom() {
 
 }
 
-// Stuff to do as soon as everything has loaded
+// Stuff to do as soon as everything on the page has loaded
 function initialize(contextPath) {
 
 	// if initializeDefaultPlugins returns false, we cannot play sound
@@ -648,6 +604,7 @@ function initialize(contextPath) {
 						}));
 			});
 
+	// Force the SVG graphics to be correctly positioned
 	realignSVG();
 
 	// Listen for mouse movements
@@ -658,33 +615,26 @@ function initialize(contextPath) {
 		};
 	});
 
+	// Fired when the window is resized
 	$(window).resize(function() {
-		console.log("resize");
 		realignSVG();
 	});
 
+	// Prevent the drumkit from being dragged so image 'ghosts'
+	// do not appear.
 	$("#drumkit").on('dragstart', function(event) {
 		event.preventDefault();
 	});
 	$("#drummap").on('dragstart', function(event) {
 		event.preventDefault();
 	});
-
-	// Make sure the user is not initially connected
-	setConnected(false);
+	
+	// Make an effort to cleanly disconnect when the user leaves.
+	// If this is not called, the server can deal with the abrupt
+	// disconnection.
+	$(window).on('beforeunload', function() {
+		drumsDisconnect();
+		return;
+	});
 
 }
-
-function realignSVG() {
-	drumPos.left = $('#drumkit').position().left;
-	drumPos.top = $('#drumkit').position().top;
-	drumPos.right = drumPos.left + $('#drumkit').width();
-	drumPos.bottom = drumPos.top + $('#drumkit').height();
-	$("#effects").css("left", drumPos.left);
-	$("#effects").css("top", drumPos.top);
-}
-
-$(window).on('beforeunload', function() {
-	drumsDisconnect();
-	return;
-});

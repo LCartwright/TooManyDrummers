@@ -4,9 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Room implements Comparable<Room>{
+/**
+ * A room which users can create, join or leave. While in a room
+ * a user can communicate by sharing and receiving all messages
+ * associated with the room and can share and hear all drum
+ * hits. Implements Comparable so they can be re-ordered.
+ */
+public class Room implements Comparable<Room> {
 	
+	// Ensures all Rooms have a different ID.
 	private static AtomicInteger counter = new AtomicInteger(0);
+	
     private final String name;
     private final String roomId;
     private List<Message> messageList = new ArrayList<Message>();
@@ -14,7 +22,6 @@ public class Room implements Comparable<Room>{
     public Room(String name) {
     	this.name = name;
     	this.roomId = String.valueOf(Room.counter.incrementAndGet()) ;
-    	System.out.println("ROOM MADE" + name);
     }
     
     public String getRoomID(){
@@ -40,7 +47,6 @@ public class Room implements Comparable<Room>{
     			returnMessageList.add(message);
     		}
     	}
-    	
     	return returnMessageList;
     }
     
@@ -54,6 +60,9 @@ public class Room implements Comparable<Room>{
     	return returnMessage;
     }
 
+    /**
+     * Used to reorder Rooms so they are presented correctly.
+     */
 	@Override
 	public int compareTo(Room compare) {
 		final int BEFORE = -1;

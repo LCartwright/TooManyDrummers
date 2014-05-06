@@ -12,21 +12,19 @@ import com.toomanydrummers.bean.User;
 import com.toomanydrummers.service.UsersService;
 
 /**
- * 
- * @author john
- *
- *         This controller handles all websocket communication in the
- *         application. It is responsible for one room - including its users,
- *         their identifications, their drum hits and cursor positions.
- *
+ * This controller handles all websocket communication in the application. It is
+ * responsible for one room - including its users, their identifications, their
+ * drum hits and cursor positions.
  */
 @Controller
 public class HitController {
 
-	// This service keeps a list of all the connected users of the drumkit.
+	// This service keeps a list of all the connected users of the drumkit/chat.
 	@Autowired
 	private UsersService usersService;
-	
+
+	// This is used for Websocket communication which needs to be more
+	// specific than the SendTo annotation.
 	private SimpMessagingTemplate template;
 
 	@Autowired
@@ -35,7 +33,7 @@ public class HitController {
 	}
 
 	/**
-	 * Listen for hits and broadcast them for everyone to hear
+	 * Listen for hits and broadcast them for everyone in the room to hear
 	 * 
 	 * @param message
 	 * @return
@@ -53,40 +51,26 @@ public class HitController {
 	 * @return
 	 * @throws Exception
 	 */
-//	@MessageMapping("/newuser")
-//	@SendTo("/topic/allusers")
-//	public List<User> newUser(User user) throws Exception {
-//		usersService.addUser(user);
-//		return usersService.getUsers();
-//	}
 	@MessageMapping("/{room_id}/newuser")
 	public void newUser(@DestinationVariable String room_id, User user) throws Exception {
-		//usersService.addUser(room_id, user);
 		usersService.userHasJoinedRoom(user.getId(), room_id);
 		usersService.updateRoom(room_id);
 	}
 
 	/**
-	 * This is fired when a user is finished and leaves the room in a healthy manner.
+	 * This is fired when a user is finished and leaves the room in a healthy
+	 * manner.
 	 * 
 	 * @param user
 	 * @return
 	 * @throws Exception
 	 */
-//	@MessageMapping("/finished")
-//	@SendTo("/topic/allusers")
-//	public List<User> removeUser(User user) throws Exception {
-//		usersService.removeUser(user.getId());
-//		return usersService.getUsers();
-//	}
 	@MessageMapping("/{room_id}/finished")
 	public void removeUser(@DestinationVariable String room_id, User user) throws Exception {
-		//usersService.removeUser(room_id, user.getId());
 		usersService.userHasLeftRoom(user.getId());
 		usersService.updateRoom(room_id);
 	}
 
-	// TODO: Provide a better way of checking ids...?
 	/**
 	 * The application listens for the positions of all its participants' mouse
 	 * cursors and stores them, ready to be broadcast.
