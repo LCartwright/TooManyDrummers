@@ -3,7 +3,7 @@
   associations="true" dependencies="false" nesting-relationships="true">  
   <class id="1" language="java" name="com.toomanydrummers.bean.Room" project="TooManyDrummers" 
     file="/TooManyDrummers/src/main/java/com/toomanydrummers/bean/Room.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="405" y="709"/>    
+    <position height="-1" width="-1" x="382" y="667"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -13,7 +13,7 @@
   <class id="2" language="java" name="com.toomanydrummers.controller.RestController" project="TooManyDrummers" 
     file="/TooManyDrummers/src/main/java/com/toomanydrummers/controller/RestController.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="349" width="260" x="271" y="-9"/>    
+    <position height="313" width="260" x="222" y="2"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -23,7 +23,7 @@
   <class id="3" language="java" name="com.toomanydrummers.config.WebSocketConfig" project="TooManyDrummers" 
     file="/TooManyDrummers/src/main/java/com/toomanydrummers/config/WebSocketConfig.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="738" y="48"/>    
+    <position height="-1" width="-1" x="161" y="874"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -32,7 +32,7 @@
   </class>  
   <class id="4" language="java" name="com.toomanydrummers.bean.Message" project="TooManyDrummers" 
     file="/TooManyDrummers/src/main/java/com/toomanydrummers/bean/Message.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="407" y="1015"/>    
+    <position height="-1" width="-1" x="403" y="947"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -41,159 +41,150 @@
   </class>  
   <class id="5" language="java" name="com.toomanydrummers.bean.User" project="TooManyDrummers" 
     file="/TooManyDrummers/src/main/java/com/toomanydrummers/bean/User.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="1007" y="746"/>    
+    <position height="-1" width="-1" x="773" y="998"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="6" language="java" name="com.toomanydrummers.bean.XandY" project="TooManyDrummers" 
-    file="/TooManyDrummers/src/main/java/com/toomanydrummers/bean/XandY.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="147" y="680"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
-      visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="7" language="java" name="com.toomanydrummers.bean.DrumHit" project="TooManyDrummers" 
+  <class id="6" language="java" name="com.toomanydrummers.bean.DrumHit" project="TooManyDrummers" 
     file="/TooManyDrummers/src/main/java/com/toomanydrummers/bean/DrumHit.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="1005" y="250"/>    
+    <position height="-1" width="-1" x="135" y="560"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="8" language="java" name="com.toomanydrummers.bean.Picture" project="TooManyDrummers" 
+  <class id="7" language="java" name="com.toomanydrummers.bean.Picture" project="TooManyDrummers" 
     file="/TooManyDrummers/src/main/java/com/toomanydrummers/bean/Picture.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="1017" y="64"/>    
+    <position height="-1" width="-1" x="139" y="717"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="9" language="java" name="com.toomanydrummers.bean.Name" project="TooManyDrummers" 
+  <class id="8" language="java" name="com.toomanydrummers.bean.Name" project="TooManyDrummers" 
     file="/TooManyDrummers/src/main/java/com/toomanydrummers/bean/Name.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="147" y="113"/>    
+    <position height="241" width="146" x="36" y="2"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="10" language="java" name="com.toomanydrummers.service.NameGeneratorService" project="TooManyDrummers" 
+  <class id="9" language="java" name="com.toomanydrummers.service.NameGeneratorService" project="TooManyDrummers" 
     file="/TooManyDrummers/src/main/java/com/toomanydrummers/service/NameGeneratorService.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="155" y="454"/>    
+    <position height="-1" width="-1" x="102" y="403"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="11" language="java" name="com.toomanydrummers.service.UsersService" project="TooManyDrummers" 
+  <class id="10" language="java" name="com.toomanydrummers.service.UsersService" project="TooManyDrummers" 
     file="/TooManyDrummers/src/main/java/com/toomanydrummers/service/UsersService.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="706" y="565"/>    
+    <position height="-1" width="-1" x="689" y="403"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="12" language="java" name="com.toomanydrummers.bean.CursorPosition" project="TooManyDrummers" 
+  <class id="11" language="java" name="com.toomanydrummers.bean.CursorPosition" project="TooManyDrummers" 
     file="/TooManyDrummers/src/main/java/com/toomanydrummers/bean/CursorPosition.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="710" y="983"/>    
+    <position height="-1" width="-1" x="575" y="761"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="13" language="java" name="com.toomanydrummers.service.RoomsService" project="TooManyDrummers" 
+  <class id="12" language="java" name="com.toomanydrummers.service.RoomsService" project="TooManyDrummers" 
     file="/TooManyDrummers/src/main/java/com/toomanydrummers/service/RoomsService.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="403" y="455"/>    
+    <position height="-1" width="-1" x="386" y="422"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="14" language="java" name="com.toomanydrummers.controller.HitController" project="TooManyDrummers" 
+  <class id="13" language="java" name="com.toomanydrummers.controller.HitController" project="TooManyDrummers" 
     file="/TooManyDrummers/src/main/java/com/toomanydrummers/controller/HitController.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="707" y="223"/>    
+    <position height="-1" width="-1" x="640" y="87"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <association id="15">    
-    <end type="SOURCE" refId="11" navigable="false">      
-      <attribute id="16" name="users"/>      
-      <multiplicity id="17" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="5" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="18">    
-    <end type="SOURCE" refId="11" navigable="false">      
-      <attribute id="19" name="cursorPositions"/>      
-      <multiplicity id="20" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="12" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="21">    
-    <end type="SOURCE" refId="2" navigable="false">      
-      <attribute id="22" name="usersService"/>      
-      <multiplicity id="23" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="11" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="24">    
-    <end type="SOURCE" refId="2" navigable="false">      
-      <attribute id="25" name="roomsService"/>      
-      <multiplicity id="26" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="13" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="27">    
-    <end type="SOURCE" refId="13" navigable="false">      
-      <attribute id="28" name="roomMap"/>      
-      <multiplicity id="29" minimum="0" maximum="2147483647"/>    
+  <association id="14">    
+    <end type="SOURCE" refId="12" navigable="false">      
+      <attribute id="15" name="roomMap"/>      
+      <multiplicity id="16" minimum="0" maximum="2147483647"/>    
     </end>    
     <end type="TARGET" refId="1" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="30">    
-    <end type="SOURCE" refId="14" navigable="false">      
-      <attribute id="31" name="usersService"/>      
-      <multiplicity id="32" minimum="0" maximum="1"/>    
+  <association id="17">    
+    <end type="SOURCE" refId="10" navigable="false">      
+      <attribute id="18" name="cursorPositions"/>      
+      <multiplicity id="19" minimum="0" maximum="2147483647"/>    
     </end>    
     <end type="TARGET" refId="11" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="33">    
+  <association id="20">    
     <end type="SOURCE" refId="2" navigable="false">      
-      <attribute id="34" name="nameGeneratorService"/>      
-      <multiplicity id="35" minimum="0" maximum="1"/>    
+      <attribute id="21" name="roomsService"/>      
+      <multiplicity id="22" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="12" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="23">    
+    <end type="SOURCE" refId="10" navigable="false">      
+      <attribute id="24" name="users"/>      
+      <multiplicity id="25" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="5" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="26">    
+    <end type="SOURCE" refId="2" navigable="false">      
+      <attribute id="27" name="nameGeneratorService"/>      
+      <multiplicity id="28" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="9" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="29">    
+    <end type="SOURCE" refId="13" navigable="false">      
+      <attribute id="30" name="usersService"/>      
+      <multiplicity id="31" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="10" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="36">    
+  <association id="32">    
+    <end type="SOURCE" refId="2" navigable="false">      
+      <attribute id="33" name="usersService"/>      
+      <multiplicity id="34" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="10" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="35">    
     <end type="SOURCE" refId="1" navigable="false">      
-      <attribute id="37" name="messageList"/>      
-      <multiplicity id="38" minimum="0" maximum="2147483647"/>    
+      <attribute id="36" name="messageList"/>      
+      <multiplicity id="37" minimum="0" maximum="2147483647"/>    
     </end>    
     <end type="TARGET" refId="4" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
