@@ -236,11 +236,11 @@
 				</div>
 				<div class="modal-body">
 					<p>
+                        Click on the different components of the drum kit in order to play sound.<br/>
+                        <br/>
 						When you first connect you will be placed in the default room. While in this room you will only be able to hear sounds and see chat messages from other users in the same room.<br/>
 						<br/>
 						To change rooms use the tabs at the top right of the screen. If you wish to create a new tab type the name in the field above and press 'Create'.<br/>
-						<br/>
-						Click on the different components of the drum kit in order to play sound. This will be heard by the other people in the room.<br/>
 						<br/>
 					    To chat, type your message in the field and the bottom right of the screen and press 'Send' this will be sent to all the users in the room you are in.<br/>
 					</p>
@@ -274,8 +274,6 @@
 						sockjs.js<br/>
 						jquery.js<br/>
 						bootstrap.js<br/>
-						<br/>
-						<b>References:</b><br/>
 					</p>
 				</div>
 				<div class="modal-footer">
