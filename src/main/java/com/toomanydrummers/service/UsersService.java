@@ -46,7 +46,7 @@ public class UsersService {
 	public void addUser(User newUser) {
 		addUserCore(newUser);
 	}
-	
+
 	private void addUserCore(User newUser) {
 		try {
 			usersLock.lock();
@@ -59,34 +59,34 @@ public class UsersService {
 		}
 	}
 
-//	public void removeUser(String room_id, String id) {
-//		removeUserCore(id);
-//		
-//		try {
-//			template.convertAndSend("/topic/" + room_id + "/allusers", getUsers());
-//		} catch (MessageDeliveryException e) {
-//			// e.printStackTrace();
-//		}
-//	}
+	// public void removeUser(String room_id, String id) {
+	// removeUserCore(id);
+	//
+	// try {
+	// template.convertAndSend("/topic/" + room_id + "/allusers", getUsers());
+	// } catch (MessageDeliveryException e) {
+	// // e.printStackTrace();
+	// }
+	// }
 
-//	public void removeUser(User oldUser) {
-//		removeUserCore(oldUser.getId());
-//		
-//		// try {
-//		// template.convertAndSend("/topic/allusers", getUsers());
-//		// } catch (MessageDeliveryException e) {
-//		// // e.printStackTrace();
-//		// }
-//	}
-	
-//	private void removeUserCore(String id) {
-//		try {
-//			usersLock.lock();
-//			users.remove(id);
-//		} finally {
-//			usersLock.unlock();
-//		}
-//	}
+	// public void removeUser(User oldUser) {
+	// removeUserCore(oldUser.getId());
+	//
+	// // try {
+	// // template.convertAndSend("/topic/allusers", getUsers());
+	// // } catch (MessageDeliveryException e) {
+	// // // e.printStackTrace();
+	// // }
+	// }
+
+	// private void removeUserCore(String id) {
+	// try {
+	// usersLock.lock();
+	// users.remove(id);
+	// } finally {
+	// usersLock.unlock();
+	// }
+	// }
 
 	public User getUser(String id) {
 		User userOUT = null;
@@ -97,39 +97,35 @@ public class UsersService {
 	}
 
 	public List<User> getUsers() {
-		try {
-			usersLock.lock();
 
-			return (new ArrayList<User>(users.values()));
-
-		} finally {
-			usersLock.unlock();
-		}
+		return (new ArrayList<User>(users.values()));
 	}
-	
+
 	public void userHasJoinedRoom(String id, String room_id) {
 		users.get(id).setRoom(room_id);
 	}
-	
+
 	public void userHasLeftRoom(String id) {
 		users.get(id).clearRoom();
 	}
-	
+
 	public void updateRoom(String room_id) {
 		List<User> usersInRoom = new ArrayList<User>();
-		
+
 		for (User user : users.values()) {
-			
-			if (user.getRoom() != null && user.getRoom().equals(room_id)) {
+
+			if (user.getRoom() != null && user.getRoom().equals(room_id)
+					&& !user.isTimedOut()) {
 				usersInRoom.add(user);
 			}
 		}
-		
-		 try {
-			 template.convertAndSend("/topic/" + room_id + "/allusers", usersInRoom);
-		 } catch (MessageDeliveryException e) {
-		 // e.printStackTrace();
-		 }
+
+		try {
+			template.convertAndSend("/topic/" + room_id + "/allusers",
+					usersInRoom);
+		} catch (MessageDeliveryException e) {
+			// e.printStackTrace();
+		}
 	}
 
 	public void updatePosition(CursorPosition cursorPosition) {
@@ -138,7 +134,7 @@ public class UsersService {
 			usersLock.lock();
 
 			for (User user : users.values()) {
-				if (user.getId().equals(id)) {
+				if (user.getId().equals(id) && !user.isTimedOut()) {
 					user.setLastOnline(System.currentTimeMillis());
 					user.setX(cursorPosition.getX());
 					user.setY(cursorPosition.getY());
@@ -177,11 +173,11 @@ public class UsersService {
 		}
 
 		if (somebodyKilled) {
-			try {
-				template.convertAndSend("/topic/allusers", getUsers());
-			} catch (MessageDeliveryException e) {
-				// e.printStackTrace();
+
+			for (User u : users.values()) {
+				 updateRoom(u.getRoom());
 			}
+
 		}
 
 	}
@@ -205,8 +201,10 @@ public class UsersService {
 		try {
 			usersLock.lock();
 			for (User user : users.values()) {
-				this.cursorPositions.add(new CursorPosition(user.getId(), user
-						.getX(), user.getY()));
+				if (!user.isTimedOut()) {
+					this.cursorPositions.add(new CursorPosition(user.getId(),
+							user.getX(), user.getY()));
+				}
 			}
 		} finally {
 			usersLock.unlock();

@@ -218,11 +218,6 @@ function sendMessage(room_id, user_id) {
 
 }
 
-function addDummyMessage() {
-	$("#chat-message-area").append(""
-
-	);
-}
 
 // function tryJ/oinRoom() {
 // var roomId = $('#j/oin-room-id').val();
@@ -455,7 +450,6 @@ function setCurrentUserInfo(){
 
 function setLoggedInGuest(user_response){
 console.log("function GUEST LOGGED IN called");
-	
 	currentUserID = user_response.id;
 	currentUserFirstName = user_response.firstName;
 	currentUserLastName = user_response.lastName;

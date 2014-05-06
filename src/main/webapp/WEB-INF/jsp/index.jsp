@@ -241,7 +241,7 @@
 		</div>
 	</div>
 
-		<div class="modal fade" id="aboutWindow" tabindex="-1" role="dialog"
+	<div class="modal fade" id="aboutWindow" tabindex="-1" role="dialog"
 		aria-labelledby="myModalLabel" aria-hidden="true">
 		<div class="modal-dialog" id="aboutWindowModal">
 			<div class="modal-content">
@@ -309,10 +309,10 @@
 		<a class="pull-left"><img id="current-user-picture" class="media-object"
 			src="http://www.gravatar.com/avatar/ce94470fe980adb2d4809719da745c5e?s=50&amp;d=identicon&amp;r=PG"
 			alt="profile"></a>
-		<div id="current-name-signout-container" class="media-body" style="padding-top: 15px; display: inline;">
-			<h4 id="current-user-name" class="media-heading" style="display: inline;"></h4>
-			<div style="display: inline;">
-				<button id="user-logout-button" class="btn btn-danger pull-right" style="display: inline;" >Sign Out</button>
+		<div id="current-name-signout-container" class="media-body" >
+			<h4 id="current-user-name" class="media-heading"></h4>
+			<div>
+				<button id="user-logout-button" class="btn btn-danger pull-right">Sign Out</button>
 			</div>
 		</div>
 	</div>

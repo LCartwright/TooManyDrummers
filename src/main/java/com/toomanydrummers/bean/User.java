@@ -25,6 +25,8 @@ public class User
 	
 	private long lastOnline = System.currentTimeMillis();
 	
+	private boolean isTimedOut = false;
+	
 	private String room;
 
 	public User() {
@@ -185,6 +187,14 @@ public class User
 			//do nothing
 		}
 		return null;
+	}
+
+	public void setIsTimedOut(boolean isTimedOut) {
+		this.isTimedOut = isTimedOut;
+	}
+	
+	public boolean isTimedOut() {
+		return isTimedOut;
 	}
 
 }

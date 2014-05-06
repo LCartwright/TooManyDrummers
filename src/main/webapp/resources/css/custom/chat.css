@@ -6,6 +6,10 @@ html,body {
 	/*overflow:hidden;*/
 }
 
+#chat-room-add-button, #chat-room-send-button {
+	border-radius: 0;
+}
+
 
 div#chat-main-div {
 	background-color: #FFFFFF;
@@ -16,7 +20,7 @@ div#chat-main-div {
     /* width: 25%; */
     
     /* height: 550px; */
-    height: calc(100% - 50px);
+    height: calc(100% - 51px);
     z-index:100000000;
     /*height: 100%;*/
 }
@@ -58,6 +62,7 @@ div#guest-inputs{
 }
 /* modal fix */
 .popover{
+	width:200px;
     z-index:100000000;
 }
 
@@ -65,7 +70,7 @@ div#guest-inputs{
   width: 500px;
 }
 
-/* @CHARSET "US-ASCII";
+/* @CHARSET "US-ASCII"; */
 html,body {
     height:100%;
 }
@@ -78,31 +83,32 @@ html,body {
 	margin-left: 100px%;
 }
 
-#chat-current-user-div{
-	z-index:100000000;
-	top: 0;
-	right: 0;
+#chat-current-user-div {
+	z-index:10000;
 	position: fixed;
-	height: 50px;
+	top: 	0;
+	right:	0;
+	height: 500px;
 	width: 400px;
-	margin: auto;
+	display: none;
 }
 
-#user-logout-button{
-	margin-right: 15px;
+#user-logout-button {
+	margin-top: -30px;
+	margin-right: 12px;
 }
 
-#current-user-name{
-	padding-top: 50px;
+#current-user-name {
+	text-overflow:ellipsis;
+	white-space:nowrap; 
+	width:12em; 
+	overflow:hidden; 
+	margin-top: 15px;
 	color: #fff;
 	margin-left: 20px;
-	display: inline;
-}
-
-#chat-current-user-div{
-	display:none;
+	/*display: inline;*/
 }
 
 #current-name-signout-container{
-	margin-top: 300px;
+	
 }
