@@ -9,7 +9,6 @@ package com.toomanydrummers.bean;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class User
@@ -26,7 +25,7 @@ public class User
 	
 	private long lastOnline = System.currentTimeMillis();
 	
-	private boolean isTimedOut = false;
+	private String room;
 
 	public User() {
 		super();
@@ -130,12 +129,16 @@ public class User
 		this.lastOnline = lastOnline;
 	}
 	
-	public boolean getIsTimedOut(){
-		return this.isTimedOut;
+	public String getRoom() {
+		return room;
 	}
 	
-	public void setIsTimedOut(boolean isTimedOut){
-		this.isTimedOut = isTimedOut;
+	public void setRoom(String room) {
+		this.room = room;
+	}
+	
+	public void clearRoom() {
+		this.room = null;
 	}
 	
 	
