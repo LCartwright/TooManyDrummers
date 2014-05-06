@@ -48,6 +48,7 @@ public class UsersService {
 			usersLock.lock();
 			if (!users.containsKey(newUser.getId())) {
 				users.put(newUser.getId(), newUser);
+				System.out.println("USER " + newUser.getId() + "ACTUALLY ADDED");
 			}
 		} finally {
 			usersLock.unlock();
@@ -58,7 +59,6 @@ public class UsersService {
 		} catch (MessageDeliveryException e) {
 			// e.printStackTrace();
 		}
-		
 	}
 
 	public void removeUser(String id) {
