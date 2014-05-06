@@ -1,21 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=US-ASCII"
 	pageEncoding="US-ASCII"%>
 
-<!-- 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
--->
+<!-- HTML5 doctype -->
 <!DOCTYPE html>
 
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-
-<!--
-<meta charset="utf-8">
--->
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="">
 <meta name="author" content="Laurence!, JJohn, Henry(?) and Polearm">
@@ -59,7 +51,6 @@
 
 <script type="text/javascript">
 	$(window).load(function() {
-		// TODO: Check for name conflicts between drums.js & chat.js
 		initialize("${pageContext.request.contextPath}");
 	});
 </script>
@@ -74,32 +65,15 @@
 			enable Javascript and reload this page!</h2>
 	</noscript>
 
-	<!--
-	<h1 id="mainheading">TooManyDrummers</h1>
-	-->
-
-	<!-- Div for connect, disconnect and username fields. TODO: Make pretty -->
-	<!-- TODO: Automate connection, TODO: filter bad usernames -->
-	<!--
-	<div>
-		<button id="connect" onclick="connect();">Connect</button>
-		<button id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
-		<br /> <input id="enterUsername" type="text"
-			placeholder="Please enter your username..." maxlength="20" />
-		<!-- TODO: Check this entry field for commas, both here and on the server.
-		<p id="connectedUsers"></p>
-	</div>
-	-->
-
 	<!-- This div presents the main drum functionality of the application -->
 	<div id="drumkit_div" class="vertical">
 
-		<!-- The drumkit to play on! TODO: Sort out scaling -->
+		<!-- The drumkit to play on! -->
 		<div class="horizontal">
 			<img id="drumkit" draggable="false" class="unselectable"
 				src="${pageContext.request.contextPath}/resources/images/drumkit.png"
 				width="600" height="450" alt="drumkit" usemap="#drummap">
-
+			<!-- Areas of image on which mouse clicks will register  -->
 			<map id="drummap" name="drummap" draggable="false"
 				class="unselectable">
 				<area id="hato" shape="poly" alt="hato"
@@ -124,6 +98,7 @@
 				<area id="cuica4" alt="HONK!" shape="rect" coords="115,409,130,426" />
 			</map>
 
+			<!-- Hit effects  -->
 			<svg id="effects" width="600" height="450">
 				<defs>
 					<radialGradient id="grad1" cx="50%" cy="50%" r="50%" fx="50%"
@@ -163,9 +138,9 @@
 
 		<!-- Holder for the cursors of other users. -->
 		<div id="drumsticks"></div>
-
 	</div>
-
+	
+	<!-- Top title bar  -->
 	<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 		<div class="container">
 			<div class="navbar-header">
@@ -173,26 +148,23 @@
 			</div>
 			<div class="collapse navbar-collapse">
 				<ul class="nav navbar-nav">
-			<!--<button class="btn btn-primary btn-lg" data-toggle="modal"
-							data-target="#myModal">Launch demo modal</button> -->
 				<li><button id="btnHelp" class="btn btn-link navbar-btn" data-toggle="modal" data-target="#helpWindow">Help</button></li>
 				<li><button id="btnAbout" class="btn btn-link navbar-btn" data-toggle="modal" data-target="#aboutWindow">About</button></li>
 				</ul>
 			</div>
-			<!--/.nav-collapse -->
 		</div>
 	</div>
 	
+	<!-- Login Modal  -->
 	<div class="modal fade" id="login-modal" tabindex="-1" role="dialog"
-		aria-labelledby="myModalLabel" aria-hidden="true">
+		aria-labelledby="modalLoginLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
 					<!--  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> -->
-					<h4 class="modal-title"  align="center">Choose login service</h4>
+					<h4 id="choose-login-h4" class="modal-title">Choose login service</h4>
 				</div>
 				<div class="modal-body">
-					
 					<div id="login-buttons" style="float: none; margin: 0 auto;">
 						<button id="chat-facebook-login" class="btn btn-primary">Facebook</button>
 						<button id="chat-guest-login" class="btn btn-success" data-toggle="button">Guest</button>
@@ -207,16 +179,13 @@
 						</span>
 					</div>
 				</div>
-				<!--       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div> -->
 			</div>
 		</div>
 	</div>
 	
+	<!-- Help modal -->
 	<div class="modal fade" id="helpWindow" tabindex="-1" role="dialog"
-		aria-labelledby="myModalLabel" aria-hidden="true">
+		aria-labelledby="modalHelpLabel" aria-hidden="true">
 		<div class="modal-dialog" id="helpWindowModal">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -240,9 +209,10 @@
 			</div>
 		</div>
 	</div>
-
+	
+	<!-- modal about window -->
 	<div class="modal fade" id="aboutWindow" tabindex="-1" role="dialog"
-		aria-labelledby="myModalLabel" aria-hidden="true">
+		aria-labelledby="modalAboutLabel" aria-hidden="true">
 		<div class="modal-dialog" id="aboutWindowModal">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -258,22 +228,26 @@
 						Misha Colbourne<br/>
 						<br/>
 						<b>Libraries:</b><br/>
-                        <a href="http://www.createjs.com/#!/SoundJS" target="_blank">soundjs</a> <br/>
-                        <a href="http://jmesnil.net/stomp-websocket/doc/" target="_blank">stomp</a> <br/>
-                        <a href="https://github.com/sockjs/sockjs-client" target="_blank">sockjs</a> <br/>
-                        <a href="http://jquery.com/" target="_blank">jquery</a> <br/>
-                        <a href="http://getbootstrap.com/" target="_blank">bootstrap</a> <br/>
+                        <a href="http://www.createjs.com/#!/SoundJS" target="_blank">SoundJS</a> <br/>
+                        <a href="http://jmesnil.net/stomp-websocket/doc/" target="_blank">Stomp</a> <br/>
+                        <a href="https://github.com/sockjs/sockjs-client" target="_blank">Sockjs</a> <br/>
+                        <a href="http://jquery.com/" target="_blank">JQuery</a> <br/>
+                        <a href="http://getbootstrap.com/" target="_blank">Bootstrap</a> <br/>
+                        <a href="http://jsoup.org/" target="_blank">JSoup</a><br/>
+                        <a href="https://developers.facebook.com" target="_blank">Facebook API</a><br/>
+                        <a href="https://en.gravatar.com/" target="_blank">Gravatar</a><br/>
 					</p>
 				</div>
 				<div class="modal-footer">
-						<button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
 				</div>
 			</div>
 		</div>
 	</div>
-
-
+	
+	<!-- Main chat area  -->
 	<div id="chat-main-div">
+		<!-- Room creations and naviation controls -->
 		<div id="chat-control-area-div">
 			<div id="chat-rooms-create-div" class="input-group">
 				<span class="input-group-btn">
@@ -287,28 +261,29 @@
 					<li class="dropdown" >
 						<a class="dropdown-toggle"data-toggle="dropdown" href="#" id="chat-rooms-drop-down-toggle"><span class="caret"></span></a>
 						<ul class="dropdown-menu" id="chat-rooms-dropdown-list">
-							
+						
 						</ul>
 					</li>
 				</ul>
 			</div>
 		</div>
+		
+		<!-- Chat message area  -->
 		<div id="chat-message-area-div"></div>
+		
+		<!-- Send message controls -->
 		<div id="chat-message-controls-div" class="input-group input-group-md">
 			<span class="input-group-btn">
 				<button id="chat-room-send-button" class="btn btn-primary btn-md"
 				data-container="body" data-toggle="popover" data-placement="top" data-trigger="manual">Send</button>
 			</span> <input id="chat-room-send-input" type="text" class="form-control"
-				placeholder="enter your message here"
-				
-				 />
+				placeholder="enter your message here" />
 		</div>
 	</div>
-
+	
+	<!-- Current logged in user div -->
 	<div id="chat-current-user-div">
-		<a class="pull-left"><img id="current-user-picture" class="media-object"
-			src="http://www.gravatar.com/avatar/ce94470fe980adb2d4809719da745c5e?s=50&amp;d=identicon&amp;r=PG"
-			alt="profile"></a>
+		<a class="pull-left"><img id="current-user-picture" class="media-object" src="" alt="profile"></a>
 		<div id="current-name-signout-container" class="media-body" >
 			<h4 id="current-user-name" class="media-heading"></h4>
 			<div>
@@ -316,6 +291,5 @@
 			</div>
 		</div>
 	</div>
-</body>
 </body>
 </html>
