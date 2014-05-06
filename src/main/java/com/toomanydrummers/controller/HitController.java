@@ -1,8 +1,9 @@
 package com.toomanydrummers.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import com.toomanydrummers.bean.CursorPosition;
@@ -26,6 +27,12 @@ public class HitController {
 	@Autowired
 	private UsersService usersService;
 	
+	private SimpMessagingTemplate template;
+
+	@Autowired
+	public HitController(SimpMessagingTemplate template) {
+		this.template = template;
+	}
 
 	/**
 	 * Listen for hits and broadcast them for everyone to hear
@@ -34,13 +41,11 @@ public class HitController {
 	 * @return
 	 * @throws Exception
 	 */
-	@MessageMapping("/hit")
-	@SendTo("/topic/hitreports")
-	public DrumHit hit(DrumHit message) throws Exception {
-		return message;
+	@MessageMapping("/{room_id}/hit")
+	public void hit(@DestinationVariable String room_id, DrumHit message) throws Exception {
+		template.convertAndSend("/topic/" + room_id + "/hitreports", message);
 	}
 
-	// TODO: Check there are no commas in the id!
 	/**
 	 * This is fired when a new user joins the room.
 	 * 
@@ -54,9 +59,11 @@ public class HitController {
 //		usersService.addUser(user);
 //		return usersService.getUsers();
 //	}
-	@MessageMapping("/newuser")
-	public void newUser(User user) throws Exception {
-		//usersService.addUser(user);
+	@MessageMapping("/{room_id}/newuser")
+	public void newUser(@DestinationVariable String room_id, User user) throws Exception {
+		//usersService.addUser(room_id, user);
+		usersService.userHasJoinedRoom(user.getId(), room_id);
+		usersService.updateRoom(room_id);
 	}
 
 	/**
@@ -72,10 +79,11 @@ public class HitController {
 //		usersService.removeUser(user.getId());
 //		return usersService.getUsers();
 //	}
-	@MessageMapping("/finished")
-	public void removeUser(User user) throws Exception {
-		//usersService.removeUser(user.getId());
-		
+	@MessageMapping("/{room_id}/finished")
+	public void removeUser(@DestinationVariable String room_id, User user) throws Exception {
+		//usersService.removeUser(room_id, user.getId());
+		usersService.userHasLeftRoom(user.getId());
+		usersService.updateRoom(room_id);
 	}
 
 	// TODO: Provide a better way of checking ids...?

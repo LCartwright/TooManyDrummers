@@ -44,6 +44,10 @@ public class UsersService {
 	}
 
 	public void addUser(User newUser) {
+		addUserCore(newUser);
+	}
+	
+	private void addUserCore(User newUser) {
 		try {
 			usersLock.lock();
 			if (!users.containsKey(newUser.getId())) {
@@ -53,38 +57,36 @@ public class UsersService {
 		} finally {
 			usersLock.unlock();
 		}
-		
-		try {
-			template.convertAndSend("/topic/allusers", getUsers());
-		} catch (MessageDeliveryException e) {
-			// e.printStackTrace();
-		}
 	}
 
-	public void removeUser(String id) {
-		try {
-			usersLock.lock();
-			users.remove(id);
-		} finally {
-			usersLock.unlock();
-		}
-		
-		try {
-			template.convertAndSend("/topic/allusers", getUsers());
-		} catch (MessageDeliveryException e) {
-			// e.printStackTrace();
-		}
-	}
+//	public void removeUser(String room_id, String id) {
+//		removeUserCore(id);
+//		
+//		try {
+//			template.convertAndSend("/topic/" + room_id + "/allusers", getUsers());
+//		} catch (MessageDeliveryException e) {
+//			// e.printStackTrace();
+//		}
+//	}
 
-	public void removeUser(User oldUser) {
-		removeUser(oldUser.getId());
-		
-		try {
-			template.convertAndSend("/topic/allusers", getUsers());
-		} catch (MessageDeliveryException e) {
-			// e.printStackTrace();
-		}
-	}
+//	public void removeUser(User oldUser) {
+//		removeUserCore(oldUser.getId());
+//		
+//		// try {
+//		// template.convertAndSend("/topic/allusers", getUsers());
+//		// } catch (MessageDeliveryException e) {
+//		// // e.printStackTrace();
+//		// }
+//	}
+	
+//	private void removeUserCore(String id) {
+//		try {
+//			usersLock.lock();
+//			users.remove(id);
+//		} finally {
+//			usersLock.unlock();
+//		}
+//	}
 
 	public User getUser(String id) {
 		User userOUT = null;
@@ -103,6 +105,31 @@ public class UsersService {
 		} finally {
 			usersLock.unlock();
 		}
+	}
+	
+	public void userHasJoinedRoom(String id, String room_id) {
+		users.get(id).setRoom(room_id);
+	}
+	
+	public void userHasLeftRoom(String id) {
+		users.get(id).clearRoom();
+	}
+	
+	public void updateRoom(String room_id) {
+		List<User> usersInRoom = new ArrayList<User>();
+		
+		for (User user : users.values()) {
+			
+			if (user.getRoom() != null && user.getRoom().equals(room_id)) {
+				usersInRoom.add(user);
+			}
+		}
+		
+		 try {
+			 template.convertAndSend("/topic/" + room_id + "/allusers", usersInRoom);
+		 } catch (MessageDeliveryException e) {
+		 // e.printStackTrace();
+		 }
 	}
 
 	public void updatePosition(CursorPosition cursorPosition) {

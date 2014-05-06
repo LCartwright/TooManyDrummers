@@ -18,9 +18,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="">
-<meta name="author" content="Laurence, John, Henry et al">
+<meta name="author" content="Laurence!, JJohn, Henry(?) and Polearm">
 
-<link rel="shortcut icon" href="../../assets/ico/favicon.ico">
+<link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico">
 
 <!-- Bootstrap core CSS -->
 <link
@@ -92,10 +92,10 @@
 	-->
 
 	<!-- This div presents the main drum functionality of the application -->
-	<div id="drumkit_div">
+	<div id="drumkit_div" class="vertical">
 
 		<!-- The drumkit to play on! TODO: Sort out scaling -->
-		<div>
+		<div class="horizontal">
 			<img id="drumkit" draggable="false" class="unselectable"
 				src="${pageContext.request.contextPath}/resources/images/drumkit.png"
 				width="600" height="450" alt="drumkit" usemap="#drummap">
