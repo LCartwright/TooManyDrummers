@@ -242,7 +242,7 @@
 						<br/>
 						To change rooms use the tabs at the top right of the screen. If you wish to create a new tab type the name in the field above and press 'Create'.<br/>
 						<br/>
-					    To chat, type your message in the field and the bottom right of the screen and press 'Send' this will be sent to all the users in the room you are in.<br/>
+					    To chat, type your message in the field and the bottom right of the screen and press 'Send'. This will send your message to all the users in the room you are in.<br/>
 					</p>
 				</div>
 				<div class="modal-footer">
@@ -269,11 +269,11 @@
 						Misha Colbourne<br/>
 						<br/>
 						<b>Libraries:</b><br/>
-						stomp.js<br/>
-						soundjs.min.js<br/>
-						sockjs.js<br/>
-						jquery.js<br/>
-						bootstrap.js<br/>
+                        <a href="http://www.createjs.com/#!/SoundJS" target="_blank">soundjs</a> <br/>
+                        <a href="http://jmesnil.net/stomp-websocket/doc/" target="_blank">stomp</a> <br/>
+                        <a href="https://github.com/sockjs/sockjs-client" target="_blank">sockjs</a> <br/>
+                        <a href="http://jquery.com/" target="_blank">jquery</a> <br/>
+                        <a href="http://getbootstrap.com/" target="_blank">bootstrap</a> <br/>
 					</p>
 				</div>
 				<div class="modal-footer">
