@@ -650,9 +650,15 @@ $( document ).ready(function() {
 	
 	//chat rooms drop down bind
 	$("#chat-rooms-drop-down-toggle").click(function(event){
-		stop_fetches = true;
-		clearTimeout(stop_fetches_timeout);
-		stop_fetches_timeout = setTimeout(function(){stop_fetches=false;},5000); //make sure this gets reset eventually
+		//clearTimeout(stop_fetches_timeout);
+		if(stop_fetches_timeout == null){
+			stop_fetches = true;
+			stop_fetches_timeout = setTimeout(function(){
+				stop_fetches=false;
+				stop_fetches_timeout = null;
+			},10000); //make sure this gets reset eventually
+		}
+		
 	});
 	
 	//login modal properties to dissallow escaping
