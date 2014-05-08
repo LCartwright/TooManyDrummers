@@ -134,7 +134,6 @@ function updateRooms() {
 		for(var i = 0; i < room_id_list.length; i++){
 			if($.inArray(room_id_list[i], recieved_room_id_list) == -1){
 				//room is not in received room list, delete
-				console.log("FOUND ROOM TO REMOVE");
 				$("li[room_id =" + room_id_list[i] + "]").remove();
 			}
 		}
@@ -227,7 +226,6 @@ function fetchMessages(room_id) {
 			
 			if($("#chat-message-area-div").children("div[message_id=" + messages[i].messageId + "]").length){
 				//Do nothing, this should not happen
-				console.log("MESSAGE ALREADY EXISTS");
 			} else {
 				//iff message is new, add to currently displayed messages
 				addChatMessageToArea(messages[i]);
