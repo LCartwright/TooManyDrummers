@@ -221,11 +221,12 @@
 				</div>
 				<div class="modal-body">
 					<p>
+						<!-- Ordered by last name, first name -->
 						<b>Authors:</b><br/>
-						Henry Tesei<br/>
-						John Sharpe<br/>
 						Laurence Cartwright<br/>
 						Misha Colbourne<br/>
+						John Sharpe<br/>
+						Henry Tesei<br/>
 						<br/>
 						<b>Libraries:</b><br/>
                         <a href="http://www.createjs.com/#!/SoundJS" target="_blank">SoundJS</a> <br/>
@@ -259,7 +260,7 @@
 			<div id="chat-rooms-list-div" class="tabbable">
 				<ul id="chat-rooms-list" class="nav nav-tabs nav-justified">
 					<li class="dropdown" >
-						<a class="dropdown-toggle"data-toggle="dropdown" href="#" id="chat-rooms-drop-down-toggle"><span class="caret"></span></a>
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#" id="chat-rooms-drop-down-toggle"><span class="caret"></span></a>
 						<ul class="dropdown-menu" id="chat-rooms-dropdown-list">
 						
 						</ul>
@@ -290,6 +291,11 @@
 				<button id="user-logout-button" class="btn btn-danger pull-right">Sign Out</button>
 			</div>
 		</div>
+	</div>
+	
+	<div id="chat-current-room-users">
+		<ul id="current-users-list" class="list-inline">	
+ 		</ul>
 	</div>
 </body>
 </html>

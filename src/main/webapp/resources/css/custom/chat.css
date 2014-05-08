@@ -17,19 +17,11 @@ div#chat-main-div {
     right: 0;
     bottom: 0;
     width: 400px;
-    /* width: 25%; */
-    
-    /* height: 550px; */
+
     height: calc(100% - 51px);
     z-index:100000000;
-    /*height: 100%;*/
 }
-/* 	div#facebook-buttons{
-		height: 100px;
-    	background: #ccc;
-	}
-	 */
-	div#chat-control-area-div{
+	div#chat-control-area-div {
 		height: 30px;
 	}
 
@@ -111,4 +103,40 @@ html,body {
 
 #choose-login-h4 {
 	align: center;
+}
+
+#chat-current-room-users {
+    position: fixed;
+    left: 0;
+    top: 55px;
+    
+    height: 25px;
+    width: calc(100% - 400px);
+    z-index:10;
+    overflow:hidden; 
+}
+
+#current-users-list {
+	padding: 0px;
+	margin: 0px;
+	height: 20px;
+}
+
+.room-user-name {
+	padding: 0px;
+	margin: 0px;
+	height: 25px;
+}
+
+.user-name-well {
+	padding: 2px;
+	padding-left: 3px;
+	padding-right: 3px;
+	margin: 0px;
+	height: 25px;
+}
+
+.dropdown-menu {
+    top: auto;
+    left: auto;
 }

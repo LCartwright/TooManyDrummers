@@ -271,9 +271,36 @@ function refreshUsers(lastUsers) {
 
 				document.getElementById('drumsticks').appendChild(newChild);
 			}
+			
+		}
+	}
+	
+	updateRoomUsersList(lastUsers);
+}
+
+function updateRoomUsersList(lastUsers){
+	$("#current-users-list").empty();
+	addUserToRoomList(currentUserFirstName);
+	for(var i = 0; i < lastUsers.length; i++){
+		if(lastUsers[i].id != currentUserID){
+			addUserToRoomList(lastUsers[i].firstName);
 		}
 	}
 }
+
+function addUserToRoomList(username){
+	var li = $(document.createElement("li"))
+	.attr("class","room-user-name")
+	.append(
+			$(document.createElement("div"))
+			.attr("class", "well well-sm user-name-well")
+			.append(
+					$(document.createElement("span")).text(username)
+			)
+	);
+	$("#current-users-list").append(li);
+}
+
 
 // This method is not responsible for creating/removing drumsticks but
 // only for moving them with new information.

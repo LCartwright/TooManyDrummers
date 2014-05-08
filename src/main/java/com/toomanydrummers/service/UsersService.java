@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.toomanydrummers.bean.CursorPosition;
+import com.toomanydrummers.bean.Room;
 import com.toomanydrummers.bean.User;
 
 /**
@@ -41,17 +42,23 @@ public class UsersService {
 	
 	// This lock ensures thread-safe modification of the system's users.
 	private final ReentrantLock usersLock = new ReentrantLock();
-
+	
+	@Autowired
+	private RoomsService roomsService;
+	
 	@Autowired
 	public UsersService(SimpMessagingTemplate template) {
 		this.template = template;
 	}
-
+	
 	public void addUser(User newUser) {
 		try {
 			usersLock.lock();
 			if (!users.containsKey(newUser.getId())) {
 				users.put(newUser.getId(), newUser);
+			}else {
+				//If ID already exists (facebook) reset object to base point
+				users.get(newUser.getId()).resetUser();
 			}
 		} finally {
 			usersLock.unlock();
@@ -71,11 +78,20 @@ public class UsersService {
 	}
 
 	public void userHasJoinedRoom(String id, String room_id) {
+		Room oldRoom = roomsService.getRoom(users.get(id).getRoom());
+		if(oldRoom != null){
+			oldRoom.decUserCount();
+		} else {
+			//Do nothing
+		}
+		Room newRoom = roomsService.getRoom(room_id);
+		if(newRoom != null){
+			newRoom.incUserCount();
+		} else {
+			// Do nothing
+		}
+	
 		users.get(id).setRoom(room_id);
-	}
-
-	public void userHasLeftRoom(String id) {
-		users.get(id).clearRoom();
 	}
 
 	/**
@@ -96,8 +112,7 @@ public class UsersService {
 			}
 			
 		}
-
-		// Send the users to all of them
+		
 		try {
 			template.convertAndSend("/topic/" + room_id + "/allusers",
 					usersInRoom);
@@ -148,6 +163,7 @@ public class UsersService {
 			if (users.get(key).getLastOnline() + TIMEOUT_MILLIS < now) {
 				users.get(key).timeOut();
 				somebodyKilled = true;
+				userHasJoinedRoom(key, null);
 			}
 		}
 

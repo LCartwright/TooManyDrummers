@@ -202,6 +202,11 @@ public class User {
 		this.isTimedOut = true;
 	}
 	
+	public void resetUser(){
+		this.isTimedOut = false;
+		setLastOnline(System.currentTimeMillis());
+	}
+	
 	public boolean isTimedOut() {
 		return isTimedOut;
 	}

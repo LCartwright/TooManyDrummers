@@ -67,7 +67,6 @@ public class HitController {
 	 */
 	@MessageMapping("/{room_id}/finished")
 	public void removeUser(@DestinationVariable String room_id, User user) throws Exception {
-		usersService.userHasLeftRoom(user.getId());
 		usersService.updateRoom(room_id);
 	}
 

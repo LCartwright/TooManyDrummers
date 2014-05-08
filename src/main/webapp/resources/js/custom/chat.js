@@ -15,6 +15,8 @@ var currentUserLastName;
 var currentUserFullName;
 var currentUserPictureURL;
 
+var room_list = [];
+
 //room id's known to page
 var room_id_list = [];
 
@@ -45,6 +47,8 @@ var stop_fetches = false;
 //Timeout controlling chat spam (can clear)
 var chat_spam_timeout;
 
+var stop_fetches_timeout;
+
 
 /**
  * Joins chat rooms
@@ -52,7 +56,7 @@ var chat_spam_timeout;
  * @param alreadyConnected
  */
 function joinRoom(room_id, alreadyConnected) {
-	
+	stop_fetches = false;
 	//clear spam message blocker
 	clearInterval(message_fetch_interval);
 	currentRoomId = room_id;
@@ -64,6 +68,13 @@ function joinRoom(room_id, alreadyConnected) {
 	getting.done(function(data) {
 		
 		//Switch to room and update messages
+		$("#chat-rooms-list").children("li[default_room!='true'][room_id]").remove();
+		
+		//default room creation handled elsewhere
+		if(data.roomID != default_room_id){
+			$("#chat-rooms-list").append(createRoomElement(data));
+		}
+		
 		activateRoom(room_id);
 		$("#chat-message-area-div").empty(); // empty the area
 		message_fetch_interval = setInterval(function() {
@@ -98,18 +109,42 @@ function updateRooms() {
 	var getting = $.get(roomsURI);
 	getting.done(function(data) {
 		var rooms = JSON.parse(JSON.stringify(data));
+		room_list = rooms;
 		var new_room_id_list = []; // used to add new elements to switch too
 		for (var i = 0; i < rooms.length; i++) {
 			//Add new room id to room id list if the room is not known
 			if($.inArray(rooms[i].roomID, room_id_list) == -1){ //-1 is false check
 				room_id_list.push(rooms[i].roomID); //add to global list
 				new_room_id_list.push(rooms[i].roomID); //add to local list
-				$("#chat-rooms-list").append(createRoomElement(rooms[i]));//add to screen
+				//$("#chat-rooms-list").append(createRoomElement(rooms[i]));//add to screen
 				$("#chat-rooms-dropdown-list").append(createRoomElement(rooms[i]));//add to screen
 			}
+			
+			//Update current users count
+			$("li[room_id =" + rooms[i].roomID + "]").children("a").text(rooms[i].name + " (" + rooms[i].userCount + ")" );
 		}
+		
+		//Add all received id's to a list
+		var recieved_room_id_list = [];
+		for(var i = 0; i < rooms.length; i++){
+			recieved_room_id_list.push(rooms[i].roomID);
+		}
+		
+		//check the local list against the servers list, remove any missing
+		for(var i = 0; i < room_id_list.length; i++){
+			if($.inArray(room_id_list[i], recieved_room_id_list) == -1){
+				//room is not in received room list, delete
+				console.log("FOUND ROOM TO REMOVE");
+				$("li[room_id =" + room_id_list[i] + "]").remove();
+			}
+		}
+		
 		activateRoom(active_room_id);
 	});
+}
+
+function updateRoomCounts(rooms){
+	$("li[room_id =" + rooms[i].roomID + "]").children("a").text(rooms[i].name + " (" + rooms[i].userCount + ")" );
 }
 
 /**
@@ -125,10 +160,9 @@ function createRoomElement(room){
 	.append(
 			$(document.createElement("a"))
 			.attr("data-toggle", "tab")
-			.text(room.name)
+			.text(room.name + " (" + room.userCount + ")" )
 			.click(function (event){
 				//Pauses message fetching, joins the room
-				stop_fetches = false;
 				joinRoom($(event.target).parent().attr("room_id"), true);
 			})
 	);
@@ -148,7 +182,8 @@ function generateNewRoom(name) {
 	//Send new room to server
 	posting.done(function(data) {
 		var room = JSON.parse(JSON.stringify(data));
-		$("#chat-rooms-list").append(createRoomElement(room));
+		//$("#chat-rooms-list").children("li[room_id!=2]").remove(); //remove the last room
+		//$("#chat-rooms-list").append(createRoomElement(room)); //add this in it's place
 		$("#chat-rooms-dropdown-list").append(createRoomElement(room));
 		room_id_list.push(room.roomID);
 		joinRoom(room.roomID,true);
@@ -500,6 +535,11 @@ function setLoggedInGuest(user_response){
 	$('#login-modal').modal('toggle');	
 	stompClient = null;
 	drumsConnect();
+	
+	//connect to default room
+	var defaultRoom = room_list[0];
+	$("#chat-rooms-list").append(createRoomElement(defaultRoom).attr("default_room","true"));
+	
 	joinRoom(default_room_id, false);
 }
 
@@ -611,6 +651,8 @@ $( document ).ready(function() {
 	//chat rooms drop down bind
 	$("#chat-rooms-drop-down-toggle").click(function(event){
 		stop_fetches = true;
+		clearTimeout(stop_fetches_timeout);
+		stop_fetches_timeout = setTimeout(function(){stop_fetches=false;},5000); //make sure this gets reset eventually
 	});
 	
 	//login modal properties to dissallow escaping
@@ -676,8 +718,13 @@ function setLoggedIn(response) {
 			realignSVG();
 			stompClient = null;
 			drumsConnect();
-			joinRoom(default_room_id,false);
 			$('#login-modal').modal('toggle');
+			
+			//connect to default room
+			var defaultRoom = room_list[0];
+			$("#chat-rooms-list").append(createRoomElement(defaultRoom).attr("default_room","true"));
+			
+			joinRoom(default_room_id,false);
 		});
 	});
 }
