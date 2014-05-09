@@ -143,6 +143,7 @@ function drumsDisconnect() {
 function play(message) {
 
 	switch (message) {
+	//sounds from http://www.indiedrums.com/free-drum-samples/slingerland-drum-kit-samples-wav-samples/
 	case "hato":
 		hato.play();
 		hatc.stop();
@@ -185,6 +186,7 @@ function play(message) {
 		$("#effride").css("opacity", 0.8);
 		$("#effride").stop().fadeTo("fast", 0);
 		break;
+	// Cuica sounds from - http://www.sultansound.com/freesounds.html
 	case "cuica1":
 		cuica1.play();
 		break;
