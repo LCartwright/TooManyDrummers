@@ -234,6 +234,8 @@
                         <a href="http://jsoup.org/" target="_blank">JSoup</a><br/>
                         <a href="https://developers.facebook.com" target="_blank">Facebook API</a><br/>
                         <a href="https://en.gravatar.com/" target="_blank">Gravatar</a><br/>
+                        <a href="http://www.sultansound.com/freesounds.html" target="_blank">Cuica sounds</a><br/>
+                        <a href="http://www.indiedrums.com/free-drum-samples/slingerland-drum-kit-samples-wav-samples/" target="_blank">Drum sounds</a><br/>
 					</p>
 				</div>
 				<div class="modal-footer">
