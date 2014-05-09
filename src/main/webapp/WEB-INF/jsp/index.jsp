@@ -1,12 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=US-ASCII"
 	pageEncoding="US-ASCII"%>
-
-<!-- HTML5 doctype -->
 <!DOCTYPE html>
 
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="">
@@ -76,26 +73,26 @@
 			<!-- Areas of image on which mouse clicks will register  -->
 			<map id="drummap" name="drummap" draggable="false"
 				class="unselectable">
-				<area id="hato" shape="poly" alt="hato"
+				<area id="hato" shape="poly"
 					coords="151,150,175,155,183,169,179,180,164,194,125,206,87,206,65,198,61,182,82,164,97,157,125,150,135,149" />
-				<area id="hatc" shape="poly" alt="hatc"
+				<area id="hatc" shape="poly"
 					coords="151,346,159,387,201,441,219,432,175,336,161,332" />
-				<area id="snare" shape="poly" alt="snare"
+				<area id="snare" shape="poly"
 					coords="251,205,280,210,298,221,309,239,308,257,291,280,268,288,250,292,223,287,200,272,193,253,197,234,217,213,231,208" />
-				<area id="kick" shape="poly" alt="kick"
+				<area id="kick" shape="poly"
 					coords="324,222,349,229,374,241,387,253,380,317,346,332,334,333,325,401,309,405,299,328,271,318,295,305,309,292,312,272,312,242,299,219,309,219" />
-				<area id="rtom" shape="poly" alt="rtom"
+				<area id="rtom" shape="poly"
 					coords="278,90,301,95,319,108,325,121,318,137,293,150,262,149,240,139,229,118,248,96,253,94" />
-				<area id="ftom" shape="poly" alt="ftom"
+				<area id="ftom" shape="poly"
 					coords="445,203,474,208,502,224,516,241,521,259,512,281,484,292,454,294,419,285,397,266,388,239,401,216,420,207" />
-				<area id="crash" shape="poly" alt="crash"
+				<area id="crash" shape="poly"
 					coords="216,78,256,71,270,59,273,40,257,20,223,7,182,10,158,29,157,43,167,58,184,69" />
-				<area id="ride" shape="poly" alt="ride"
+				<area id="ride" shape="poly"
 					coords="429,95,476,86,507,61,501,35,467,19,421,21,387,36,367,55,364,68,383,84,401,92" />
-				<area id="cuica1" alt="honk" shape="rect" coords="440,420,453,432" />
-				<area id="cuica2" alt="honk!" shape="rect" coords="451,99,463,115" />
-				<area id="cuica3" alt="Honk!" shape="rect" coords="103,107,113,119" />
-				<area id="cuica4" alt="HONK!" shape="rect" coords="115,409,130,426" />
+				<area id="cuica1" shape="rect" coords="440,420,453,432" />
+				<area id="cuica2" shape="rect" coords="451,99,463,115" />
+				<area id="cuica3" shape="rect" coords="103,107,113,119" />
+				<area id="cuica4" shape="rect" coords="115,409,130,426" />
 			</map>
 
 			<!-- Hit effects  -->
@@ -157,7 +154,7 @@
 	
 	<!-- Login Modal  -->
 	<div class="modal fade" id="login-modal" tabindex="-1" role="dialog"
-		aria-labelledby="modalLoginLabel" aria-hidden="true">
+		aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -185,7 +182,7 @@
 	
 	<!-- Help modal -->
 	<div class="modal fade" id="helpWindow" tabindex="-1" role="dialog"
-		aria-labelledby="modalHelpLabel" aria-hidden="true">
+		aria-hidden="true">
 		<div class="modal-dialog" id="helpWindowModal">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -212,7 +209,7 @@
 	
 	<!-- modal about window -->
 	<div class="modal fade" id="aboutWindow" tabindex="-1" role="dialog"
-		aria-labelledby="modalAboutLabel" aria-hidden="true">
+		aria-hidden="true">
 		<div class="modal-dialog" id="aboutWindowModal">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -284,7 +281,7 @@
 	
 	<!-- Current logged in user div -->
 	<div id="chat-current-user-div">
-		<a class="pull-left"><img id="current-user-picture" class="media-object" src="" alt="profile"></a>
+		<a class="pull-left"><img id="current-user-picture" class="media-object" src="#" alt="profile"></a>
 		<div id="current-name-signout-container" class="media-body" >
 			<h4 id="current-user-name" class="media-heading"></h4>
 			<div>
